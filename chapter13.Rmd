@@ -1,4 +1,4 @@
-Capital in the 21st Century: Chapter 0
+Capital in the 21st Century: Chapter 13
 ========================================================
 
 ### Data provenance
@@ -17,8 +17,8 @@ library(reshape2)
 
 
 ## Table TS1.1a
-ts11a = read.xlsx("./Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",sheetName="TS1.1a",rowIndex=8:18,colIndex=c(1,8:12),header=FALSE)
-names(ts11a) = c("year","world","europe","america","africa","asia")
+ts131 = read.xlsx("./Piketty2014FiguresTables/Chapter13TablesFigures.xlsx",sheetName="TS13.1",rowIndex=5:20,colIndex=c(1,2:5),header=TRUE)
+names(ts131)[1] = "Decade"
 ts11a[,2:6] = ts11a[,2:6]/ts11a$world*100
 ts11a=subset(ts11a,select=-world)
 ts11a = melt(ts11a,id.vars="year")
