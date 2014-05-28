@@ -1,4 +1,4 @@
-The Metamorphoses of Capital: Chapter 3
+From Old Europe to the New World: Chapter 4
 ========================================================
 
 ### Data provenance
@@ -18,32 +18,35 @@ library(reshape2)
 library(scales)
 ```
 
-## Figures 3.1 and 3.2
+## Figures 4.1 and 4.2
 
-These figures are based on Table TS3.1 and TS3.2. Here we read
+These figures are based on Table TS3.1 and TS3.1. Here we read
 data from the excel file and name the data series.
 
-```{r tabTS3.1, message=FALSE, cache=TRUE}
-## Table TS3.1
-tab = read.xlsx("../Piketty2014FiguresTables/Chapter3TablesFigures.xlsx",sheetName="TS3.1",rowIndex=9:19,colIndex=1:10,header=FALSE)
+```{r tabTS4.1, message=FALSE, cache=TRUE}
+## Table TS4.1
+tab = read.xlsx("../Piketty2014FiguresTables/Chapter4TablesFigures.xlsx",sheetName="TS4.1",rowIndex=9:17,colIndex=1:10,header=FALSE)
 names(tab) =  c("year","nat","nat_land", "nat_house", "nat_dom", "nat_foreign", "public", "public_ass", "public_debt", "private")
 ```
 
-```{r tabTS3.2,  message=FALSE, cache=TRUE}
-## Table TS3.1
-tab32 = read.xlsx("../Piketty2014FiguresTables/Chapter3TablesFigures.xlsx",sheetName="TS3.2",rowIndex=9:19,colIndex=1:10,header=FALSE)
-names(tab32) =  c("year","nat","nat_land", "nat_house", "nat_dom", "nat_foreign", "public", "public_ass", "public_debt", "private")
-```
 
-The caption of the table TS3.1 lists the sources for this table
+The caption of the table lists the sources for this table
 as 
 
-> Source: Piketty-Zucman 2013, UK.xls, links frozen on 01-24-2013.   				
+> Source: Piketty-Zucman 2013, Germany.xls, links frozen on 01-24-2013.       		  				
 
-and 
-> Source: Piketty-Zucman 2013, France.xls, links frozen on 01-24-2013
 
-for table TS3.2
+```{r tabTS4.2, message=FALSE, cache=TRUE}
+## Table TS4.2
+tab42 = read.xlsx("../Piketty2014FiguresTables/Chapter4TablesFigures.xlsx",sheetName="TS4.2",rowIndex=11:21,colIndex=1:10,header=FALSE)
+names(tab42) =  c("year","nat","nat_land", "nat_house", "nat_dom", "nat_foreign", "public", "public_ass", "public_debt", "private")
+```
+
+The caption of the table lists the sources for this table
+as 
+
+> Source: Piketty-Zucman 2013, USA.xls, links frozen on 01-24-2013.     			
+
 Let's make a function that will 
 ```{r func3_1, fig.width=8, fig.height=4}
 run31_32 = function(tab, num, country){
