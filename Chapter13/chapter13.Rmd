@@ -26,11 +26,15 @@ ts131m$TaxRevenuesPercents <- ts131m$TaxRevenues*100
 ## Make Figure 13.1
 
 ```{r,dependson="loadCh13",fig.height=4,fig.width=8}
-ggplot(data=ts131m, aes(x=Decade,y=TaxRevenuesPercents,colour=Country),xlim=c(1870,2010),xlab="Year",ylab="Tax Revenues (Percent National Income)") + geom_line()
+ggplot(data=ts131m, aes(x=Decade,y=TaxRevenuesPercents,colour=Country),xlim=c(1870,2010)) + 
+  xlab("Year") + 
+  ylab("Tax Revenues (Percent National Income)") +
+  geom_line() + 
+  geom_point(aes(shape=Country))
 ```
 ## below is the qplot way to do it, quick dirty.  up above
 ## may allow more customization
-qplot(Decade,TaxRevenuesPercents,data=ts131m, color=Country,geom="line",xlim=c(1870,2010),xlab="Year",ylab="Tax Revenues (Percent National Income)")
+## qplot(Decade,TaxRevenuesPercents,data=ts131m, color=Country,geom="line",xlim=c(1870,2010),xlab="Year",ylab="Tax Revenues (Percent National Income)")
 
 Now there is a table to the side, that's not summarized into decades...let's see where this goes...
 
@@ -44,21 +48,17 @@ ts131xm$TaxRevenuesPercents <- ts131xm$TaxRevenues*100
 ## Make Figure 13.1
 
 ```{r,dependson="loadCh13",fig.height=4,fig.width=8}
-ggplot(data=ts131xm, aes(x=Year,y=TaxRevenuesPercents,colour=Country),xlim=c(1870,2010),xlab="Year",ylab="Tax Revenues (Percent National Income)") + geom_line()
+ggplot(data=ts131xm, aes(x=Year,y=TaxRevenuesPercents,colour=Country),xlim=c(1870,2010)) + 
+  xlab("Year") + 
+  ylab("Tax Revenues (Percent National Income)") +
+  geom_line() + 
+  geom_point(aes(shape=Country))
 ```
 ## below is the qplot way to do it, quick dirty.  up above
 ## may allow more customization
-qplot(Year,TaxRevenuesPercents,data=ts131xm, color=Country,geom="line",xlim=c(1870,2010),xlab="Year",ylab="Tax Revenues (Percent National Income)")
+##qplot(Year,TaxRevenuesPercents,data=ts131xm, color=Country,geom="line",xlim=c(1870,2010),xlab="Year",ylab="Tax Revenues (Percent National Income)")
 
 
 
 ## prettify above, edit below.
-
-## Make Figure 1.2
-
-This code remakes Figure 1.2. Note that in the figure in the Excel tables, the x-axis is not evenly spaced, so the figure looks different. 
-
-```{r,dependson="loadCh0",fig.height=4,fig.width=8}
-qplot(year,worldPopulation,data=ts12,fill=Country,geom="ribbon",position="stack",xlim=c(1700,2012),xlab="Year",ylab="Percent of World Population")
-```
-
+## items remaining -- the table 13.2, for which there was no included figure(s).
