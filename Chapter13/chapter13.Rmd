@@ -17,7 +17,7 @@ library(reshape2)
 
 
 ## Table TS13.1
-ts131 = read.xlsx("./Piketty2014FiguresTables/Chapter13TablesFigures.xlsx",sheetName="TS13.1",rowIndex=5:20,colIndex=c(1,2:5),header=TRUE)
+ts131 = read.xlsx("../Piketty2014FiguresTables/Chapter13TablesFigures.xlsx",sheetName="TS13.1",rowIndex=5:20,colIndex=c(1,2:5),header=TRUE)
 names(ts131)[1] = "Decade"
 ts131m = melt(ts131,id.vars="Decade")
 names(ts131m) = c("Decade","Country","TaxRevenues")
@@ -28,6 +28,9 @@ names(ts131m) = c("Decade","Country","TaxRevenues")
 ```{r,dependson="loadCh13",fig.height=4,fig.width=8}
 ggplot(data=ts131m, aes(x=Decade,y=TaxRevenues,colour=Country),xlim=c(1870,2010),xlab="Year",ylab="Tax Revenues (Percent National Income)") + geom_line()
 ```
+
+
+## prettify above, edit below.
 
 ## Make Figure 1.2
 
