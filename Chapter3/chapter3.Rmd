@@ -44,7 +44,7 @@ and
 > Source: Piketty-Zucman 2013, France.xls, links frozen on 01-24-2013
 
 for table TS3.2
-Let's make a function that will 
+Let's make a function that will plot our data:
 ```{r func3_1, fig.width=8, fig.height=4}
 run31_32 = function(tab, num, country){
   fdat <- tab[,c("year","nat_land", "nat_house", "nat_dom", "nat_foreign")]
