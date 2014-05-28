@@ -11,11 +11,6 @@ This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/
 
 
 
-```r
-library(ggplot2)
-library(xlsx)
-```
-
 ```
 ## Warning: package 'xlsx' was built under R version 3.0.2
 ```
@@ -28,23 +23,10 @@ library(xlsx)
 ## Warning: package 'xlsxjars' was built under R version 3.0.2
 ```
 
+
+
 ```r
-library(reshape2)
-
-
-## Table TS13.1
-ts131 = read.xlsx("../Piketty2014FiguresTables/Chapter13TablesFigures.xlsx", 
-    sheetName = "TS13.1", rowIndex = 5:20, colIndex = c(1, 2:5), header = TRUE)
-names(ts131) = c("Decade", "U.S.", "U.K.", "Sweden", "France")
-ts131m = melt(ts131, id.vars = "Decade")
-names(ts131m) = c("Decade", "Country", "TaxRevenues")
-ts131m$TaxRevenuesPercents <- ts131m$TaxRevenues * 100
-```
-
 ## Make Figure 13.1
-
-
-```r
 ggplot(data = ts131m, aes(x = Decade, y = TaxRevenuesPercents, colour = Country), 
     xlim = c(1870, 2010)) + xlab("Year") + ylab("Tax Revenues (Percent National Income)") + 
     geom_line() + geom_point(aes(shape = Country))
@@ -52,9 +34,11 @@ ggplot(data = ts131m, aes(x = Decade, y = TaxRevenuesPercents, colour = Country)
 
 ![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1.png) 
 
+<!--
 ## below is the qplot way to do it, quick dirty.  up above
 ## may allow more customization
 ## qplot(Decade,TaxRevenuesPercents,data=ts131m, color=Country,geom="line",xlim=c(1870,2010),xlab="Year",ylab="Tax Revenues (Percent National Income)")
+-->
 
 Now there is a table to the side, that's not summarized into decades...let's see where this goes...
 
@@ -69,10 +53,11 @@ names(ts131xm) = c("Year", "Country", "TaxRevenues")
 ts131xm$TaxRevenuesPercents <- ts131xm$TaxRevenues * 100
 ```
 
-## Make Figure 13.1x
+
 
 
 ```r
+## Make Figure 13.1x
 ggplot(data = ts131xm, aes(x = Year, y = TaxRevenuesPercents, colour = Country), 
     xlim = c(1870, 2010)) + xlab("Year") + ylab("Tax Revenues (Percent National Income)") + 
     geom_line() + geom_point(aes(shape = Country))
@@ -89,6 +74,7 @@ ggplot(data = ts131xm, aes(x = Year, y = TaxRevenuesPercents, colour = Country),
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2.png) 
 
 
+<!--
 ## below is the qplot way to do it, quick dirty.  up above
 ## may allow more customization
 ##qplot(Year,TaxRevenuesPercents,data=ts131xm, color=Country,geom="line",xlim=c(1870,2010),xlab="Year",ylab="Tax Revenues (Percent National Income)")
@@ -97,3 +83,4 @@ ggplot(data = ts131xm, aes(x = Year, y = TaxRevenuesPercents, colour = Country),
 
 ## prettify above, edit below.
 ## items remaining -- the table 13.2, for which there was no included figure(s).
+-->
