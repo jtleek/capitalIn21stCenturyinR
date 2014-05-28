@@ -14,22 +14,14 @@ This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/
 ```r
 library(ggplot2)
 library(xlsx)
-```
-
-```
-## Loading required package: rJava
-## Loading required package: xlsxjars
-```
-
-```r
 library(reshape2)
 
-tsi1 = read.xlsx("./Piketty2014FiguresTables/Chapter0TablesFigures.xlsx", sheetName = "TSI.1", 
+tsi1 = read.xlsx("../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx", sheetName = "TSI.1", 
     rowIndex = 7:107, colIndex = 1:2, header = FALSE)
 names(tsi1) = c("year", "top10is")
 
 
-tsi2 = read.xlsx("./Piketty2014FiguresTables/Chapter0TablesFigures.xlsx", sheetName = "TSI.2", 
+tsi2 = read.xlsx("../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx", sheetName = "TSI.2", 
     rowIndex = 6:20, colIndex = 1:4, header = FALSE)
 names(tsi2) = c("year", "germany", "france", "britain")
 tsi2 = melt(tsi2, id.vars = c("year"))

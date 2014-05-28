@@ -191,20 +191,14 @@ hljs.initHighlightingOnLoad();
 
 <pre><code class="r">library(ggplot2)
 library(xlsx)
-</code></pre>
+library(reshape2)
 
-<pre><code>## Loading required package: rJava
-## Loading required package: xlsxjars
-</code></pre>
-
-<pre><code class="r">library(reshape2)
-
-tsi1 = read.xlsx(&quot;./Piketty2014FiguresTables/Chapter0TablesFigures.xlsx&quot;, sheetName = &quot;TSI.1&quot;, 
+tsi1 = read.xlsx(&quot;../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx&quot;, sheetName = &quot;TSI.1&quot;, 
     rowIndex = 7:107, colIndex = 1:2, header = FALSE)
 names(tsi1) = c(&quot;year&quot;, &quot;top10is&quot;)
 
 
-tsi2 = read.xlsx(&quot;./Piketty2014FiguresTables/Chapter0TablesFigures.xlsx&quot;, sheetName = &quot;TSI.2&quot;, 
+tsi2 = read.xlsx(&quot;../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx&quot;, sheetName = &quot;TSI.2&quot;, 
     rowIndex = 6:20, colIndex = 1:4, header = FALSE)
 names(tsi2) = c(&quot;year&quot;, &quot;germany&quot;, &quot;france&quot;, &quot;britain&quot;)
 tsi2 = melt(tsi2, id.vars = c(&quot;year&quot;))
