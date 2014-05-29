@@ -68,7 +68,7 @@ title("F1.1: World Output, 1700-2012 (linear time scale)")
 
 This code remakes Figure F1.1 as it appears in the original analysis: data points on the x-axis are equally spaced, no matter how far apart in time they are:
 
-```{r f11o, dependson="p1", fig.height=7, fig.width=8, fig.cap=""}
+```{r f11o, fig.height=7, fig.width=8, fig.cap=""}
 myRibbonPlot(fig1s1_dat, xlim=c(1700, 2012), even_axis=TRUE, ylab='World Output')
 text(8, 0.9, 'Asia')
 text(8, 0.764, 'Africa')
@@ -128,7 +128,7 @@ title("F1.2: World Population Distribution, 1700-2012 (linear time scale)")
 
 And here is code to re-make Figure F1.2 with the x-axis scaled as it was in the original analysis (equal spacing between each year with data):
 
-```{r f12o, dependson="load2", fig.height=7, fig.width=8, fig.cap=""}
+```{r f12o, fig.height=7, fig.width=8, fig.cap=""}
 myRibbonPlot(dat=fig2s2_dat, even_axis=TRUE, ylab='Percent of World Population', xlim=c(1700, 2012))
 text(7, 0.75, 'Asia')
 text(7, 0.4, 'Africa')
@@ -179,13 +179,10 @@ This code reproduces Figure F1.3, scaling the x-axis linearly with time:
 
 ```{r f13l, fig.height=6, fig.width=8, fig.cap=""}
 xcoords = fig3s3_dat$Year[4:11]
-plot(xcoords, fig3s3_dat$World[4:11], ylim=c(0,250), xlim=c(1700,2012), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19)
+plot(xcoords, fig3s3_dat$World[4:11], ylim=c(0,250), xlim=c(1700,2012), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19, lwd=2, type='o')
 grid()
-lines(xcoords, fig3s3_dat$World[4:11], col=cbPalette[3], lwd=2)
-points(xcoords, fig3s3_dat$EuropeAmerica[4:11], col=cbPalette[4], pch=19)
-lines(xcoords, fig3s3_dat$EuropeAmerica[4:11], col=cbPalette[4], lwd=2)
-points(xcoords, fig3s3_dat$AsiaAfrica[4:11], col=cbPalette[7], pch=19)
-lines(xcoords, fig3s3_dat$AsiaAfrica[4:11], col=cbPalette[7], lwd=2)
+lines(xcoords, fig3s3_dat$EuropeAmerica[4:11], col=cbPalette[4], lwd=2, type='o', pch=19)
+lines(xcoords, fig3s3_dat$AsiaAfrica[4:11], col=cbPalette[7], lwd=2, pch=19, type='o')
 title("F1.3: Global inequality, 1700-2012 (linear time scale)")
 ```
 
@@ -193,14 +190,11 @@ And here is the code for Figure F1.3 with an x-axis scaled as it is in the origi
 
 ```{r f13o, fig.height=6, fig.width=8, fig.cap=""}
 xcoords = 1:8
-plot(xcoords, fig3s3_dat$World[4:11], ylim=c(0,250), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19, xaxt='n')
+plot(xcoords, fig3s3_dat$World[4:11], ylim=c(0,250), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19, xaxt='n', type='o', lwd=2)
 grid()
 axis(side=1, at=1:8, labels=fig3s3_dat$Year[4:11])
-lines(xcoords, fig3s3_dat$World[4:11], col=cbPalette[3], lwd=2)
-points(xcoords, fig3s3_dat$EuropeAmerica[4:11], col=cbPalette[4], pch=19)
-lines(xcoords, fig3s3_dat$EuropeAmerica[4:11], col=cbPalette[4], lwd=2)
-points(xcoords, fig3s3_dat$AsiaAfrica[4:11], col=cbPalette[7], pch=19)
-lines(xcoords, fig3s3_dat$AsiaAfrica[4:11], col=cbPalette[7], lwd=2)
+lines(xcoords, fig3s3_dat$EuropeAmerica[4:11], col=cbPalette[4], lwd=2, pch=19, type='o')
+lines(xcoords, fig3s3_dat$AsiaAfrica[4:11], col=cbPalette[7], lwd=2, pch=19, type='o')
 title("F1.3: Global inequality, 1700-2012 (original time scale)")
 ```
 
@@ -210,13 +204,10 @@ This code reproduces Figure SF1.3, with time scaled linearly on the x-axis:
 
 ```{r fs13l, fig.height=6, fig.width=8, fig.cap=""}
 xcoords = fig3s3_dat$Year
-plot(xcoords, fig3s3_dat$World, ylim=c(0,250), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19)
+plot(xcoords, fig3s3_dat$World, ylim=c(0,250), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19, lwd=2, type='o')
 grid()
-lines(xcoords, fig3s3_dat$World, col=cbPalette[3], lwd=2)
-points(xcoords, fig3s3_dat$EuropeAmerica, col=cbPalette[4], pch=19)
-lines(xcoords, fig3s3_dat$EuropeAmerica, col=cbPalette[4], lwd=2)
-points(xcoords, fig3s3_dat$AsiaAfrica, col=cbPalette[7], pch=19)
-lines(xcoords, fig3s3_dat$AsiaAfrica, col=cbPalette[7], lwd=2)
+lines(xcoords, fig3s3_dat$EuropeAmerica, col=cbPalette[4], lwd=2, pch=19, type='o')
+lines(xcoords, fig3s3_dat$AsiaAfrica, col=cbPalette[7], lwd=2, pch=19, type='o')
 title("FS1.3: Global inequality, 0-2012 (linear time scale)")
 ```
 
@@ -224,18 +215,15 @@ And this code reproduces Figure SF1.3 with the time points evenly spaced on the 
 
 ```{r fs13o, fig.height=6, fig.width=8, fig.cap=""}
 xcoords = 1:11
-plot(xcoords, fig3s3_dat$World, ylim=c(0,250), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19, xaxt='n')
+plot(xcoords, fig3s3_dat$World, ylim=c(0,250), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19, xaxt='n', type='o', lwd=2)
 grid()
 axis(side=1, at=1:11, labels=fig3s3_dat$Year)
-lines(xcoords, fig3s3_dat$World, col=cbPalette[3], lwd=2)
-points(xcoords, fig3s3_dat$EuropeAmerica, col=cbPalette[4], pch=19)
-lines(xcoords, fig3s3_dat$EuropeAmerica, col=cbPalette[4], lwd=2)
-points(xcoords, fig3s3_dat$AsiaAfrica, col=cbPalette[7], pch=19)
-lines(xcoords, fig3s3_dat$AsiaAfrica, col=cbPalette[7], lwd=2)
+lines(xcoords, fig3s3_dat$EuropeAmerica, col=cbPalette[4], lwd=2, pch=19, type='o')
+lines(xcoords, fig3s3_dat$AsiaAfrica, col=cbPalette[7], lwd=2, pch=19, type='o')
 title("FS1.3: Global inequality, 1700-2012 (original time scale)")
 ```
 
-Finally, here is a plot of the Europe/America and Africa/Asia per capita GDPs as a percentage of world income, _separately_, compared to the overall region per capita GDP as percentage of world income. 
+Finally, here is a plot of the Europe/America and Africa/Asia per capita GDPs as a percentage of world income, _separately_, compared to the overall region per capita GDP as percentage of world income. These show that Europe seems to have more influence on the Europe/America combined figure than America does, and Asia seems to have more influence on the Asia/Africa combined figure than Africa does.
 
 ```{r extra, fig.height=6, fig.width=12, fig.cap=""}
 par(mfrow=c(1,2))
@@ -268,6 +256,7 @@ plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.dollar, xlab='Year',
     ylab='rate/parity, in dollars per 1 euro', type='o', col=cbPalette[4],
     lwd=2, pch=19)
 lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.dollar, type='o', col=cbPalette[7], pch=19, lwd=2)
+grid()
 legend('topleft', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
     c('Exchange Rate (dollars per 1 euro)', 'Purchasing Power Parity (dollars per 1 euro)'))
 title('F1.4: Exchange rate and purchasing power parity, euros & dollars')
@@ -281,6 +270,7 @@ This code remakes Figure FS1.4a.
 plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.rupee, xlab='Year',
     ylab='rate/parity, in rupees per 1 euro', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(0, 70))
+grid()
 lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.rupee, type='o', col=cbPalette[7], pch=19, lwd=2)
 legend('topleft', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
     c('Exchange Rate (rupees per 1 euro)', 'Purchasing Power Parity (rupees per 1 euro)'))
@@ -295,6 +285,7 @@ This code reproduces Figure FS1.4b.
 plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.yen, xlab='Year',
     ylab='rate/parity, in yen per 1 euro', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(90, 200))
+grid()
 lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.yen, type='o', col=cbPalette[7], pch=19, lwd=2)
 legend('topright', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
     c('Exchange Rate (yen per 1 euro)', 'Purchasing Power Parity (yen per 1 euro)'))
@@ -309,6 +300,7 @@ This code reproduces Figure F1.5.
 plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.yuan, xlab='Year',
     ylab='rate/parity, in yuans per 1 euro', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(0, 12))
+grid()
 lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.yuan, type='o', col=cbPalette[7], pch=19, lwd=2)
 legend('bottomright', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
     c('Exchange Rate (yuans per 1 euro)', 'Purchasing Power Parity (yuans per 1 euro)'))
@@ -323,6 +315,7 @@ This code remakes Figure FS1.5a.
 plot(fig45_dat$Year, fig45_dat$exchange.rate.dollar.yuan., xlab='Year',
     ylab='rate/parity, in yuans per 1 dollar', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(0, 9))
+grid()
 lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.dollar.yuan, type='o', col=cbPalette[7], pch=19, lwd=2)
 legend('bottomright', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
     c('Exchange Rate (yuans per 1 dollar)', 'Purchasing Power Parity (yuans per 1 dollar)'))
@@ -337,6 +330,7 @@ This code remakes Figure FS1.5b.
 plot(fig45_dat$Year, fig45_dat$exchange.rate.dollar.rupee, xlab='Year',
     ylab='rate/parity, in rupees per 1 dollar', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(0, 55))
+grid()
 lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.dollar.rupee, type='o', col=cbPalette[7], pch=19, lwd=2)
 legend('bottomright', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
     c('Exchange Rate (rupees per 1 dollar)', 'Purchasing Power Parity (rupees per 1 dollar)'))
@@ -351,6 +345,7 @@ This code recreates Figure FS1.5c
 plot(fig45_dat$Year, fig45_dat$exchange.rate.dollar.yen, xlab='Year',
     ylab='rate/parity, in yen per 1 dollar', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(70, 200))
+grid()
 lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.dollar.yen, type='o', col=cbPalette[7], pch=19, lwd=2)
 legend('topright', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
     c('Exchange Rate (yen per 1 dollar)', 'Purchasing Power Parity (yen per 1 dollar)'))

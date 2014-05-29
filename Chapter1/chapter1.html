@@ -87,11 +87,7 @@ cbPalette &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="s
     <span class="dt">sheetName=</span><span class="st">&quot;TS1.2&quot;</span>, <span class="dt">rowIndex=</span><span class="dv">7</span>:<span class="dv">18</span>, <span class="dt">colIndex=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>:<span class="dv">6</span>), <span class="dt">header=</span><span class="ot">TRUE</span>)
 <span class="kw">names</span>(fig2s2_dat)[<span class="dv">1</span>] =<span class="st"> &quot;Year&quot;</span> 
 fig2s2_dat$EAm =<span class="st"> </span>fig2s2_dat$Europe+fig2s2_dat$America
-fig2s2_dat$EAmAf =<span class="st"> </span>fig2s2_dat$EAm+fig2s2_dat$Africa
-
-<span class="co"># colors:</span>
-cbPalette =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;#999999&quot;</span>, <span class="st">&quot;#E69F00&quot;</span>, <span class="st">&quot;#56B4E9&quot;</span>, <span class="st">&quot;#009E73&quot;</span>, <span class="st">&quot;#F0E442&quot;</span>, 
-    <span class="st">&quot;#0072B2&quot;</span>, <span class="st">&quot;#D55E00&quot;</span>, <span class="st">&quot;#CC79A7&quot;</span>) <span class="co">#ggplot2 recommended colorblind </span></code></pre>
+fig2s2_dat$EAmAf =<span class="st"> </span>fig2s2_dat$EAm+fig2s2_dat$Africa</code></pre>
 <h2 id="figure-f1.2">Figure F1.2</h2>
 <p>Here is code to re-make Figure F1.2, with time scaled linearly on the x-axis:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">myRibbonPlot</span>(<span class="dt">dat=</span>fig2s2_dat, <span class="dt">ylab=</span><span class="st">&quot;Percent of World Population&quot;</span>, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">1700</span>, <span class="dv">2012</span>))
@@ -101,7 +97,7 @@ cbPalette =<span class="st"> </span><span class="kw">c</span>(<span class="st">&
 <span class="kw">text</span>(<span class="dv">1900</span>, <span class="fl">0.15</span>, <span class="st">&#39;Europe&#39;</span>)
 <span class="kw">title</span>(<span class="st">&quot;F1.2: World Population Distribution, 1700-2012 (linear time scale)&quot;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-1.png" />
+<img src="figure/f12l.png" />
 </div>
 <p>And here is code to re-make Figure F1.2 with the x-axis scaled as it was in the original analysis (equal spacing between each year with data):</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">myRibbonPlot</span>(<span class="dt">dat=</span>fig2s2_dat, <span class="dt">even_axis=</span><span class="ot">TRUE</span>, <span class="dt">ylab=</span><span class="st">&#39;Percent of World Population&#39;</span>, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">1700</span>, <span class="dv">2012</span>))
@@ -111,7 +107,7 @@ cbPalette =<span class="st"> </span><span class="kw">c</span>(<span class="st">&
 <span class="kw">text</span>(<span class="dv">7</span>, <span class="fl">0.15</span>, <span class="st">&#39;Europe&#39;</span>)
 <span class="kw">title</span>(<span class="st">&quot;F1.2: World Population Distribution, 1700-2012 (original time scale)&quot;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-2.png" />
+<img src="figure/f12o.png" />
 </div>
 <h2 id="figure-fs1.2">Figure FS1.2</h2>
 <p>This code recreates figure FS1.2, scaling time linearly on the x-axis:</p>
@@ -122,7 +118,7 @@ cbPalette =<span class="st"> </span><span class="kw">c</span>(<span class="st">&
 <span class="kw">text</span>(<span class="dv">1000</span>, <span class="fl">0.075</span>, <span class="st">&#39;Europe&#39;</span>)
 <span class="kw">title</span>(<span class="st">&quot;FS1.2: World Population Distribution, 0-2012 (linear time scale)&quot;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-3.png" />
+<img src="figure/fs12l.png" />
 </div>
 <p>And this code recreates figure FS1.2, with the x-axis scaled as it was in the original analysis:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">myRibbonPlot</span>(<span class="dt">dat=</span>fig2s2_dat, <span class="dt">ylab=</span><span class="st">&quot;Percent of World Population&quot;</span>, <span class="dt">even_axis=</span><span class="ot">TRUE</span>)
@@ -132,7 +128,7 @@ cbPalette =<span class="st"> </span><span class="kw">c</span>(<span class="st">&
 <span class="kw">text</span>(<span class="dv">7</span>, <span class="fl">0.14</span>, <span class="st">&#39;Europe&#39;</span>)
 <span class="kw">title</span>(<span class="st">&quot;FS1.2: World Population Distribution, 0-2012 (original time scale)&quot;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-4.png" />
+<img src="figure/fs12o.png" />
 </div>
 <h3 id="loading-data-for-figures-f1.3-and-fs1.3">Loading data for Figures F1.3 and FS1.3</h3>
 <pre class="sourceCode r"><code class="sourceCode r">fig3s3_dat =<span class="st"> </span><span class="kw">read.xlsx</span>(
@@ -143,60 +139,48 @@ fig3s3_dat[<span class="dv">2</span>:<span class="dv">8</span>] =<span class="st
 <h2 id="figure-f1.3">Figure F1.3</h2>
 <p>This code reproduces Figure F1.3, scaling the x-axis linearly with time:</p>
 <pre class="sourceCode r"><code class="sourceCode r">xcoords =<span class="st"> </span>fig3s3_dat$Year[<span class="dv">4</span>:<span class="dv">11</span>]
-<span class="kw">plot</span>(xcoords, fig3s3_dat$World[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">250</span>), <span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">1700</span>,<span class="dv">2012</span>), <span class="dt">xlab=</span><span class="st">&quot;Year&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Per capita GDP as % of world average&quot;</span>,<span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">pch=</span><span class="dv">19</span>)
+<span class="kw">plot</span>(xcoords, fig3s3_dat$World[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">250</span>), <span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">1700</span>,<span class="dv">2012</span>), <span class="dt">xlab=</span><span class="st">&quot;Year&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Per capita GDP as % of world average&quot;</span>,<span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>)
 <span class="kw">grid</span>()
-<span class="kw">lines</span>(xcoords, fig3s3_dat$World[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
-<span class="kw">points</span>(xcoords, fig3s3_dat$EuropeAmerica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">pch=</span><span class="dv">19</span>)
-<span class="kw">lines</span>(xcoords, fig3s3_dat$EuropeAmerica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
-<span class="kw">points</span>(xcoords, fig3s3_dat$AsiaAfrica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>)
-<span class="kw">lines</span>(xcoords, fig3s3_dat$AsiaAfrica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
+<span class="kw">lines</span>(xcoords, fig3s3_dat$EuropeAmerica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">pch=</span><span class="dv">19</span>)
+<span class="kw">lines</span>(xcoords, fig3s3_dat$AsiaAfrica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>)
 <span class="kw">title</span>(<span class="st">&quot;F1.3: Global inequality, 1700-2012 (linear time scale)&quot;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-5.png" />
+<img src="figure/f13l.png" />
 </div>
 <p>And here is the code for Figure F1.3 with an x-axis scaled as it is in the original analysis (equally spaced between years with data):</p>
 <pre class="sourceCode r"><code class="sourceCode r">xcoords =<span class="st"> </span><span class="dv">1</span>:<span class="dv">8</span>
-<span class="kw">plot</span>(xcoords, fig3s3_dat$World[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">250</span>), <span class="dt">xlab=</span><span class="st">&quot;Year&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Per capita GDP as % of world average&quot;</span>,<span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">xaxt=</span><span class="st">&#39;n&#39;</span>)
+<span class="kw">plot</span>(xcoords, fig3s3_dat$World[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">250</span>), <span class="dt">xlab=</span><span class="st">&quot;Year&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Per capita GDP as % of world average&quot;</span>,<span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">xaxt=</span><span class="st">&#39;n&#39;</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
 <span class="kw">grid</span>()
 <span class="kw">axis</span>(<span class="dt">side=</span><span class="dv">1</span>, <span class="dt">at=</span><span class="dv">1</span>:<span class="dv">8</span>, <span class="dt">labels=</span>fig3s3_dat$Year[<span class="dv">4</span>:<span class="dv">11</span>])
-<span class="kw">lines</span>(xcoords, fig3s3_dat$World[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
-<span class="kw">points</span>(xcoords, fig3s3_dat$EuropeAmerica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">pch=</span><span class="dv">19</span>)
-<span class="kw">lines</span>(xcoords, fig3s3_dat$EuropeAmerica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
-<span class="kw">points</span>(xcoords, fig3s3_dat$AsiaAfrica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>)
-<span class="kw">lines</span>(xcoords, fig3s3_dat$AsiaAfrica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
+<span class="kw">lines</span>(xcoords, fig3s3_dat$EuropeAmerica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>)
+<span class="kw">lines</span>(xcoords, fig3s3_dat$AsiaAfrica[<span class="dv">4</span>:<span class="dv">11</span>], <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>)
 <span class="kw">title</span>(<span class="st">&quot;F1.3: Global inequality, 1700-2012 (original time scale)&quot;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-6.png" />
+<img src="figure/f13o.png" />
 </div>
 <h2 id="figure-fs1.3">Figure FS1.3</h2>
 <p>This code reproduces Figure SF1.3, with time scaled linearly on the x-axis:</p>
 <pre class="sourceCode r"><code class="sourceCode r">xcoords =<span class="st"> </span>fig3s3_dat$Year
-<span class="kw">plot</span>(xcoords, fig3s3_dat$World, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">250</span>), <span class="dt">xlab=</span><span class="st">&quot;Year&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Per capita GDP as % of world average&quot;</span>,<span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">pch=</span><span class="dv">19</span>)
+<span class="kw">plot</span>(xcoords, fig3s3_dat$World, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">250</span>), <span class="dt">xlab=</span><span class="st">&quot;Year&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Per capita GDP as % of world average&quot;</span>,<span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>)
 <span class="kw">grid</span>()
-<span class="kw">lines</span>(xcoords, fig3s3_dat$World, <span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
-<span class="kw">points</span>(xcoords, fig3s3_dat$EuropeAmerica, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">pch=</span><span class="dv">19</span>)
-<span class="kw">lines</span>(xcoords, fig3s3_dat$EuropeAmerica, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
-<span class="kw">points</span>(xcoords, fig3s3_dat$AsiaAfrica, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>)
-<span class="kw">lines</span>(xcoords, fig3s3_dat$AsiaAfrica, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
+<span class="kw">lines</span>(xcoords, fig3s3_dat$EuropeAmerica, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>)
+<span class="kw">lines</span>(xcoords, fig3s3_dat$AsiaAfrica, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>)
 <span class="kw">title</span>(<span class="st">&quot;FS1.3: Global inequality, 0-2012 (linear time scale)&quot;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-7.png" />
+<img src="figure/fs13l.png" />
 </div>
 <p>And this code reproduces Figure SF1.3 with the time points evenly spaced on the x-axis, as they are in the original analysis:</p>
 <pre class="sourceCode r"><code class="sourceCode r">xcoords =<span class="st"> </span><span class="dv">1</span>:<span class="dv">11</span>
-<span class="kw">plot</span>(xcoords, fig3s3_dat$World, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">250</span>), <span class="dt">xlab=</span><span class="st">&quot;Year&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Per capita GDP as % of world average&quot;</span>,<span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">xaxt=</span><span class="st">&#39;n&#39;</span>)
+<span class="kw">plot</span>(xcoords, fig3s3_dat$World, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">250</span>), <span class="dt">xlab=</span><span class="st">&quot;Year&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Per capita GDP as % of world average&quot;</span>,<span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">xaxt=</span><span class="st">&#39;n&#39;</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
 <span class="kw">grid</span>()
 <span class="kw">axis</span>(<span class="dt">side=</span><span class="dv">1</span>, <span class="dt">at=</span><span class="dv">1</span>:<span class="dv">11</span>, <span class="dt">labels=</span>fig3s3_dat$Year)
-<span class="kw">lines</span>(xcoords, fig3s3_dat$World, <span class="dt">col=</span>cbPalette[<span class="dv">3</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
-<span class="kw">points</span>(xcoords, fig3s3_dat$EuropeAmerica, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">pch=</span><span class="dv">19</span>)
-<span class="kw">lines</span>(xcoords, fig3s3_dat$EuropeAmerica, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
-<span class="kw">points</span>(xcoords, fig3s3_dat$AsiaAfrica, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>)
-<span class="kw">lines</span>(xcoords, fig3s3_dat$AsiaAfrica, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">lwd=</span><span class="dv">2</span>)
-<span class="kw">title</span>(<span class="st">&quot;SF1.3: Global inequality, 1700-2012 (original time scale)&quot;</span>)</code></pre>
+<span class="kw">lines</span>(xcoords, fig3s3_dat$EuropeAmerica, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>], <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>)
+<span class="kw">lines</span>(xcoords, fig3s3_dat$AsiaAfrica, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>)
+<span class="kw">title</span>(<span class="st">&quot;FS1.3: Global inequality, 1700-2012 (original time scale)&quot;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-8.png" />
+<img src="figure/fs13o.png" />
 </div>
-<p>Finally, here is a plot of the Europe/America and Africa/Asia per capita GDPs as a percentage of world income, <em>separately</em>, compared to the overall region per capita GDP as percentage of world income.</p>
+<p>Finally, here is a plot of the Europe/America and Africa/Asia per capita GDPs as a percentage of world income, <em>separately</em>, compared to the overall region per capita GDP as percentage of world income. These show that Europe seems to have more influence on the Europe/America combined figure than America does, and Asia seems to have more influence on the Asia/Africa combined figure than Africa does.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
 <span class="kw">plot</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(fig3s3_dat), fig3s3_dat$Europe, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">20</span>, <span class="dv">280</span>), <span class="dt">xlab=</span><span class="st">&#39;Year&#39;</span>, <span class="dt">xaxt=</span><span class="st">&#39;n&#39;</span>, <span class="dt">ylab=</span><span class="st">&#39;Per capita GDP as % of world average&#39;</span>, <span class="dt">main=</span><span class="st">&#39;Europe/America&#39;</span>)
 <span class="kw">axis</span>(<span class="dt">side=</span><span class="dv">1</span>, <span class="dt">at=</span><span class="dv">1</span>:<span class="dv">11</span>, <span class="dt">labels=</span>fig3s3_dat$Year)
@@ -209,7 +193,7 @@ fig3s3_dat[<span class="dv">2</span>:<span class="dv">8</span>] =<span class="st
 <span class="kw">lines</span>(<span class="dv">1</span>:<span class="dv">11</span>, fig3s3_dat$AsiaAfrica, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&#39;green3&#39;</span>)
 <span class="kw">legend</span>(<span class="st">&#39;topleft&#39;</span>, <span class="dt">pch=</span><span class="kw">c</span>(<span class="dv">19</span>,<span class="dv">19</span>,<span class="dv">19</span>), <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&#39;black&#39;</span>, <span class="st">&#39;gray&#39;</span>, <span class="st">&#39;green3&#39;</span>), <span class="kw">c</span>(<span class="st">&#39;Asia&#39;</span>, <span class="st">&#39;Africa&#39;</span>, <span class="st">&#39;combined&#39;</span>))</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-9.png" />
+<img src="figure/extra.png" />
 </div>
 <h3 id="load-data-for-figures-f1.4-f1.5-fs1.4ab-and-fs1.5abc">load data for Figures F1.4, F1.5, FS1.4(ab) and FS1.5(abc)</h3>
 <pre class="sourceCode r"><code class="sourceCode r">fig45_dat =<span class="st"> </span><span class="kw">read.xlsx</span>(
@@ -222,81 +206,88 @@ fig3s3_dat[<span class="dv">2</span>:<span class="dv">8</span>] =<span class="st
     <span class="dt">ylab=</span><span class="st">&#39;rate/parity, in dollars per 1 euro&#39;</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>],
     <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>)
 <span class="kw">lines</span>(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.dollar, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
+<span class="kw">grid</span>()
 <span class="kw">legend</span>(<span class="st">&#39;topleft&#39;</span>, <span class="dt">pch=</span><span class="kw">c</span>(<span class="dv">19</span>,<span class="dv">19</span>), <span class="dt">col=</span><span class="kw">c</span>(cbPalette[<span class="dv">4</span>], cbPalette[<span class="dv">7</span>]), 
     <span class="kw">c</span>(<span class="st">&#39;Exchange Rate (dollars per 1 euro)&#39;</span>, <span class="st">&#39;Purchasing Power Parity (dollars per 1 euro)&#39;</span>))
 <span class="kw">title</span>(<span class="st">&#39;F1.4: Exchange rate and purchasing power parity, euros &amp; dollars&#39;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-10.png" />
+<img src="figure/f14.png" />
 </div>
 <h2 id="figure-fs1.4a">Figure FS1.4a</h2>
 <p>This code remakes Figure FS1.4a.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fig45_dat$Year, fig45_dat$exchange.rate.euro.rupee, <span class="dt">xlab=</span><span class="st">&#39;Year&#39;</span>,
     <span class="dt">ylab=</span><span class="st">&#39;rate/parity, in rupees per 1 euro&#39;</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>],
     <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">70</span>))
+<span class="kw">grid</span>()
 <span class="kw">lines</span>(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.rupee, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
 <span class="kw">legend</span>(<span class="st">&#39;topleft&#39;</span>, <span class="dt">pch=</span><span class="kw">c</span>(<span class="dv">19</span>,<span class="dv">19</span>), <span class="dt">col=</span><span class="kw">c</span>(cbPalette[<span class="dv">4</span>], cbPalette[<span class="dv">7</span>]), 
     <span class="kw">c</span>(<span class="st">&#39;Exchange Rate (rupees per 1 euro)&#39;</span>, <span class="st">&#39;Purchasing Power Parity (rupees per 1 euro)&#39;</span>))
 <span class="kw">title</span>(<span class="st">&#39;FS1.4a: Exchange rate and purchasing power parity, euros &amp; rupees&#39;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-11.png" />
+<img src="figure/fs14a.png" />
 </div>
 <h2 id="figure-fs1.4b">Figure FS1.4b</h2>
 <p>This code reproduces Figure FS1.4b.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fig45_dat$Year, fig45_dat$exchange.rate.euro.yen, <span class="dt">xlab=</span><span class="st">&#39;Year&#39;</span>,
     <span class="dt">ylab=</span><span class="st">&#39;rate/parity, in yen per 1 euro&#39;</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>],
     <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">90</span>, <span class="dv">200</span>))
+<span class="kw">grid</span>()
 <span class="kw">lines</span>(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.yen, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
 <span class="kw">legend</span>(<span class="st">&#39;topright&#39;</span>, <span class="dt">pch=</span><span class="kw">c</span>(<span class="dv">19</span>,<span class="dv">19</span>), <span class="dt">col=</span><span class="kw">c</span>(cbPalette[<span class="dv">4</span>], cbPalette[<span class="dv">7</span>]), 
     <span class="kw">c</span>(<span class="st">&#39;Exchange Rate (yen per 1 euro)&#39;</span>, <span class="st">&#39;Purchasing Power Parity (yen per 1 euro)&#39;</span>))
 <span class="kw">title</span>(<span class="st">&#39;FS1.4b: Exchange rate and purchasing power parity, euros &amp; yen&#39;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-12.png" />
+<img src="figure/fs14b.png" />
 </div>
 <h2 id="figure-f1.5">Figure F1.5</h2>
 <p>This code reproduces Figure F1.5.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fig45_dat$Year, fig45_dat$exchange.rate.euro.yuan, <span class="dt">xlab=</span><span class="st">&#39;Year&#39;</span>,
     <span class="dt">ylab=</span><span class="st">&#39;rate/parity, in yuans per 1 euro&#39;</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>],
     <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">12</span>))
+<span class="kw">grid</span>()
 <span class="kw">lines</span>(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.yuan, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
 <span class="kw">legend</span>(<span class="st">&#39;bottomright&#39;</span>, <span class="dt">pch=</span><span class="kw">c</span>(<span class="dv">19</span>,<span class="dv">19</span>), <span class="dt">col=</span><span class="kw">c</span>(cbPalette[<span class="dv">4</span>], cbPalette[<span class="dv">7</span>]), 
     <span class="kw">c</span>(<span class="st">&#39;Exchange Rate (yuans per 1 euro)&#39;</span>, <span class="st">&#39;Purchasing Power Parity (yuans per 1 euro)&#39;</span>))
 <span class="kw">title</span>(<span class="st">&#39;F1.5: Exchange rate and purchasing power parity, euros &amp; yuans&#39;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-13.png" />
+<img src="figure/f15.png" />
 </div>
 <h2 id="figure-fs1.5a">Figure FS1.5a</h2>
 <p>This code remakes Figure FS1.5a.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fig45_dat$Year, fig45_dat$exchange.rate.dollar.yuan., <span class="dt">xlab=</span><span class="st">&#39;Year&#39;</span>,
     <span class="dt">ylab=</span><span class="st">&#39;rate/parity, in yuans per 1 dollar&#39;</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>],
     <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">9</span>))
+<span class="kw">grid</span>()
 <span class="kw">lines</span>(fig45_dat$Year, fig45_dat$purchasing.power.parity.dollar.yuan, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
 <span class="kw">legend</span>(<span class="st">&#39;bottomright&#39;</span>, <span class="dt">pch=</span><span class="kw">c</span>(<span class="dv">19</span>,<span class="dv">19</span>), <span class="dt">col=</span><span class="kw">c</span>(cbPalette[<span class="dv">4</span>], cbPalette[<span class="dv">7</span>]), 
     <span class="kw">c</span>(<span class="st">&#39;Exchange Rate (yuans per 1 dollar)&#39;</span>, <span class="st">&#39;Purchasing Power Parity (yuans per 1 dollar)&#39;</span>))
 <span class="kw">title</span>(<span class="st">&#39;FS1.5a: Exchange rate and purchasing power parity, dollars &amp; yuans&#39;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-14.png" />
+<img src="figure/fs15a.png" />
 </div>
 <h2 id="figure-fs1.5b">Figure FS1.5b</h2>
 <p>This code remakes Figure FS1.5b.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fig45_dat$Year, fig45_dat$exchange.rate.dollar.rupee, <span class="dt">xlab=</span><span class="st">&#39;Year&#39;</span>,
     <span class="dt">ylab=</span><span class="st">&#39;rate/parity, in rupees per 1 dollar&#39;</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>],
     <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">55</span>))
+<span class="kw">grid</span>()
 <span class="kw">lines</span>(fig45_dat$Year, fig45_dat$purchasing.power.parity.dollar.rupee, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
 <span class="kw">legend</span>(<span class="st">&#39;bottomright&#39;</span>, <span class="dt">pch=</span><span class="kw">c</span>(<span class="dv">19</span>,<span class="dv">19</span>), <span class="dt">col=</span><span class="kw">c</span>(cbPalette[<span class="dv">4</span>], cbPalette[<span class="dv">7</span>]), 
     <span class="kw">c</span>(<span class="st">&#39;Exchange Rate (rupees per 1 dollar)&#39;</span>, <span class="st">&#39;Purchasing Power Parity (rupees per 1 dollar)&#39;</span>))
 <span class="kw">title</span>(<span class="st">&#39;FS1.5b: Exchange rate and purchasing power parity, dollars &amp; rupees&#39;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-15.png" />
+<img src="figure/fs15b.png" />
 </div>
 <h2 id="figure-fs1.5c">Figure FS1.5c</h2>
 <p>This code recreates Figure FS1.5c</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fig45_dat$Year, fig45_dat$exchange.rate.dollar.yen, <span class="dt">xlab=</span><span class="st">&#39;Year&#39;</span>,
     <span class="dt">ylab=</span><span class="st">&#39;rate/parity, in yen per 1 dollar&#39;</span>, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">4</span>],
     <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">70</span>, <span class="dv">200</span>))
+<span class="kw">grid</span>()
 <span class="kw">lines</span>(fig45_dat$Year, fig45_dat$purchasing.power.parity.dollar.yen, <span class="dt">type=</span><span class="st">&#39;o&#39;</span>, <span class="dt">col=</span>cbPalette[<span class="dv">7</span>], <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
 <span class="kw">legend</span>(<span class="st">&#39;topright&#39;</span>, <span class="dt">pch=</span><span class="kw">c</span>(<span class="dv">19</span>,<span class="dv">19</span>), <span class="dt">col=</span><span class="kw">c</span>(cbPalette[<span class="dv">4</span>], cbPalette[<span class="dv">7</span>]), 
     <span class="kw">c</span>(<span class="st">&#39;Exchange Rate (yen per 1 dollar)&#39;</span>, <span class="st">&#39;Purchasing Power Parity (yen per 1 dollar)&#39;</span>))
 <span class="kw">title</span>(<span class="st">&#39;F1.5c: Exchange rate and purchasing power parity, dollars &amp; yen&#39;</span>)</code></pre>
 <div class="figure">
-<img src="figure/unnamed-chunk-16.png" />
+<img src="figure/fs15c.png" />
 </div>
