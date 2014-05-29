@@ -12,11 +12,9 @@ This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/
 
 ```r
 library(xlsx)
-library(ggplot2)
-library(reshape2)
 
 fig1s1_dat = read.xlsx(
-    "./Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
+    "../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
     sheetName="TS1.1a", rowIndex=7:18, colIndex=c(1,3:6), header=TRUE)
 names(fig1s1_dat)[1] = "Year" 
 fig1s1_dat$EAm = fig1s1_dat$Europe+fig1s1_dat$America
@@ -119,7 +117,7 @@ title("FS1.1: Distribution of World Output, 0-2012 (original x-axis)")
 
 ```r
 fig2s2_dat = read.xlsx(
-    "./Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
+    "../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
     sheetName="TS1.2", rowIndex=7:18, colIndex=c(1,3:6), header=TRUE)
 names(fig2s2_dat)[1] = "Year" 
 fig2s2_dat$EAm = fig2s2_dat$Europe+fig2s2_dat$America
@@ -221,7 +219,7 @@ title("FS1.2: World Population Distribution, 0-2012 (original time scale)")
 
 ```r
 fig3s3_dat = read.xlsx(
-    "./Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
+    "../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
     sheetName="TS1.3", rowIndex=7:18, colIndex=c(1:8), header=TRUE)
 names(fig3s3_dat)[c(1,2,4,7,8)] = c("Year", "World", "America", "EuropeAmerica", "AsiaAfrica")
 fig3s3_dat[2:8] = 100*fig3s3_dat[2:8]

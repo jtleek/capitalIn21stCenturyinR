@@ -4,11 +4,9 @@
 <h3 id="loading-libraries-and-data-for-figures-f1.1-and-fs1.1">Loading libraries and data for Figures F1.1 and FS1.1</h3>
 <p>This document depends on the <a href="http://cran.r-project.org/web/packages/xlsx/index.html">xlsx</a> package.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(xlsx)
-<span class="kw">library</span>(ggplot2)
-<span class="kw">library</span>(reshape2)
 
 fig1s1_dat =<span class="st"> </span><span class="kw">read.xlsx</span>(
-    <span class="st">&quot;./Piketty2014FiguresTables/Chapter1TablesFigures.xlsx&quot;</span>, 
+    <span class="st">&quot;../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx&quot;</span>, 
     <span class="dt">sheetName=</span><span class="st">&quot;TS1.1a&quot;</span>, <span class="dt">rowIndex=</span><span class="dv">7</span>:<span class="dv">18</span>, <span class="dt">colIndex=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>:<span class="dv">6</span>), <span class="dt">header=</span><span class="ot">TRUE</span>)
 <span class="kw">names</span>(fig1s1_dat)[<span class="dv">1</span>] =<span class="st"> &quot;Year&quot;</span> 
 fig1s1_dat$EAm =<span class="st"> </span>fig1s1_dat$Europe+fig1s1_dat$America
@@ -87,7 +85,7 @@ xcoords =<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</
 </div>
 <h3 id="loading-data-for-figures-f1.2-and-sf1.2">Loading data for figures F1.2 and SF1.2</h3>
 <pre class="sourceCode r"><code class="sourceCode r">fig2s2_dat =<span class="st"> </span><span class="kw">read.xlsx</span>(
-    <span class="st">&quot;./Piketty2014FiguresTables/Chapter1TablesFigures.xlsx&quot;</span>, 
+    <span class="st">&quot;../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx&quot;</span>, 
     <span class="dt">sheetName=</span><span class="st">&quot;TS1.2&quot;</span>, <span class="dt">rowIndex=</span><span class="dv">7</span>:<span class="dv">18</span>, <span class="dt">colIndex=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>:<span class="dv">6</span>), <span class="dt">header=</span><span class="ot">TRUE</span>)
 <span class="kw">names</span>(fig2s2_dat)[<span class="dv">1</span>] =<span class="st"> &quot;Year&quot;</span> 
 fig2s2_dat$EAm =<span class="st"> </span>fig2s2_dat$Europe+fig2s2_dat$America
@@ -165,7 +163,7 @@ myRibbonPlot =<span class="st"> </span>function(dat, <span class="dt">xlim=</spa
 </div>
 <h3 id="loading-data-for-figures-f1.3-and-fs1.3">Loading data for Figures F1.3 and FS1.3</h3>
 <pre class="sourceCode r"><code class="sourceCode r">fig3s3_dat =<span class="st"> </span><span class="kw">read.xlsx</span>(
-    <span class="st">&quot;./Piketty2014FiguresTables/Chapter1TablesFigures.xlsx&quot;</span>, 
+    <span class="st">&quot;../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx&quot;</span>, 
     <span class="dt">sheetName=</span><span class="st">&quot;TS1.3&quot;</span>, <span class="dt">rowIndex=</span><span class="dv">7</span>:<span class="dv">18</span>, <span class="dt">colIndex=</span><span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">8</span>), <span class="dt">header=</span><span class="ot">TRUE</span>)
 <span class="kw">names</span>(fig3s3_dat)[<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">7</span>,<span class="dv">8</span>)] =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Year&quot;</span>, <span class="st">&quot;World&quot;</span>, <span class="st">&quot;America&quot;</span>, <span class="st">&quot;EuropeAmerica&quot;</span>, <span class="st">&quot;AsiaAfrica&quot;</span>)
 fig3s3_dat[<span class="dv">2</span>:<span class="dv">8</span>] =<span class="st"> </span><span class="dv">100</span>*fig3s3_dat[<span class="dv">2</span>:<span class="dv">8</span>]</code></pre>
