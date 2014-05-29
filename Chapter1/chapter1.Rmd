@@ -201,7 +201,7 @@ names(fig3s3_dat)[c(1,2,4,7,8)] = c("Year", "World", "America", "EuropeAmerica",
 fig3s3_dat[2:8] = 100*fig3s3_dat[2:8]
 ```
 
-### Figure F1.3
+## Figure F1.3
 
 This code reproduces Figure F1.3, scaling the x-axis linearly with time:
 
@@ -232,7 +232,7 @@ lines(xcoords, fig3s3_dat$AsiaAfrica[4:11], col=cbPalette[7], lwd=2)
 title("F1.3: Global inequality, 1700-2012 (original time scale)")
 ```
 
-### Figure FS1.3
+## Figure FS1.3
 
 This code reproduces Figure SF1.3, with time scaled linearly on the x-axis:
 
@@ -265,7 +265,21 @@ title("SF1.3: Global inequality, 1700-2012 (original time scale)")
 
 Finally, here is a plot of the Europe/America and Africa/Asia per capita GDPs as a percentage of world income, _separately_, compared to the overall region per capita GDP as percentage of world income. 
 
-[Coming soon]
+```{r, fig.height=6, fig.width=12, fig.cap=""}
+par(mfrow=c(1,2))
+plot(1:nrow(fig3s3_dat), fig3s3_dat$Europe, type='o', pch=19, ylim=c(20, 280), xlab='Year', xaxt='n', ylab='Per capita GDP as % of world average', main='Europe/America')
+axis(side=1, at=1:11, labels=fig3s3_dat$Year)
+lines(1:11, fig3s3_dat$America, type='o', pch=19, lwd=2, col='gray')
+lines(1:11, fig3s3_dat$EuropeAmerica, type='o', pch=19, lwd=2, col='dodgerblue')
+legend('topleft', pch=c(19,19,19), col=c('black', 'gray', 'dodgerblue'), c('Europe', 'America', 'combined'))
+plot(1:nrow(fig3s3_dat), fig3s3_dat$Africa, type='o', pch=19, ylim=c(20, 280), col='gray', xaxt='n', xlab='Year', ylab='Per capita GDP as % of world average', main='Asia/Africa')
+axis(side=1, at=1:11, labels=fig3s3_dat$Year)
+lines(1:11, fig3s3_dat$Asia, type='o', pch=19, lwd=2)
+lines(1:11, fig3s3_dat$AsiaAfrica, type='o', pch=19, lwd=2, col='green3')
+legend('topleft', pch=c(19,19,19), col=c('black', 'gray', 'green3'), c('Asia', 'Africa', 'combined'))
+```
+
+
 
 
 
