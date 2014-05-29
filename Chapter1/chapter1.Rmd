@@ -9,7 +9,7 @@ The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capit
 
 This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html) package.
 
-```{r load1, message=FALSE, cache=TRUE}
+```{r load1, message=FALSE}
 library(xlsx)
 
 fig1s1_dat = read.xlsx(
@@ -21,102 +21,12 @@ fig1s1_dat$EAmAf = fig1s1_dat$EAm+fig1s1_dat$Africa
 
 ```
 
+Here's a custom ribbon plot function, since this type of figure is created several times, and a vector of ggplot2-approved, colorblind-friendly colors:
 
-## Figure F1.1
-
-This code remakes Figure F1.1, scaling time on the x-axis linearly:
-
-```{r p1, dependson="load1", fig.height=7, fig.width=8, cache=TRUE, fig.cap=""}
-plotdat = subset(fig1s1_dat, Year>=1700) #take out years before 1700
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", 
-    "#0072B2", "#D55E00", "#CC79A7") #ggplot2 recommended colorblind palette
-plot(plotdat$Year, rep(0, nrow(plotdat)), 
-    type='n', ylim=c(0,1), xlab="Year", ylab='World Output')
-yearRevYear = c(plotdat$Year, rev(plotdat$Year))
-polygon(x=yearRevYear, y=c(rep(0, nrow(plotdat)), rev(plotdat$Europe)), col=cbPalette[2])
-polygon(x=yearRevYear, y=c(plotdat$Europe, rev(plotdat$EAm)), col=cbPalette[3])
-polygon(x=yearRevYear, y=c(plotdat$EAm, rev(plotdat$EAmAf)), col=cbPalette[5])
-polygon(x=yearRevYear, y=c(plotdat$EAmAf, rep(1, nrow(plotdat))), col=cbPalette[1])
-text(1950, 0.9, 'Asia')
-text(1950, 0.764, 'Africa')
-text(1950, 0.55, 'America')
-text(1950, 0.2, 'Europe')
-title("F1.1: World Output, 1700-2012 (linear time scale)")
-```
-
-This code remakes Figure F1.1 as it appears in the original analysis: data points on the x-axis are equally spaced, no matter how far apart in time they are:
-
-```{r, dependson="p1", fig.height=7, fig.width=8, fig.cap=""}
-plot(1:8, rep(0,8), type='n', xaxt='n', ylim=c(0,1), xlab="Year", 
-    ylab='World Output')
-axis(side=1, at=1:8, labels=plotdat$Year)
-xcoords = c(1:8, 8:1)
-polygon(x=xcoords, y=c(rep(0,8), rev(plotdat$Europe)), col=cbPalette[2])
-polygon(x=xcoords, y=c(plotdat$Europe, rev(plotdat$EAm)), col=cbPalette[3])
-polygon(x=xcoords, y=c(plotdat$EAm, rev(plotdat$EAmAf)), col=cbPalette[5])
-polygon(x=xcoords, y=c(plotdat$EAmAf, rep(1,8)), col=cbPalette[1])
-text(5, 0.9, 'Asia')
-text(5, 0.764, 'Africa')
-text(5, 0.55, 'America')
-text(5, 0.2, 'Europe')
-title("F1.1: World Output, 1700-2012 (original x-axis)")
-```
-
-## Figure FS1.1
-
-This code remakes Figure FS1.1, scaling time on the x-axis linearly:
-
-```{r, dependson="load1", fig.height=7, fig.width=8, fig.cap=""}
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-plot(fig1s1_dat$Year, rep(0,nrow(fig1s1_dat)), 
-    type='n', ylim=c(0,1), xlab="Year", ylab='World Output')
-yearRevYear = c(fig1s1_dat$Year, rev(fig1s1_dat$Year))
-polygon(x=yearRevYear, y=c(rep(0,nrow(fig1s1_dat)), rev(fig1s1_dat$Europe)), col=cbPalette[2])
-polygon(x=yearRevYear, y=c(fig1s1_dat$Europe, rev(fig1s1_dat$EAm)), col=cbPalette[3])
-polygon(x=yearRevYear, y=c(fig1s1_dat$EAm, rev(fig1s1_dat$EAmAf)), col=cbPalette[5])
-polygon(x=yearRevYear, y=c(fig1s1_dat$EAmAf, rep(1, nrow(fig1s1_dat))), col=cbPalette[1])
-text(1950, 0.9, 'Asia')
-text(1950, 0.764, 'Africa')
-text(1950, 0.55, 'America')
-text(1950, 0.2, 'Europe')
-title("FS1.1: Distribution of World Output, 0-2012 (linear time scale)")
-```
-
-And this code remakes Figure FS1.1, scaling time as it was scaled in the original figure:
-
-```{r, fig.height=7, fig.width=8, fig.cap=""}
-plot(1:11, rep(0,11), type='n', xaxt='n', ylim=c(0,1), xlab="Year", 
-    ylab='World Output')
-axis(side=1, at=1:11, labels=fig1s1_dat$Year)
-xcoords = c(1:11, 11:1)
-polygon(x=xcoords, y=c(rep(0,11), rev(fig1s1_dat$Europe)), col=cbPalette[2])
-polygon(x=xcoords, y=c(fig1s1_dat$Europe, rev(fig1s1_dat$EAm)), col=cbPalette[3])
-polygon(x=xcoords, y=c(fig1s1_dat$EAm, rev(fig1s1_dat$EAmAf)), col=cbPalette[5])
-polygon(x=xcoords, y=c(fig1s1_dat$EAmAf, rep(1,11)), col=cbPalette[1])
-text(8, 0.9, 'Asia')
-text(8, 0.764, 'Africa')
-text(8, 0.55, 'America')
-text(8, 0.2, 'Europe')
-title("FS1.1: Distribution of World Output, 0-2012 (original x-axis)")
-```
-
-### Loading data for figures F1.2 and SF1.2
-
-```{r load2, message=FALSE, cache=TRUE}
-fig2s2_dat = read.xlsx(
-    "../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
-    sheetName="TS1.2", rowIndex=7:18, colIndex=c(1,3:6), header=TRUE)
-names(fig2s2_dat)[1] = "Year" 
-fig2s2_dat$EAm = fig2s2_dat$Europe+fig2s2_dat$America
-fig2s2_dat$EAmAf = fig2s2_dat$EAm+fig2s2_dat$Africa
-
-# colors:
-cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", 
-    "#0072B2", "#D55E00", "#CC79A7") #ggplot2 recommended colorblind 
-
-# a plotting function, since I find myself repeating my code a lot:
+```{r ribbonplot}
 myRibbonPlot = function(dat, xlim=NULL, even_axis=FALSE, xlab='Year', ylab){
-    stopifnot(all(c("Year", "Europe", "EAm", "EAmAf") %in% names(dat))) # this is a very specific function :) 
+    stopifnot(all(c("Year", "Europe", "EAm", "EAmAf") %in% names(dat))) 
+    # this is a very specific function :) 
     if(even_axis){
         xcoords = c(1:nrow(dat), nrow(dat):1)
         xaxtype = 'n'
@@ -139,13 +49,75 @@ myRibbonPlot = function(dat, xlim=NULL, even_axis=FALSE, xlab='Year', ylab){
     }
 }
 
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", 
+    "#0072B2", "#D55E00", "#CC79A7") 
+```
+
+## Figure F1.1
+
+This code remakes Figure F1.1, scaling time on the x-axis linearly:
+
+```{r f11l, fig.height=7, fig.width=8, fig.cap=""}
+myRibbonPlot(fig1s1_dat, xlim=c(1700, 2012), ylab="World Output")
+text(1950, 0.9, 'Asia')
+text(1950, 0.764, 'Africa')
+text(1950, 0.55, 'America')
+text(1950, 0.2, 'Europe')
+title("F1.1: World Output, 1700-2012 (linear time scale)")
+```
+
+This code remakes Figure F1.1 as it appears in the original analysis: data points on the x-axis are equally spaced, no matter how far apart in time they are:
+
+```{r f11o, dependson="p1", fig.height=7, fig.width=8, fig.cap=""}
+myRibbonPlot(fig1s1_dat, xlim=c(1700, 2012), even_axis=TRUE, ylab='World Output')
+text(8, 0.9, 'Asia')
+text(8, 0.764, 'Africa')
+text(8, 0.55, 'America')
+text(8, 0.2, 'Europe')
+title("F1.1: World Output, 1700-2012 (original x-axis)")
+```
+
+## Figure FS1.1
+
+This code remakes Figure FS1.1, scaling time on the x-axis linearly:
+
+```{r fs11l, fig.height=7, fig.width=8, fig.cap=""}
+myRibbonPlot(fig1s1_dat, ylab='World Output')
+text(1000, 0.6, 'Asia')
+text(1000, 0.24, 'Africa')
+text(1000, 0.16, 'America')
+text(1000, 0.07, 'Europe')
+title("FS1.1: Distribution of World Output, 0-2012 (linear time scale)")
+```
+
+And this code remakes Figure FS1.1, scaling time as it was scaled in the original figure:
+
+```{r fs11o, fig.height=7, fig.width=8, fig.cap=""}
+myRibbonPlot(fig1s1_dat, ylab='World Output', even_axis=TRUE)
+text(8, 0.9, 'Asia')
+text(8, 0.764, 'Africa')
+text(8, 0.55, 'America')
+text(8, 0.2, 'Europe')
+title("FS1.1: Distribution of World Output, 0-2012 (original x-axis)")
+```
+
+### Loading data for figures F1.2 and SF1.2
+
+```{r load2, message=FALSE}
+fig2s2_dat = read.xlsx(
+    "../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
+    sheetName="TS1.2", rowIndex=7:18, colIndex=c(1,3:6), header=TRUE)
+names(fig2s2_dat)[1] = "Year" 
+fig2s2_dat$EAm = fig2s2_dat$Europe+fig2s2_dat$America
+fig2s2_dat$EAmAf = fig2s2_dat$EAm+fig2s2_dat$Africa
+
 ```
 
 ## Figure F1.2
 
 Here is code to re-make Figure F1.2, with time scaled linearly on the x-axis:
 
-```{r, dependson="load2", fig.height=7, fig.width=8, fig.cap=""}
+```{r f12l, fig.height=7, fig.width=8, fig.cap=""}
 myRibbonPlot(dat=fig2s2_dat, ylab="Percent of World Population", xlim=c(1700, 2012))
 text(1900, 0.75, 'Asia')
 text(1900, 0.385, 'Africa')
@@ -156,7 +128,7 @@ title("F1.2: World Population Distribution, 1700-2012 (linear time scale)")
 
 And here is code to re-make Figure F1.2 with the x-axis scaled as it was in the original analysis (equal spacing between each year with data):
 
-```{r, dependson="load2", fig.height=7, fig.width=8, fig.cap=""}
+```{r f12o, dependson="load2", fig.height=7, fig.width=8, fig.cap=""}
 myRibbonPlot(dat=fig2s2_dat, even_axis=TRUE, ylab='Percent of World Population', xlim=c(1700, 2012))
 text(7, 0.75, 'Asia')
 text(7, 0.4, 'Africa')
@@ -170,7 +142,7 @@ title("F1.2: World Population Distribution, 1700-2012 (original time scale)")
 
 This code recreates figure FS1.2, scaling time linearly on the x-axis:
 
-```{r, dependson="load2", fig.height=7, fig.width=8, fig.cap=""}
+```{r fs12l, fig.height=7, fig.width=8, fig.cap=""}
 myRibbonPlot(dat=fig2s2_dat, ylab="Percent of World Population")
 text(1000, 0.6, 'Asia')
 text(1000, 0.25, 'Africa')
@@ -181,7 +153,7 @@ title("FS1.2: World Population Distribution, 0-2012 (linear time scale)")
 
 And this code recreates figure FS1.2, with the x-axis scaled as it was in the original analysis:
 
-```{r, dependson="load2", fig.height=7, fig.width=8, fig.cap=""}
+```{r fs12o, fig.height=7, fig.width=8, fig.cap=""}
 myRibbonPlot(dat=fig2s2_dat, ylab="Percent of World Population", even_axis=TRUE)
 text(7, 0.75, 'Asia')
 text(7, 0.39, 'Africa')
@@ -193,7 +165,7 @@ title("FS1.2: World Population Distribution, 0-2012 (original time scale)")
 
 ### Loading data for Figures F1.3 and FS1.3
 
-```{r load3, message=FALSE, cache=TRUE}
+```{r load3, message=FALSE}
 fig3s3_dat = read.xlsx(
     "../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
     sheetName="TS1.3", rowIndex=7:18, colIndex=c(1:8), header=TRUE)
@@ -205,7 +177,7 @@ fig3s3_dat[2:8] = 100*fig3s3_dat[2:8]
 
 This code reproduces Figure F1.3, scaling the x-axis linearly with time:
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r f13l, fig.height=6, fig.width=8, fig.cap=""}
 xcoords = fig3s3_dat$Year[4:11]
 plot(xcoords, fig3s3_dat$World[4:11], ylim=c(0,250), xlim=c(1700,2012), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19)
 grid()
@@ -219,7 +191,7 @@ title("F1.3: Global inequality, 1700-2012 (linear time scale)")
 
 And here is the code for Figure F1.3 with an x-axis scaled as it is in the original analysis (equally spaced between years with data):
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r f13o, fig.height=6, fig.width=8, fig.cap=""}
 xcoords = 1:8
 plot(xcoords, fig3s3_dat$World[4:11], ylim=c(0,250), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19, xaxt='n')
 grid()
@@ -236,7 +208,7 @@ title("F1.3: Global inequality, 1700-2012 (original time scale)")
 
 This code reproduces Figure SF1.3, with time scaled linearly on the x-axis:
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r fs13l, fig.height=6, fig.width=8, fig.cap=""}
 xcoords = fig3s3_dat$Year
 plot(xcoords, fig3s3_dat$World, ylim=c(0,250), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19)
 grid()
@@ -250,7 +222,7 @@ title("FS1.3: Global inequality, 0-2012 (linear time scale)")
 
 And this code reproduces Figure SF1.3 with the time points evenly spaced on the x-axis, as they are in the original analysis:
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r fs13o, fig.height=6, fig.width=8, fig.cap=""}
 xcoords = 1:11
 plot(xcoords, fig3s3_dat$World, ylim=c(0,250), xlab="Year", ylab="Per capita GDP as % of world average",col=cbPalette[3], pch=19, xaxt='n')
 grid()
@@ -260,12 +232,12 @@ points(xcoords, fig3s3_dat$EuropeAmerica, col=cbPalette[4], pch=19)
 lines(xcoords, fig3s3_dat$EuropeAmerica, col=cbPalette[4], lwd=2)
 points(xcoords, fig3s3_dat$AsiaAfrica, col=cbPalette[7], pch=19)
 lines(xcoords, fig3s3_dat$AsiaAfrica, col=cbPalette[7], lwd=2)
-title("SF1.3: Global inequality, 1700-2012 (original time scale)")
+title("FS1.3: Global inequality, 1700-2012 (original time scale)")
 ```
 
 Finally, here is a plot of the Europe/America and Africa/Asia per capita GDPs as a percentage of world income, _separately_, compared to the overall region per capita GDP as percentage of world income. 
 
-```{r, fig.height=6, fig.width=12, fig.cap=""}
+```{r extra, fig.height=6, fig.width=12, fig.cap=""}
 par(mfrow=c(1,2))
 plot(1:nrow(fig3s3_dat), fig3s3_dat$Europe, type='o', pch=19, ylim=c(20, 280), xlab='Year', xaxt='n', ylab='Per capita GDP as % of world average', main='Europe/America')
 axis(side=1, at=1:11, labels=fig3s3_dat$Year)
@@ -280,7 +252,7 @@ legend('topleft', pch=c(19,19,19), col=c('black', 'gray', 'green3'), c('Asia', '
 ```
 
 ### load data for Figures F1.4, F1.5, FS1.4(ab) and FS1.5(abc)
-```{r load4, message=FALSE, cache=TRUE}
+```{r load4, message=FALSE}
 fig45_dat = read.xlsx(
     "../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
     sheetName="TS1.7", rowIndex=7:30, colIndex=c(1:9, 17:22), header=TRUE)
@@ -291,7 +263,7 @@ names(fig45_dat)[1] = 'Year'
 
 Here is code that recreates Figure F1.4. The figure is labeled with "Euro/dollar", but the y-axis labeling (in dollars) indicates that the data presented is "dollars per Euro", i.e., the exchange rate in 2012 is $1.30 per 1 Euro, and the purchasing power parity is $1.20 per 1 Euro.
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r f14, fig.height=6, fig.width=8, fig.cap=""}
 plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.dollar, xlab='Year',
     ylab='rate/parity, in dollars per 1 euro', type='o', col=cbPalette[4],
     lwd=2, pch=19)
@@ -305,7 +277,7 @@ title('F1.4: Exchange rate and purchasing power parity, euros & dollars')
 
 This code remakes Figure FS1.4a.
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r fs14a, fig.height=6, fig.width=8, fig.cap=""}
 plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.rupee, xlab='Year',
     ylab='rate/parity, in rupees per 1 euro', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(0, 70))
@@ -319,7 +291,7 @@ title('FS1.4a: Exchange rate and purchasing power parity, euros & rupees')
 
 This code reproduces Figure FS1.4b.
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r fs14b, fig.height=6, fig.width=8, fig.cap=""}
 plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.yen, xlab='Year',
     ylab='rate/parity, in yen per 1 euro', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(90, 200))
@@ -333,7 +305,7 @@ title('FS1.4b: Exchange rate and purchasing power parity, euros & yen')
 
 This code reproduces Figure F1.5. 
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r f15, fig.height=6, fig.width=8, fig.cap=""}
 plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.yuan, xlab='Year',
     ylab='rate/parity, in yuans per 1 euro', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(0, 12))
@@ -347,7 +319,7 @@ title('F1.5: Exchange rate and purchasing power parity, euros & yuans')
 
 This code remakes Figure FS1.5a.
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r fs15a, fig.height=6, fig.width=8, fig.cap=""}
 plot(fig45_dat$Year, fig45_dat$exchange.rate.dollar.yuan., xlab='Year',
     ylab='rate/parity, in yuans per 1 dollar', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(0, 9))
@@ -361,7 +333,7 @@ title('FS1.5a: Exchange rate and purchasing power parity, dollars & yuans')
 
 This code remakes Figure FS1.5b.
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r fs15b, fig.height=6, fig.width=8, fig.cap=""}
 plot(fig45_dat$Year, fig45_dat$exchange.rate.dollar.rupee, xlab='Year',
     ylab='rate/parity, in rupees per 1 dollar', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(0, 55))
@@ -375,7 +347,7 @@ title('FS1.5b: Exchange rate and purchasing power parity, dollars & rupees')
 
 This code recreates Figure FS1.5c
 
-```{r, fig.height=6, fig.width=8, fig.cap=""}
+```{r fs15c, fig.height=6, fig.width=8, fig.cap=""}
 plot(fig45_dat$Year, fig45_dat$exchange.rate.dollar.yen, xlab='Year',
     ylab='rate/parity, in yen per 1 dollar', type='o', col=cbPalette[4],
     lwd=2, pch=19, ylim=c(70, 200))
