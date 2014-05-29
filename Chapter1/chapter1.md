@@ -318,8 +318,132 @@ legend('topleft', pch=c(19,19,19), col=c('black', 'gray', 'green3'), c('Asia', '
 
 ![](figure/unnamed-chunk-12.png) 
 
+### load data for Figures F1.4, F1.5, FS1.4(ab) and FS1.5(abc)
+
+```r
+fig45_dat = read.xlsx(
+    "../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx", 
+    sheetName="TS1.7", rowIndex=7:30, colIndex=c(1:9, 17:22), header=TRUE)
+names(fig45_dat)[1] = 'Year'
+```
+
+## Figure F1.4
+
+Here is code that recreates Figure F1.4. The figure is labeled with "Euro/dollar", but the y-axis labeling (in dollars) indicates that the data presented is "dollars per Euro", i.e., the exchange rate in 2012 is $1.30 per 1 Euro, and the purchasing power parity is $1.20 per 1 Euro.
 
 
+```r
+plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.dollar, xlab='Year',
+    ylab='rate/parity, in dollars per 1 euro', type='o', col=cbPalette[4],
+    lwd=2, pch=19)
+lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.dollar, type='o', col=cbPalette[7], pch=19, lwd=2)
+legend('topleft', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
+    c('Exchange Rate (dollars per 1 euro)', 'Purchasing Power Parity (dollars per 1 euro)'))
+title('F1.4: Exchange rate and purchasing power parity, euros & dollars')
+```
 
+![](figure/unnamed-chunk-13.png) 
+
+## Figure FS1.4a
+
+This code remakes Figure FS1.4a.
+
+
+```r
+plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.rupee, xlab='Year',
+    ylab='rate/parity, in rupees per 1 euro', type='o', col=cbPalette[4],
+    lwd=2, pch=19, ylim=c(0, 70))
+lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.rupee, type='o', col=cbPalette[7], pch=19, lwd=2)
+legend('topleft', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
+    c('Exchange Rate (rupees per 1 euro)', 'Purchasing Power Parity (rupees per 1 euro)'))
+title('FS1.4a: Exchange rate and purchasing power parity, euros & rupees')
+```
+
+![](figure/unnamed-chunk-14.png) 
+
+## Figure FS1.4b
+
+This code reproduces Figure FS1.4b.
+
+
+```r
+plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.yen, xlab='Year',
+    ylab='rate/parity, in yen per 1 euro', type='o', col=cbPalette[4],
+    lwd=2, pch=19, ylim=c(90, 200))
+lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.yen, type='o', col=cbPalette[7], pch=19, lwd=2)
+legend('topright', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
+    c('Exchange Rate (yen per 1 euro)', 'Purchasing Power Parity (yen per 1 euro)'))
+title('FS1.4b: Exchange rate and purchasing power parity, euros & yen')
+```
+
+![](figure/unnamed-chunk-15.png) 
+
+## Figure F1.5
+
+This code reproduces Figure F1.5. 
+
+
+```r
+plot(fig45_dat$Year, fig45_dat$exchange.rate.euro.yuan, xlab='Year',
+    ylab='rate/parity, in yuans per 1 euro', type='o', col=cbPalette[4],
+    lwd=2, pch=19, ylim=c(0, 12))
+lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.euro.yuan, type='o', col=cbPalette[7], pch=19, lwd=2)
+legend('bottomright', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
+    c('Exchange Rate (yuans per 1 euro)', 'Purchasing Power Parity (yuans per 1 euro)'))
+title('F1.5: Exchange rate and purchasing power parity, euros & yuans')
+```
+
+![](figure/unnamed-chunk-16.png) 
+
+## Figure FS1.5a
+
+This code remakes Figure FS1.5a.
+
+
+```r
+plot(fig45_dat$Year, fig45_dat$exchange.rate.dollar.yuan., xlab='Year',
+    ylab='rate/parity, in yuans per 1 dollar', type='o', col=cbPalette[4],
+    lwd=2, pch=19, ylim=c(0, 9))
+lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.dollar.yuan, type='o', col=cbPalette[7], pch=19, lwd=2)
+legend('bottomright', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
+    c('Exchange Rate (yuans per 1 dollar)', 'Purchasing Power Parity (yuans per 1 dollar)'))
+title('FS1.5a: Exchange rate and purchasing power parity, dollars & yuans')
+```
+
+![](figure/unnamed-chunk-17.png) 
+
+## Figure FS1.5b
+
+This code remakes Figure FS1.5b.
+
+
+```r
+plot(fig45_dat$Year, fig45_dat$exchange.rate.dollar.rupee, xlab='Year',
+    ylab='rate/parity, in rupees per 1 dollar', type='o', col=cbPalette[4],
+    lwd=2, pch=19, ylim=c(0, 55))
+lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.dollar.rupee, type='o', col=cbPalette[7], pch=19, lwd=2)
+legend('bottomright', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
+    c('Exchange Rate (rupees per 1 dollar)', 'Purchasing Power Parity (rupees per 1 dollar)'))
+title('FS1.5b: Exchange rate and purchasing power parity, dollars & rupees')
+```
+
+![](figure/unnamed-chunk-18.png) 
+
+## Figure FS1.5c
+
+This code recreates Figure FS1.5c
+
+
+```r
+plot(fig45_dat$Year, fig45_dat$exchange.rate.dollar.yen, xlab='Year',
+    ylab='rate/parity, in yen per 1 dollar', type='o', col=cbPalette[4],
+    lwd=2, pch=19, ylim=c(70, 200))
+lines(fig45_dat$Year, fig45_dat$purchasing.power.parity.dollar.yen, type='o', col=cbPalette[7], pch=19, lwd=2)
+legend('topright', pch=c(19,19), col=c(cbPalette[4], cbPalette[7]), 
+    c('Exchange Rate (yen per 1 dollar)', 'Purchasing Power Parity (yen per 1 dollar)'))
+title('F1.5: Exchange rate and purchasing power parity, dollars & yen')
+```
+
+![](figure/unnamed-chunk-19.png) 
 
 
