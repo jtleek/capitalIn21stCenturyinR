@@ -1,0 +1,113 @@
+---
+title: "chapter6"
+output:
+  html_document:
+    fig_width: 8
+    toc: yes
+date: "June 30, 2014"
+---
+
+### Data provenance
+
+The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capital21c2. 
+
+### Loading relevant libraries and data
+
+This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), [scales](http://cran.r-project.org/web/packages/scales/index.html), [plyr](http://cran.r-project.org/web/packages/plyr/index.html), and [ggplot2](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
+
+
+```{r loadLibs,message=FALSE}
+library(ggplot2)
+library(xlsx)
+library(reshape2)
+```
+
+### Fig 6.1
+```{r fig6.1Load}
+# series used for figures 6.1, 6.3 et S6.1
+s1 = read.xlsx("~/documents/projects/capitalIn21stCenturyinR/Piketty2014FiguresTables/Chapter6TablesFigures.xlsx",
+               sheetName="TS6.1", rowIndex=8:33,colIndex=1:3,header=TRUE)
+
+names(s1) =  c('Year','Capital Income', 'Labor Income')
+```
+
+```{r fig6.1Clean}
+s1 <- melt(s1, id.vars = 'Year')
+```
+
+```{r fig6.1Plot, fig.retina=2}
+ggplot(data = s1, aes(x=Year, y=value))+
+  geom_line(aes(color=variable))+
+  geom_point(aes(shape=variable))+
+  scale_y_continuous(breaks=seq(0, 1, 0.1), labels=c('0%', '10%','20%', '30%','40%', '50%','60%', '70%','80%', '90%','100%'))+
+  scale_x_continuous(breaks=seq(1770, 2010, 20), labels=seq(1770, 2010, 20))+
+  ylab('Labor and capital income (% national income')+
+  xlab('During the 19th century, capital income (rent, profits, dividends, interest,..) \n absorbed about 40% of national income, vs. 60% for labor income (salaried and non salaried).\n Sources and series: see piketty.pse.ens.fr/capital21c.
+')+
+  ggtitle('Figure 6.1. The capital-labor split in the Britain, 1770-2010  
+')+
+  theme_bw(10)+ # Make b/w theme
+  theme(legend.title=element_blank()) # remove legend title
+```
+
+### Fig 6.2
+
+```{r fig6.2Load}
+# series used for figures 6.2, 6.4 et S6.2
+s2 = read.xlsx("~/documents/projects/capitalIn21stCenturyinR/Piketty2014FiguresTables/Chapter6TablesFigures.xlsx",
+               sheetName="TS6.2", rowIndex=6:26,colIndex=1:3,header=TRUE)
+
+names(s2) =  c('Year','Capital Income', 'Labor Income')
+```
+
+```{r fig6.2Clean}
+s2 <- melt(s2, id.vars = 'Year')
+```
+
+```{r fig6.2Plot, fig.retina=2}
+ggplot(data = s2, aes(x=Year, y=value))+
+  geom_line(aes(color=variable))+
+  geom_point(aes(shape=variable))+
+  scale_y_continuous(breaks=seq(0, 1, 0.1), labels=c('0%', '10%','20%', '30%','40%', '50%','60%', '70%','80%', '90%','100%'))+
+  scale_x_continuous(breaks=seq(1820, 2010, 20), labels=seq(1820, 2010, 20))+
+  ylab('Labor and capital income (% national income')+
+  xlab('In the 21st century, capital income (rent, profits, dividends, interest,..) \nabsorbs about 30% of national income, vs. 70% for labor income (salaried and non salaried).\n Sources and series: see piketty.pse.ens.fr/capital21c.')+
+  ggtitle('Figure 6.2. The capital-labor split in France, 1820-2010')+
+  theme_bw(10)+ # Make b/w theme
+  theme(legend.title=element_blank()) # remove legend title
+```
+
+### Fig 6.3
+```{r fig6.3Load}
+# series used for figures 6.1, 6.3 et S6.1
+s1 = read.xlsx("~/documents/projects/capitalIn21stCenturyinR/Piketty2014FiguresTables/Chapter6TablesFigures.xlsx",
+               sheetName="TS6.1", rowIndex=8:33,colIndex=c(1,4:5),header=TRUE)
+
+names(s1) =  c('Year','Observed', 'Pure')
+```
+
+```{r fig6.3Clean}
+s1 <- melt(s1, id.vars = 'Year')
+```
+
+```{r fig6.3Plot, fig.retina=2}
+ggplot(data = s1, aes(x=Year, y=value))+
+  geom_line(aes(color=variable))+
+  geom_point(aes(shape=variable))+
+  scale_y_continuous(breaks=seq(0, 0.16, 0.02), labels=c('0%', '2%','4%', '6%','8%', '10%','12%', '14%','16%'))+
+  scale_x_continuous(breaks=seq(1770, 2010, 20), labels=seq(1770, 2010, 20))+
+  ylab('Annual rate of return')+
+  xlab('The pure rate of return to capital is roughly stable around 4%-5% in the long run.\n 
+Sources and series: see piketty.pse.ens.fr/capital21c.')+
+  ggtitle('Figure 6.3. The pure return to capital in Britain, 1770-2010')+
+  scale_shape_discrete(name='', 
+                       breaks=c('Observed', 'Pure'),
+                       labels=c('Observed average rate of return to capital', 
+                                'Pure rate of return to capital (estimate)'))+
+  scale_color_discrete(name='', 
+                       breaks=c('Observed', 'Pure'),
+                       labels=c('Observed average rate of return to capital', 
+                                'Pure rate of return to capital (estimate)'))+
+  theme_bw(10)+ # Make b/w theme
+  theme(legend.title=element_blank()) # remove legend title
+```
