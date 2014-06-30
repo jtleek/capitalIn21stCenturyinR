@@ -17,4 +17,3 @@ request, please add yourself to the list of contributors below.
 * [Hector Corrada Bravo](http://www.cbcb.umd.edu/~hcorrada/)
 * [Jeff Leek](http://jtleek.com)
 * [Bruce Swihart](http://www.biostat.jhsph.edu/~bswihart/)
-* [Ryan Kelly](http://www.rmdk.ca)
