@@ -10,7 +10,8 @@ The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capit
 This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), and [ggplot2](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
 
 
-```{r loadCh0,message=FALSE}
+
+```r
 library(ggplot2)
 library(xlsx)
 library(reshape2)
@@ -21,7 +22,8 @@ library(reshape2)
 These figures are based on Table TS8.1. Here we read
 data from the excel file and name the data series
 
-```{r tabTS8.1, dependson="loadCh0", message=FALSE}
+
+```r
 ## Table TS8.1
 ts81 = read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",sheetName="TS8.1",rowIndex=6:116,colIndex=1:6,header=FALSE)
 names(ts81) = c("year","top_10percent_income_share","top_1percent_income_share", "top_0.1percent_income_share", "top_10percent_wage_share", "top_1percent_wage_share")
@@ -35,7 +37,8 @@ as
 
 Now we make Figure F8.1
 
-```{r figF8.1, dependson="tabTS8.1", fig.width=8, fig.height=4}
+
+```r
 #TODO: confirm calculations in table. for example 1909 and 1911 top 10% income shares are interpolated
 
 f81dat <- ts81[,c("year","top_10percent_income_share", "top_10percent_wage_share")]
@@ -64,12 +67,14 @@ plt <- plt + ggtitle("Figure 8.1. Income inequality in France, 1910-2010")
 plt <- plt + theme(legend.title=element_blank(),legend.position=c(.8,.8))
 
 print(plt)
-
 ```
+
+![plot of chunk figF8.1](figure/figF8.1.png) 
 
 And Figure S8.2
 
-```{r figs8.2, dependson="tabTS8.1", fig.width=8, fig.height=4}
+
+```r
 f82dat <- ts81[,c("year","top_1percent_income_share", "top_1percent_wage_share")]
 names(f82dat) <- c("year","income","wage")
 f82dat<-melt(f82dat,id=c("year"))
@@ -95,6 +100,7 @@ plt <- plt + ggtitle("Figure 8.2. The fall of rentiers in France, 1910-2010")
 plt <- plt + theme(legend.title=element_blank(),legend.position=c(.8,.8))
 
 print(plt)
-
 ```
+
+![plot of chunk figs8.2](figure/figs8.2.png) 
 #todo f8.3-8.10
