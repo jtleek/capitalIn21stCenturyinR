@@ -145,6 +145,18 @@ plt <- ggplot(data=f84dat,aes(x=group,y=income.percentage,group=income.type,shap
 plt
 ```
 
+``` {r F8.9,dependson"tabTS8.3",message=FALSE}
+f89dat<-ts83[ts83$country=="USA" & ts83$year==1929 &ts83$capital.gains=="with.capital.gains",]
+  
+plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+plt
+```
+``` {r F8.10,dependson"tabTS8.3",message=FALSE}
+f89dat<-ts83[ts83$country=="USA" & ts83$year==2007 &ts83$capital.gains=="with.capital.gains",]
+  
+plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+plt
+```
 #todo f8.3-8.10
 
 
