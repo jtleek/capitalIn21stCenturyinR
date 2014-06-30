@@ -101,4 +101,50 @@ print(plt)
 ```
 
 
+```{r tabTS8.3, dependson="loadCh0", message=FALSE}
+## Table TS8.1
+fname="../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx"
+ts83a = melt(read.xlsx(fname,sheetName="TS8.3",rowIndex=5:11,colIndex=1:7,header=TRUE))
+numentries=nrow(ts83a)
+ts83a$country<-rep("France",numentries)
+ts83a$capital.gains<-factor(rep("NA",numentries))
+ts83a$year<-rep(c("1932","2005"),each=numentries/2)
+
+ts83b = melt(read.xlsx(fname,sheetName="TS8.3",rowIndex=14:20,colIndex=1:7,header=TRUE))
+numentries=nrow(ts83b)
+ts83b$country<-rep("USA",numentries)
+ts83b$capital.gains<-factor(rep("with.capital.gains",numentries))
+ts83b$year<-rep(c("1929","2007"),each=numentries/2)
+
+ts83c = melt(read.xlsx(fname,sheetName="TS8.3",rowIndex=23:29,colIndex=1:7,header=TRUE))
+numentries=nrow(ts83c)
+ts83c$country<-rep("USA",numentries)
+ts83c$capital.gains<-factor(rep("no.capital.gains",numentries))
+ts83c$year<-rep(c("1929","2007"),each=numentries/2)
+
+#combine all three and get rid of spurious .1 appended in melt
+ts83<-rbind(ts83a,ts83b,ts83c)
+ts83$variable<-sub("income.1","income",ts83$variable)
+
+names(ts83)<-c("group","income.type","income.percentage","country","capital.gains","year")
+
+
+```
+
+``` {r F8.3,dependson"tabTS8.3",message=FALSE}
+f83dat<-ts83[ts83$country=="France" & ts83$year==1932,]
+  
+plt <- ggplot(data=f83dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+plt
+```
+
+``` {r F8.4,dependson"tabTS8.3",message=FALSE}
+f84dat<-ts83[ts83$country=="France" & ts83$year==2005,]
+  
+plt <- ggplot(data=f84dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+plt
+```
+
 #todo f8.3-8.10
+
+
