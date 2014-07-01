@@ -115,30 +115,67 @@ Sources and series: see piketty.pse.ens.fr/capital21c.')+
 ### Fig 6.7
 ```{r fig6.1Load}
 # series used for figures 6.6-6.8 and S6.3
-s6 = read.xlsx("../Piketty2014FiguresTables/Chapter6TablesFigures.xlsx", sheetName="TS6.4", rowIndex=5:120,colIndex=1:2,header=TRUE)
+s7 = read.xlsx("../Piketty2014FiguresTables/Chapter6TablesFigures.xlsx", sheetName="TS6.4", rowIndex=5:120,colIndex=1:6,header=TRUE)
 
-names(s6) =  c('Year','Housing share in national income'
+names(s7) =  c('Year','Housing share in national income',
+               'Gross profit share in gross value added',
+               'Net profits share in net value added',
+               'Capital share in national income',
+               'After-tax capital income excl. retained earnings'
                )
 ```
 
 ```{r fig6.1Clean}
-s6 <- melt(s6, id.vars = 'Year')
+s7 <- melt(s7, id.vars = 'Year')
+s7 =s7[s7$variable == 'Housing share in national income', ]
 ```
 
 ```{r fig6.1Plot, fig.retina=2}
-ggplot(data = s6, aes(x=Year, y=value))+
+ggplot(data = s7, aes(x=Year, y=value))+
   geom_line(aes(color=variable))+
   geom_point(aes(shape=variable))+
   scale_y_continuous(breaks=seq(0, .12, .02)
                      , labels=seq(0, .12, .02))+
   scale_x_continuous(breaks=seq(1900, 2008, 6)
                     , labels=seq(1900, 2008, 6))+
-  ylab('Share of housing rent in national income')+
+  ylab(unique(s7$variable))+
   xlab('The share of housing rent (rental value of dwellings) \n rose from 2% of national income in 1948 to 10% in 2010. \n Sources and series: see piketty.pse.ens.fr/capital21c.')+
   ggtitle('Figure 6.7. The share of housing rent \n in national income in France, \n 1900-2010')+
   theme_bw(10)+ # Make b/w theme
   theme(legend.title=element_blank() )+ # remove legend title
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +      theme(legend.position = "none")
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +      theme(legend.position = "none")
 ```
 
+### Fig 6.8
+```{r fig6.1Load}
+# series used for figures 6.6-6.8 and S6.3
+s8 = read.xlsx("../Piketty2014FiguresTables/Chapter6TablesFigures.xlsx", sheetName="TS6.4", rowIndex=5:120,colIndex=1:6,header=TRUE)
 
+names(s8) =  c('Year','Housing share in national income',
+               'Gross profit share in gross value added',
+               'Net profits share in net value added',
+               'Capital share in national income',
+               'After-tax capital income excl. retained earnings'
+               )
+```
+
+```{r fig6.1Clean}
+s8 <- melt(s8, id.vars = 'Year')
+s8 <- s8[s8$variable == 'Capital share in national income',]
+```
+
+```{r fig6.1Plot, fig.retina=2}
+ggplot(data = s8, aes(x=Year, y=value))+
+  geom_line(aes(color=variable))+
+  geom_point(aes(shape=variable))+
+  scale_y_continuous(breaks=seq(0, .5, .1 )
+                     , labels=seq(0, .5, .1 ))+
+  scale_x_continuous(breaks=seq(1900, 2008, 6)
+                    , labels=seq(1900, 2008, 6))+
+  ylab(unique(s8$variable))+
+  xlab('The share of capital income (net profits and rents) \n  rose from 15% of national income in 1982 to 27% in 2010. \n Sources and series: see piketty.pse.ens.fr/capital21c. ')+
+  ggtitle('Figure 6.8. \n The capital share in national income in France, \n 1900-2010')+
+  theme_bw(10)+ # Make b/w theme
+  theme(legend.title=element_blank() )+ # remove legend title
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +      theme(legend.position = "none")
+```
