@@ -47,16 +47,13 @@ names(ts81) = c("year","top_10percent_income_share","top_1percent_income_share",
 ```r
 fname="../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx"
 tabname="TS8.2"
-ts82 = read.xlsx(fname,tabName=sheetname,rowIndex=6:116,colIndex=1:6,header=FALSE)
-```
-
-```
-## Error: Please provide a sheet name OR a sheet index.
-```
-
-```r
-names(ts81) = c("year","top_10percent_income_share","top_1percent_income_share",
-                "top_0.1percent_income_share", "top_10percent_wage_share", "top_1percent_wage_share")
+ts82 = read.xlsx(fname,sheetName=tabname,rowIndex=6:116,colIndex=1:11,header=FALSE)
+names(ts82) = c("year","top_10percent_income_share","top_10_to5percent_income_share",
+                "top_5_to1percent_income_share","top_1percent_income_share",
+                "top0.1percent_income_share","top_10percent_income_share_wo.capitalgains",
+                "top_1percent_income_share_wo.capitalgains",
+                "top_0.1percent_income_share_wo.capitalgains","top_10percent_wage_share",
+                "top_1percent_wage_share")
 ```
 
 ### Table TS8.3
@@ -180,7 +177,8 @@ fig 8.3
 ```r
 f83dat<-ts83[ts83$country=="France" & ts83$year==1932,]
   
-plt <- ggplot(data=f83dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+plt <- ggplot(data=f83dat,aes(x=group,y=income.percentage,group=income.type))+geom_line()
+plt <- plt+geom_point(aes(shape=income.type),size=3)
 print(plt)
 ```
 
@@ -191,6 +189,7 @@ fig 8.4
 f84dat<-ts83[ts83$country=="France" & ts83$year==2005,]
   
 plt <- ggplot(data=f84dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+plt <- plt+geom_point(aes(shape=income.type),size=3)
 print(plt)
 ```
 
@@ -200,14 +199,71 @@ print(plt)
 Figure 8.5 Interesting note that the X-axis (year) of this plot in the original Excel file is derived from the France data. Although in this case both sheets have the same numbers in them this is ripe for later errors.
 
 ```r
-#plot here
+f85dat <- ts82[,c("year","top_10percent_income_share", "top_10percent_income_share_wo.capitalgains")]
+names(f85dat) <- c("year","income","income_wo.capitalgains")
+f85dat<-melt(f85dat,id=c("year"))
+#remove years < 1910, which have many NAs
+f85dat<-f85dat[f85dat$year>1909,]
+plt <- ggplot(data=f85dat,aes(x=year,y=value,group=variable,shape=variable))+geom_line()
+plt <- plt+geom_point(aes(shape=variable,fill=variable),size=3)
+print(plt)
 ```
+
+![plot of chunk F8.5](figure/F8.5.png) 
+
+fig 8.6
+
+
+```r
+f86dat <- ts82[,c("year","top_1percent_income_share","top_5_to1percent_income_share","top_10_to5percent_income_share")]
+names(f86dat) <- c("year","top_1percent_income_share","top_5_to1percent_income_share","top_10_to5percent_income_share")
+f86dat<-melt(f86dat,id=c("year"))
+#remove years < 1910, which have many NAs
+f86dat<-f86dat[f86dat$year>1909,]
+plt <- ggplot(data=f86dat,aes(x=year,y=value,group=variable,shape=variable))+geom_line()
+plt <- plt+geom_point(aes(shape=variable,fill=variable),size=3)
+print(plt)
+```
+
+![plot of chunk F8.6](figure/F8.6.png) 
+
+fig 8.7
+
+```r
+f87dat <- ts82[,c("year","top_10percent_income_share","top_10percent_income_share_wo.capitalgains","top_10percent_wage_share")]
+names(f87dat) <- c("year","top_10percent_income_share","top_10percent_income_share_wo.capitalgains","top_10percent_wage_share")
+f87dat<-melt(f87dat,id=c("year"))
+#remove years < 1910, which have many NAs
+f87dat<-f87dat[f87dat$year>1909,]
+plt <- ggplot(data=f87dat,aes(x=year,y=value,group=variable,shape=variable))+geom_line()
+plt <- plt+geom_point(aes(shape=variable,fill=variable),size=3)
+print(plt)
+```
+
+![plot of chunk F8.7](figure/F8.7.png) 
+
+fig 8.8
+
+```r
+f88dat <- ts82[,c("year","top_1percent_income_share","top_1percent_income_share_wo.capitalgains","top_1percent_wage_share")]
+names(f88dat) <- c("year","top_1percent_income_share","top_1percent_income_share_wo.capitalgains","top_1percent_wage_share")
+f88dat<-melt(f88dat,id=c("year"))
+#remove years < 1910, which have many NAs
+f88dat<-f88dat[f88dat$year>1909,]
+plt <- ggplot(data=f88dat,aes(x=year,y=value,group=variable,shape=variable))+geom_line()
+plt <- plt+geom_point(aes(shape=variable,fill=variable),size=3)
+print(plt)
+```
+
+![plot of chunk F8.8](figure/F8.8.png) 
+
 fig 8.9
 
 ```r
 f89dat<-ts83[ts83$country=="USA" & ts83$year==1929 &ts83$capital.gains=="with.capital.gains",]
   
 plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+plt <- plt+geom_point(aes(shape=income.type),size=3)
 print(plt)
 ```
 
@@ -218,6 +274,7 @@ fig 8.10
 f89dat<-ts83[ts83$country=="USA" & ts83$year==2007 &ts83$capital.gains=="with.capital.gains",]
   
 plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+plt <- plt+geom_point(aes(shape=income.type),size=3)
 print(plt)
 ```
 
