@@ -133,28 +133,29 @@ names(ts83)<-c("group","income.type","income.percentage","country","capital.gain
 
 
 ```
-
-``` {r F8.3,dependson"tabTS8.3",message=FALSE}
+fig 8.3
+``` {r F8.3,dependson="tabTS8.3",message=FALSE}
 f83dat<-ts83[ts83$country=="France" & ts83$year==1932,]
   
 plt <- ggplot(data=f83dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
 print(plt)
 ```
-
-``` {r F8.4,dependson"tabTS8.3",message=FALSE}
+fig 8.4
+``` {r F8.4,dependson="tabTS8.3",message=FALSE}
 f84dat<-ts83[ts83$country=="France" & ts83$year==2005,]
   
 plt <- ggplot(data=f84dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
 print(plt)
 ```
-
-``` {r F8.9,dependson"tabTS8.3",message=FALSE}
+fig 8.9
+``` {r F8.9,dependson="tabTS8.3",message=FALSE}
 f89dat<-ts83[ts83$country=="USA" & ts83$year==1929 &ts83$capital.gains=="with.capital.gains",]
   
 plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
 print(plt)
 ```
-``` {r F8.10,dependson"tabTS8.3",message=FALSE}
+fig 8.10
+``` {r F8.10,dependson="tabTS8.3",message=FALSE}
 f89dat<-ts83[ts83$country=="USA" & ts83$year==2007 &ts83$capital.gains=="with.capital.gains",]
   
 plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()

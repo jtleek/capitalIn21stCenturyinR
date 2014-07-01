@@ -139,11 +139,46 @@ ts83$variable<-sub("income.1","income",ts83$variable)
 
 names(ts83)<-c("group","income.type","income.percentage","country","capital.gains","year")
 ```
+fig 8.3
 
+```r
+f83dat<-ts83[ts83$country=="France" & ts83$year==1932,]
+  
+plt <- ggplot(data=f83dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+print(plt)
+```
 
+![plot of chunk F8.3](figure/F8.3.png) 
+fig 8.4
 
+```r
+f84dat<-ts83[ts83$country=="France" & ts83$year==2005,]
+  
+plt <- ggplot(data=f84dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+print(plt)
+```
 
+![plot of chunk F8.4](figure/F8.4.png) 
+fig 8.9
 
+```r
+f89dat<-ts83[ts83$country=="USA" & ts83$year==1929 &ts83$capital.gains=="with.capital.gains",]
+  
+plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+print(plt)
+```
 
+![plot of chunk F8.9](figure/F8.9.png) 
+fig 8.10
+
+```r
+f89dat<-ts83[ts83$country=="USA" & ts83$year==2007 &ts83$capital.gains=="with.capital.gains",]
+  
+plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
+print(plt)
+```
+
+![plot of chunk F8.10](figure/F8.10.png) 
+#todo f8.3-8.10
 
 
