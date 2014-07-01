@@ -17,10 +17,61 @@ library(reshape2)
 library(scales)
 ```
 
+These figures are based on Table CTS4.5. Here we read data from the excel file and name the data series.
+
+```{r tabCTS4.5, message=FALSE, cache=TRUE}
+## Table CTS4.5
+tab_private = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="CTS4.5", rowIndex=6:20, colIndex=1:6, header=FALSE)
+names(tab_private) =  c("year","usa", "germany", "france", "uk", "europe")
+tab_private$capital_type <- as.factor("Private")
+
+tab_national = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="CTS4.5",rowIndex=6:20, colIndex=c(1, 7:11), header=FALSE)
+names(tab_national) =  c("year","usa", "germany", "france", "uk", "europe")
+tab_national$capital_type <- as.factor("National")
+
+tab_public = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="CTS4.5", rowIndex=6:20, colIndex=c(1, 12:16), header=FALSE)
+names(tab_public) =  c("year","usa", "germany", "france", "uk", "europe")
+tab_public$capital_type <- as.factor("Public")
+
+tab_foreign = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="CTS4.5", rowIndex=6:20, colIndex=c(1, 21:25), header=FALSE)
+names(tab_foreign) =  c("year","usa", "germany", "france", "uk", "europe")
+tab_foreign$capital_type <- as.factor("Net foreign")
+
+tab <- Reduce(function(x, y) merge(x, y, all=TRUE), list(tab_private, tab_national, tab_public, tab_foreign))
+```
+
+The caption of the table lists the sources for this table as: 
+
+> Links to PZ 2013 frozen on 8-2-2013
+
 ## Figures 5.1, and 5.2
 
-These figures are based on Table TS5.1. Here we read
-data from the excel file and name the data series.
+```{r func5_1, fig.width=8, fig.height=4}
+run51 = function(tab, num){
+  fdat <- tab[,c("year","capital_type","usa","europe")]
+  names(fdat) <- c("year","capital_type", "United States","Europe")
+  
+  # Make the data long for stacking
+  fdat <- melt(fdat, id.vars=c("year", "capital_type"))
+  names(fdat) <- c("year", "capital_type", "region", "percent")
+  
+  qplot(year, percent, data=fdat, geom="path", colour=region, xlab="Year", ylab="Value of private and public capital (% national income)") + 
+    scale_y_continuous(labels = percent, limits = c(0, 8)) +
+    ggtitle(paste0("Figure ", num, ". Private and public capital: Europe and America, 1870-2010")) +
+    theme(legend.position="bottom", legend.background = element_rect(fill="transparent")) +
+    scale_x_continuous(breaks = seq(1870, 2010, by=20))
+}
+```
+
+```{r figF5_1, dependson="tabTS5.1", fig.width=8, fig.height=4}
+run51(tab, num = "5.1")
+```
+
+```{r figF5_2, dependson="tabTS5.1", fig.width=8, fig.height=4}
+run51(tab, num = "5.2")
+```
+
+## Figure 5.3
 
 ```{r tabTS5.1, message=FALSE, cache=TRUE}
 ## Table TS5.1
@@ -28,15 +79,10 @@ tab = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetNa
 names(tab) =  c("year","us","japan", "germany", "france", "uk", "italy", "canada", "australia", "spain")
 ```
 
-The caption of the table lists the sources for this table as: 
-
-> Links to the files Piketty-Zucman 2013 frozen on 2-8-13
-
-## Figure 5.3
-
 Let's make a function that will plot our data
+
 ```{r func5_3, fig.width=8, fig.height=4}
-run53 = function(tab, num, country){
+run53 = function(tab, num){
   fdat <- tab[,c("year","us","japan", "germany", "france", "uk", "italy", "canada", "australia", "spain")]
   names(fdat) <- c("year","United States","Japan", "Germany", "France", "Britain", "Italy", "Canada", "Australia", "Spain")
   
@@ -54,6 +100,6 @@ run53 = function(tab, num, country){
 
 Now we make Figure F5.3:
 
-```{r figF4_1, dependson="tabTS5.1", fig.width=8, fig.height=4}
+```{r figF5_3, dependson="tabTS5.1", fig.width=8, fig.height=4}
 run53(tab, num = "5.3")
 ```
