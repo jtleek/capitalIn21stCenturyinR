@@ -113,7 +113,7 @@ Sources and series: see piketty.pse.ens.fr/capital21c.')+
 
 
 ### Fig 6.7
-```{r fig6.1Load}
+```{r fig6.7Load}
 # series used for figures 6.6-6.8 and S6.3
 s7 = read.xlsx("../Piketty2014FiguresTables/Chapter6TablesFigures.xlsx", sheetName="TS6.4", rowIndex=5:120,colIndex=1:6,header=TRUE)
 
@@ -125,12 +125,12 @@ names(s7) =  c('Year','Housing share in national income',
                )
 ```
 
-```{r fig6.1Clean}
+```{r fig6.7Clean}
 s7 <- melt(s7, id.vars = 'Year')
 s7 =s7[s7$variable == 'Housing share in national income', ]
 ```
 
-```{r fig6.1Plot, fig.retina=2}
+```{r fig6.7Plot, fig.retina=2}
 ggplot(data = s7, aes(x=Year, y=value))+
   geom_line(aes(color=variable))+
   geom_point(aes(shape=variable))+
@@ -147,7 +147,7 @@ ggplot(data = s7, aes(x=Year, y=value))+
 ```
 
 ### Fig 6.8
-```{r fig6.1Load}
+```{r fig6.8Load}
 # series used for figures 6.6-6.8 and S6.3
 s8 = read.xlsx("../Piketty2014FiguresTables/Chapter6TablesFigures.xlsx", sheetName="TS6.4", rowIndex=5:120,colIndex=1:6,header=TRUE)
 
@@ -159,12 +159,12 @@ names(s8) =  c('Year','Housing share in national income',
                )
 ```
 
-```{r fig6.1Clean}
+```{r fig6.8Clean}
 s8 <- melt(s8, id.vars = 'Year')
 s8 <- s8[s8$variable == 'Capital share in national income',]
 ```
 
-```{r fig6.1Plot, fig.retina=2}
+```{r fig6.8Plot, fig.retina=2}
 ggplot(data = s8, aes(x=Year, y=value))+
   geom_line(aes(color=variable))+
   geom_point(aes(shape=variable))+
