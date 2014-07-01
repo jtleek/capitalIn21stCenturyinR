@@ -47,28 +47,37 @@ The caption of the table lists the sources for this table as:
 ## Figures 5.1, and 5.2
 
 ```{r func5_1, fig.width=8, fig.height=4}
-run51 = function(tab, num){
+run51 = function(tab, num, capital_types){
   fdat <- tab[,c("year","capital_type","usa","europe")]
   names(fdat) <- c("year","capital_type", "United States","Europe")
   
   # Make the data long for stacking
   fdat <- melt(fdat, id.vars=c("year", "capital_type"))
   names(fdat) <- c("year", "capital_type", "region", "percent")
+  fdat <- subset(fdat, capital_type %in% capital_types)
   
-  qplot(year, percent, data=fdat, geom="path", colour=region, xlab="Year", ylab="Value of private and public capital (% national income)") + 
-    scale_y_continuous(labels = percent, limits = c(0, 8)) +
-    ggtitle(paste0("Figure ", num, ". Private and public capital: Europe and America, 1870-2010")) +
+#  qplot(year, percent, data=fdat, geom="path", colour=region, xlab="Year", ylab="Value of private and public capital (% national income)") + 
+#    scale_y_continuous(labels = percent, limits = c(0, 8)) +
+#    ggtitle(paste0("Figure ", num, ". Private and public capital: Europe and America, 1870-2010")) +
+#    theme(legend.position="bottom", legend.background = element_rect(fill="transparent")) +
+#    scale_x_continuous(breaks = seq(1870, 2010, by=20))
+  
+  ggplot() +
+    geom_line(data=fdat, aes(x=year, y=percent, colour=region, group=interaction(region, capital_type))) +
+    scale_y_continuous(labels = percent, limits = c(-1, 8)) +
+    ggtitle(paste0("Figure ", num, ". X capital: Europe and America, 1870-2010")) +
     theme(legend.position="bottom", legend.background = element_rect(fill="transparent")) +
-    scale_x_continuous(breaks = seq(1870, 2010, by=20))
+    scale_x_continuous(breaks = seq(1870, 2010, by=20)) +
+    geom_text(data = subset(fdat, region == "United States")[fdat$year == 1890,], aes(x=year, y=percent, label = capital_type), hjust = 0.7, vjust = 1)
 }
 ```
 
 ```{r figF5_1, dependson="tabTS5.1", fig.width=8, fig.height=4}
-run51(tab, num = "5.1")
+run51(tab, num = "5.1", c("Private", "Public"))
 ```
 
 ```{r figF5_2, dependson="tabTS5.1", fig.width=8, fig.height=4}
-run51(tab, num = "5.2")
+run51(tab, num = "5.2", c("National", "Net foreign"))
 ```
 
 ## Figure 5.3
