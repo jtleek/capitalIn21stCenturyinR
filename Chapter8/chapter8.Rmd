@@ -19,16 +19,19 @@ library(reshape2)
 ## Figures 8.1 and Supplementary Figures
 
 These figures are based on Table TS8.1. Here we read
-data from the excel file and name the data series
+data from the excel file and name the data series. Note that in a separate section the calculations upone which TS8.1 are based are recalculated.
 
 ```{r tabTS8.1, dependson="loadCh0", message=FALSE}
 ## Table TS8.1
-ts81 = read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
-                 sheetName="TS8.1",rowIndex=6:116,colIndex=1:6,header=FALSE)
+fname="../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx"
+ts81 = read.xlsx(fname,sheetName="TS8.1",rowIndex=6:116,colIndex=1:6,header=FALSE)
 names(ts81) = c("year","top_10percent_income_share","top_1percent_income_share",
                 "top_0.1percent_income_share", "top_10percent_wage_share", "top_1percent_wage_share")
 ```
-
+```{r tabderivation,message=FALSE}
+sheetname="DetailsWTIDSeries"
+tabWTID<-read.xlsx(fname,sheetName=sheetname,rowIndex=7:147,colIndex=1:126,header=FALSE)
+```
 The caption of the table lists the sources for this table
 as 
 
@@ -101,7 +104,7 @@ print(plt)
 ```
 
 
-```{r tabTS8.3, dependson="loadCh0", message=FALSE}
+```{r TS8.3, dependson="loadCh0", message=FALSE}
 ## Table TS8.1
 fname="../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx"
 ts83a = melt(read.xlsx(fname,sheetName="TS8.3",rowIndex=5:11,colIndex=1:7,header=TRUE))
@@ -135,27 +138,27 @@ names(ts83)<-c("group","income.type","income.percentage","country","capital.gain
 f83dat<-ts83[ts83$country=="France" & ts83$year==1932,]
   
 plt <- ggplot(data=f83dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
-plt
+print(plt)
 ```
 
 ``` {r F8.4,dependson"tabTS8.3",message=FALSE}
 f84dat<-ts83[ts83$country=="France" & ts83$year==2005,]
   
 plt <- ggplot(data=f84dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
-plt
+print(plt)
 ```
 
 ``` {r F8.9,dependson"tabTS8.3",message=FALSE}
 f89dat<-ts83[ts83$country=="USA" & ts83$year==1929 &ts83$capital.gains=="with.capital.gains",]
   
 plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
-plt
+print(plt)
 ```
 ``` {r F8.10,dependson"tabTS8.3",message=FALSE}
 f89dat<-ts83[ts83$country=="USA" & ts83$year==2007 &ts83$capital.gains=="with.capital.gains",]
   
 plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shape=income.type))+geom_line()
-plt
+print(plt)
 ```
 #todo f8.3-8.10
 

@@ -20,17 +20,21 @@ library(reshape2)
 ## Figures 8.1 and Supplementary Figures
 
 These figures are based on Table TS8.1. Here we read
-data from the excel file and name the data series
+data from the excel file and name the data series. Note that in a separate section the calculations upone which TS8.1 are based are recalculated.
 
 
 ```r
 ## Table TS8.1
-ts81 = read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
-                 sheetName="TS8.1",rowIndex=6:116,colIndex=1:6,header=FALSE)
+fname="../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx"
+ts81 = read.xlsx(fname,sheetName="TS8.1",rowIndex=6:116,colIndex=1:6,header=FALSE)
 names(ts81) = c("year","top_10percent_income_share","top_1percent_income_share",
                 "top_0.1percent_income_share", "top_10percent_wage_share", "top_1percent_wage_share")
 ```
 
+```r
+sheetname="DetailsWTIDSeries"
+tabWTID<-read.xlsx(fname,sheetName=sheetname,rowIndex=7:147,colIndex=1:126,header=FALSE)
+```
 The caption of the table lists the sources for this table
 as 
 
@@ -107,4 +111,39 @@ print(plt)
 ![plot of chunk figs8.2](figure/figs8.2.png) 
 
 
-#todo f8.3-8.10
+
+```r
+## Table TS8.1
+fname="../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx"
+ts83a = melt(read.xlsx(fname,sheetName="TS8.3",rowIndex=5:11,colIndex=1:7,header=TRUE))
+numentries=nrow(ts83a)
+ts83a$country<-rep("France",numentries)
+ts83a$capital.gains<-factor(rep("NA",numentries))
+ts83a$year<-rep(c("1932","2005"),each=numentries/2)
+
+ts83b = melt(read.xlsx(fname,sheetName="TS8.3",rowIndex=14:20,colIndex=1:7,header=TRUE))
+numentries=nrow(ts83b)
+ts83b$country<-rep("USA",numentries)
+ts83b$capital.gains<-factor(rep("with.capital.gains",numentries))
+ts83b$year<-rep(c("1929","2007"),each=numentries/2)
+
+ts83c = melt(read.xlsx(fname,sheetName="TS8.3",rowIndex=23:29,colIndex=1:7,header=TRUE))
+numentries=nrow(ts83c)
+ts83c$country<-rep("USA",numentries)
+ts83c$capital.gains<-factor(rep("no.capital.gains",numentries))
+ts83c$year<-rep(c("1929","2007"),each=numentries/2)
+
+#combine all three and get rid of spurious .1 appended in melt
+ts83<-rbind(ts83a,ts83b,ts83c)
+ts83$variable<-sub("income.1","income",ts83$variable)
+
+names(ts83)<-c("group","income.type","income.percentage","country","capital.gains","year")
+```
+
+
+
+
+
+
+
+
