@@ -1,0 +1,59 @@
+The Capital/Income Ratio over the Long Run: Chapter 5
+========================================================
+
+### Data provenance
+
+The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capital21c2. 
+
+### Loading relevant libraries and data
+
+This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), [scales](http://cran.r-project.org/web/packages/scales/index.html), [plyr](http://cran.r-project.org/web/packages/plyr/index.html), and [ggplot2](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
+
+```{r loadCh0,message=FALSE}
+library(ggplot2)
+library(xlsx)
+library(reshape2)
+### scales for percent of the axes
+library(scales)
+```
+
+## Figures 5.1, and 5.2
+
+These figures are based on Table TS5.1. Here we read
+data from the excel file and name the data series.
+
+```{r tabTS5.1, message=FALSE, cache=TRUE}
+## Table TS5.1
+tab = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="TS5.1",rowIndex=5:45,colIndex=1:10,header=FALSE)
+names(tab) =  c("year","us","japan", "germany", "france", "uk", "italy", "canada", "australia", "spain")
+```
+
+The caption of the table lists the sources for this table as: 
+
+> Links to the files Piketty-Zucman 2013 frozen on 2-8-13
+
+## Figure 5.3
+
+Let's make a function that will plot our data
+```{r func5_3, fig.width=8, fig.height=4}
+run53 = function(tab, num, country){
+  fdat <- tab[,c("year","us","japan", "germany", "france", "uk", "italy", "canada", "australia", "spain")]
+  names(fdat) <- c("year","United States","Japan", "Germany", "France", "Britain", "Italy", "Canada", "Australia", "Spain")
+  
+  # Make the data long for stacking
+  fdat <- melt(fdat, id.var="year")
+  names(fdat) <- c("year","country","percent")
+  
+  qplot(year, percent, data=fdat, geom="path", colour=country, xlab="Year", ylab="Value of private capital (% national income)") + 
+    scale_y_continuous(labels = percent, limits = c(0, 8)) +
+    ggtitle(paste0("Figure ", num, ". Private Capital in rich countries, 1970-2010")) +
+    theme(legend.position="bottom", legend.background = element_rect(fill="transparent")) +
+    scale_x_continuous(breaks = seq(1970, 2010, by=5))
+}
+```
+
+Now we make Figure F5.3:
+
+```{r figF4_1, dependson="tabTS5.1", fig.width=8, fig.height=4}
+run53(tab, num = "5.3")
+```
