@@ -18,3 +18,4 @@ request, please add yourself to the list of contributors below.
 * [Jeff Leek](http://jtleek.com)
 * [Bruce Swihart](http://www.biostat.jhsph.edu/~bswihart/)
 * [Ryan Kelly](http://www.rmdk.ca)
+* [Brian Schousek](https://plus.google.com/107712647868079948212)
