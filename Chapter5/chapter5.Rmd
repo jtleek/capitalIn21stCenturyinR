@@ -169,3 +169,26 @@ names(tab) =  c("year","us","japan", "germany", "france", "uk", "italy", "canada
 ```{r figF5_7, dependson="tabTS5.3", fig.width=8, fig.height=4}
 run56(tab, num = "5.7", y_min = -1, y_max = 8.2, y_label = "Value of capital (% national income)")
 ```
+
+```{r tabCTS12.3, message=FALSE, cache=TRUE}
+## Table CTS12.3
+tab = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="CTS12.3",rowIndex=5:28,colIndex=1:2,header=FALSE)
+names(tab) =  c("year","private_capital")
+```
+
+```{r func5_8, fig.width=8, fig.height=4}
+run58 = function(tab, num, y_min, y_max, y_label){
+  fdat <- tab[,c("year","private_capital")]
+  names(fdat) <- c("year","private_capital")
+  
+  qplot(year, private_capital, data=fdat, geom="path", xlab="Year", ylab=y_label) + 
+    scale_y_continuous(labels = percent, limits = c(y_min, y_max)) +
+    ggtitle(paste0("Figure ", num, ". 1870-2090")) +
+    theme(legend.position="bottom", legend.background = element_rect(fill="transparent")) +
+    scale_x_continuous(breaks = seq(1870, 2090, by=20))
+}
+```
+
+```{r figF5_8, dependson="tabCTS12.3", fig.width=8, fig.height=4}
+run58(tab, num = "5.8", y_min = 0, y_max = 8, y_label = "Value of private capital (% national income)")
+```
