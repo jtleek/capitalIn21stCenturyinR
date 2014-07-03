@@ -135,7 +135,7 @@ run53(tab, num = "5.5", y_min = -1, y_max = 8, y_label = "Value of capital (% na
 
 ```{r tabTS5.11, message=FALSE, cache=TRUE}
 ## Table TS5.11
-tab = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="TS5.11",rowIndex=5:45,colIndex=1:10,header=FALSE)
+tab = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="TS5.11",rowIndex=5:45,colIndex=1:9,header=FALSE)
 names(tab) =  c("year","us","japan", "germany", "france", "uk", "italy", "canada", "australia")
 ```
 
@@ -160,3 +160,12 @@ run56 = function(tab, num, y_min, y_max, y_label){
 run56(tab, num = "5.6", y_min = 0, y_max = 1.6, y_label = "Ratio between market value and book value of corporations")
 ```
 
+```{r tabTS5.3, message=FALSE, cache=TRUE}
+## Table TS5.3
+tab = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="TS5.3",rowIndex=5:45,colIndex=1:10,header=FALSE)
+names(tab) =  c("year","us","japan", "germany", "france", "uk", "italy", "canada", "australia", "spain")
+```
+
+```{r figF5_7, dependson="tabTS5.3", fig.width=8, fig.height=4}
+run56(tab, num = "5.7", y_min = -1, y_max = 8.2, y_label = "Value of capital (% national income)")
+```
