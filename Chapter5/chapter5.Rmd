@@ -91,7 +91,7 @@ names(tab) =  c("year","us","japan", "germany", "france", "uk", "italy", "canada
 Let's make a function that will plot our data
 
 ```{r func5_3, fig.width=8, fig.height=4}
-run53 = function(tab, num, y_max, y_label){
+run53 = function(tab, num, y_min, y_max, y_label){
   fdat <- tab[,c("year","us","japan", "germany", "france", "uk", "italy", "canada", "australia", "spain")]
   names(fdat) <- c("year","United States","Japan", "Germany", "France", "Britain", "Italy", "Canada", "Australia", "Spain")
   
@@ -100,7 +100,7 @@ run53 = function(tab, num, y_max, y_label){
   names(fdat) <- c("year","country","percent")
   
   qplot(year, percent, data=fdat, geom="path", colour=country, xlab="Year", ylab=y_label) + 
-    scale_y_continuous(labels = percent, limits = c(0, y_max)) +
+    scale_y_continuous(labels = percent, limits = c(y_min, y_max)) +
     ggtitle(paste0("Figure ", num, ". Private Capital in rich countries, 1970-2010")) +
     theme(legend.position="bottom", legend.background = element_rect(fill="transparent")) +
     scale_x_continuous(breaks = seq(1970, 2010, by=5))
@@ -110,7 +110,7 @@ run53 = function(tab, num, y_max, y_label){
 Now we make Figure F5.3:
 
 ```{r figF5_3, dependson="tabTS5.1", fig.width=8, fig.height=4}
-run53(tab, num = "5.3", y_max = 8, y_label = "Value of private capital (% national income)")
+run53(tab, num = "5.3", y_min = 0, y_max = 8, y_label = "Value of private capital (% national income)")
 ```
 
 ```{r tabTS5.12, message=FALSE, cache=TRUE}
@@ -120,5 +120,15 @@ names(tab) =  c("year","us","japan", "germany", "france", "uk", "italy", "canada
 ```
 
 ```{r figF5_4, dependson="tabTS5.12", fig.width=8, fig.height=4}
-run53(tab, num = "5.4", y_max = 10, y_label = "Private capital (%disposable household income)")
+run53(tab, num = "5.4", y_min = 0, y_max = 10, y_label = "Private capital (% disposable household income)")
+```
+
+```{r tabTS5.2, message=FALSE, cache=TRUE}
+## Table TS5.2
+tab = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="TS5.2",rowIndex=5:45,colIndex=1:10,header=FALSE)
+names(tab) =  c("year","us","japan", "germany", "france", "uk", "italy", "canada", "australia", "spain")
+```
+
+```{r figF5_5, dependson="tabTS5.2", fig.width=8, fig.height=4}
+run53(tab, num = "5.5", y_min = -1, y_max = 8, y_label = "Value of capital (% national income)")
 ```
