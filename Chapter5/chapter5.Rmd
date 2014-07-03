@@ -113,12 +113,12 @@ Now we make Figure F5.3:
 run53(tab, num = "5.3", y_max = 8, y_label = "Value of private capital (% national income)")
 ```
 
-```{r tabTS5.9, message=FALSE, cache=TRUE}
-## Table TS5.9
-tab = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="TS5.9",rowIndex=5:45,colIndex=1:10,header=FALSE)
+```{r tabTS5.12, message=FALSE, cache=TRUE}
+## Table TS5.12
+tab = read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",sheetName="TS5.12",rowIndex=5:45,colIndex=1:10,header=FALSE)
 names(tab) =  c("year","us","japan", "germany", "france", "uk", "italy", "canada", "australia", "spain")
 ```
 
-```{r figF5_4, dependson="tabTS5.9", fig.width=8, fig.height=4}
+```{r figF5_4, dependson="tabTS5.12", fig.width=8, fig.height=4}
 run53(tab, num = "5.4", y_max = 10, y_label = "Private capital (%disposable household income)")
 ```
