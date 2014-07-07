@@ -91,7 +91,7 @@ names(ts83)<-c("group","income.type","income.percentage","country","capital.gain
 #tabWTID<-read.xlsx(fname,sheetName=sheetname,rowIndex=7:147,colIndex=1:126,header=FALSE)
 ```
 
-##Figures 
+## Figures 
 
 The caption of the table lists the sources for this table
 as 
@@ -99,7 +99,7 @@ as
 >Top income shares series based upon WTID series; missing values interpolated using moving averages and top 5% and top 1% series (see formulas and "Details" sheet)
 >Top wage series: Piketty 2001 (figure 3.2) (missing values for 1910-1918, 1939-1946, and 1999-2010 interpolated using income series and composition series, and series from Landais 2007 and Godechot 2012)
 
-Now we make Figure F8.1
+### Figure F8.1
 
 ```{r figF8.1, dependson="tabTS8.1", fig.width=8, fig.height=6}
 #TODO: confirm calculations in table. for example 1909 and 1911 top 10% income shares are interpolated
@@ -133,7 +133,7 @@ print(plt)
 
 ```
 
-And Figure 8.2
+### Figure 8.2
 
 ```{r figs8.2, dependson="tabTS8.1", fig.width=8, fig.height=6}
 f82dat <- ts81[,c("year","top_1percent_income_share", "top_1percent_wage_share")]
@@ -166,7 +166,7 @@ print(plt)
 
 
 
-fig 8.3
+### fig 8.3
 ``` {r F8.3,dependson="tabTS8.3",message=FALSE, fig.width=8, fig.height=6}
 f83dat<-ts83[ts83$country=="France" & ts83$year==1932,]
   
@@ -174,7 +174,7 @@ plt <- ggplot(data=f83dat,aes(x=group,y=income.percentage,group=income.type))+ge
 plt <- plt+geom_point(aes(shape=income.type),size=3)
 print(plt)
 ```
-fig 8.4
+### fig 8.4
 ``` {r F8.4,dependson="tabTS8.3",message=FALSE, fig.width=8, fig.height=6}
 f84dat<-ts83[ts83$country=="France" & ts83$year==2005,]
   
@@ -184,7 +184,9 @@ print(plt)
 ```
 
 
-Figure 8.5 Interesting note that the X-axis (year) of this plot in the original Excel file is derived from the France data. Although in this case both sheets have the same numbers in them this is ripe for later errors.
+### Figure 8.5
+
+Interesting note that the X-axis (year) of this plot in the original Excel file is derived from the France data. Although in this case both sheets have the same numbers in them this is ripe for later errors.
 ``` {r F8.5,dependson="TS8.2",message=FALSE, fig.width=8, fig.height=6}
 f85dat <- ts82[,c("year","top_10percent_income_share", "top_10percent_income_share_wo.capitalgains")]
 names(f85dat) <- c("year","income","income_wo.capitalgains")
@@ -196,7 +198,7 @@ plt <- plt+geom_point(aes(shape=variable,fill=variable),size=3)
 print(plt)
 ```
 
-fig 8.6
+### fig 8.6
 
 ``` {r F8.6,dependson="TS8.2",message=FALSE, fig.width=8, fig.height=6}
 f86dat <- ts82[,c("year","top_1percent_income_share","top_5_to1percent_income_share","top_10_to5percent_income_share")]
@@ -210,7 +212,7 @@ print(plt)
 
 ```
 
-fig 8.7
+### fig 8.7
 ``` {r F8.7,dependson="TS8.2",message=FALSE, fig.width=8, fig.height=6}
 f87dat <- ts82[,c("year","top_10percent_income_share","top_10percent_income_share_wo.capitalgains","top_10percent_wage_share")]
 names(f87dat) <- c("year","top_10percent_income_share","top_10percent_income_share_wo.capitalgains","top_10percent_wage_share")
@@ -223,7 +225,7 @@ print(plt)
 
 ```
 
-fig 8.8
+### fig 8.8
 ``` {r F8.8,dependson="TS8.2",message=FALSE, fig.width=8, fig.height=6}
 f88dat <- ts82[,c("year","top_1percent_income_share","top_1percent_income_share_wo.capitalgains","top_1percent_wage_share")]
 names(f88dat) <- c("year","top_1percent_income_share","top_1percent_income_share_wo.capitalgains","top_1percent_wage_share")
@@ -236,7 +238,7 @@ print(plt)
 
 ```
 
-fig 8.9
+### fig 8.9
 ``` {r F8.9,dependson="tabTS8.3",message=FALSE, fig.width=8, fig.height=6}
 f89dat<-ts83[ts83$country=="USA" & ts83$year==1929 &ts83$capital.gains=="with.capital.gains",]
   
@@ -244,7 +246,7 @@ plt <- ggplot(data=f89dat,aes(x=group,y=income.percentage,group=income.type,shap
 plt <- plt+geom_point(aes(shape=income.type),size=3)
 print(plt)
 ```
-fig 8.10
+### fig 8.10
 ``` {r F8.10,dependson="tabTS8.3",message=FALSE, fig.width=8, fig.height=6}
 f89dat<-ts83[ts83$country=="USA" & ts83$year==2007 &ts83$capital.gains=="with.capital.gains",]
   
@@ -257,6 +259,8 @@ print(plt)
 ## Package Version Information
 
 The information for this chapter was originally developed on a system with the following library versions:
+
+
 R version 3.0.3 (2014-03-06)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 

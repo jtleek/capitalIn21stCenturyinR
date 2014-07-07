@@ -93,7 +93,7 @@ names(ts83)<-c("group","income.type","income.percentage","country","capital.gain
 #tabWTID<-read.xlsx(fname,sheetName=sheetname,rowIndex=7:147,colIndex=1:126,header=FALSE)
 ```
 
-##Figures 
+## Figures 
 
 The caption of the table lists the sources for this table
 as 
@@ -101,7 +101,7 @@ as
 >Top income shares series based upon WTID series; missing values interpolated using moving averages and top 5% and top 1% series (see formulas and "Details" sheet)
 >Top wage series: Piketty 2001 (figure 3.2) (missing values for 1910-1918, 1939-1946, and 1999-2010 interpolated using income series and composition series, and series from Landais 2007 and Godechot 2012)
 
-Now we make Figure F8.1
+### Figure F8.1
 
 
 ```r
@@ -137,7 +137,7 @@ print(plt)
 
 ![plot of chunk figF8.1](figure/figF8.1.png) 
 
-And Figure 8.2
+### Figure 8.2
 
 
 ```r
@@ -172,7 +172,7 @@ print(plt)
 
 
 
-fig 8.3
+### fig 8.3
 
 ```r
 f83dat<-ts83[ts83$country=="France" & ts83$year==1932,]
@@ -183,7 +183,7 @@ print(plt)
 ```
 
 ![plot of chunk F8.3](figure/F8.3.png) 
-fig 8.4
+### fig 8.4
 
 ```r
 f84dat<-ts83[ts83$country=="France" & ts83$year==2005,]
@@ -196,7 +196,9 @@ print(plt)
 ![plot of chunk F8.4](figure/F8.4.png) 
 
 
-Figure 8.5 Interesting note that the X-axis (year) of this plot in the original Excel file is derived from the France data. Although in this case both sheets have the same numbers in them this is ripe for later errors.
+### Figure 8.5
+
+Interesting note that the X-axis (year) of this plot in the original Excel file is derived from the France data. Although in this case both sheets have the same numbers in them this is ripe for later errors.
 
 ```r
 f85dat <- ts82[,c("year","top_10percent_income_share", "top_10percent_income_share_wo.capitalgains")]
@@ -211,7 +213,7 @@ print(plt)
 
 ![plot of chunk F8.5](figure/F8.5.png) 
 
-fig 8.6
+### fig 8.6
 
 
 ```r
@@ -227,7 +229,7 @@ print(plt)
 
 ![plot of chunk F8.6](figure/F8.6.png) 
 
-fig 8.7
+### fig 8.7
 
 ```r
 f87dat <- ts82[,c("year","top_10percent_income_share","top_10percent_income_share_wo.capitalgains","top_10percent_wage_share")]
@@ -242,7 +244,7 @@ print(plt)
 
 ![plot of chunk F8.7](figure/F8.7.png) 
 
-fig 8.8
+### fig 8.8
 
 ```r
 f88dat <- ts82[,c("year","top_1percent_income_share","top_1percent_income_share_wo.capitalgains","top_1percent_wage_share")]
@@ -257,7 +259,7 @@ print(plt)
 
 ![plot of chunk F8.8](figure/F8.8.png) 
 
-fig 8.9
+### fig 8.9
 
 ```r
 f89dat<-ts83[ts83$country=="USA" & ts83$year==1929 &ts83$capital.gains=="with.capital.gains",]
@@ -268,7 +270,7 @@ print(plt)
 ```
 
 ![plot of chunk F8.9](figure/F8.9.png) 
-fig 8.10
+### fig 8.10
 
 ```r
 f89dat<-ts83[ts83$country=="USA" & ts83$year==2007 &ts83$capital.gains=="with.capital.gains",]
@@ -284,6 +286,8 @@ print(plt)
 ## Package Version Information
 
 The information for this chapter was originally developed on a system with the following library versions:
+
+
 R version 3.0.3 (2014-03-06)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 
