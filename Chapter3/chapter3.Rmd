@@ -7,7 +7,7 @@ The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capit
 
 ### Loading relevant libraries and data
 
-#This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), [scales](http://cran.r-project.org/web/packages/scales/index.html), and [ggplot2](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
+### This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), [scales](http://cran.r-project.org/web/packages/scales/index.html), and [ggplot2](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
 
 setwd("/Users/pacha/Dropbox/R/capitalIn21stCenturyinR/Chapter3")
 
