@@ -10,12 +10,14 @@ request, please add yourself to the list of contributors below.
 
 ### Contributors
 
-* [Abhinav Nellore](http://www.biostat.jhsph.edu/people/postdocs/nellore.shtml)
+* [Hector Corrada Bravo](http://www.cbcb.umd.edu/~hcorrada/)
 * [Aaron Fisher](http://aaronjfisher.wordpress.com/)
 * [Alyssa Frazee](http://alyssafrazee.com/)
-* [John Muschelli](http://biostat.jhsph.edu/~jmuschel/)
-* [Hector Corrada Bravo](http://www.cbcb.umd.edu/~hcorrada/)
-* [Jeff Leek](http://jtleek.com)
-* [Bruce Swihart](http://www.biostat.jhsph.edu/~bswihart/)
 * [Ryan Kelly](http://www.rmdk.ca)
+* [Jeff Leek](http://jtleek.com)
+* [John Muschelli](http://biostat.jhsph.edu/~jmuschel/)
+* [Abhinav Nellore](http://www.biostat.jhsph.edu/people/postdocs/nellore.shtml)
+* [Bruce Swihart](http://www.biostat.jhsph.edu/~bswihart/)
 * [Brian Schousek](https://plus.google.com/107712647868079948212)
+* [Mauricio Vargas](http://github.com/pachamaltese)
+
