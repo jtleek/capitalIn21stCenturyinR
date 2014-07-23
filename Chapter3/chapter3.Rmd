@@ -7,8 +7,14 @@ The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capit
 
 ### Loading relevant libraries and data
 
-This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), [scales](http://cran.r-project.org/web/packages/scales/index.html), and [ggplot2](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
+#This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), [scales](http://cran.r-project.org/web/packages/scales/index.html), and [ggplot2](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
 
+setwd("/Users/pacha/Dropbox/R/capitalIn21stCenturyinR")
+
+library(XLConnect)
+library(WriteXLS)
+
+excel.file <- file.path("Chapter3TablesFigures.xlsx")
 
 ```{r loadCh0,message=FALSE}
 library(ggplot2)
@@ -25,13 +31,13 @@ data from the excel file and name the data series.
 
 ```{r tabTS3.1, message=FALSE, cache=TRUE}
 ## Table TS3.1
-tab = read.xlsx("../Piketty2014FiguresTables/Chapter3TablesFigures.xlsx",sheetName="TS3.1",rowIndex=9:19,colIndex=1:10,header=FALSE)
+tab = read.xlsx("Piketty2014FiguresTables/Chapter3TablesFigures.xlsx",sheetName="TS3.1",rowIndex=9:19,colIndex=1:10,header=FALSE)
 names(tab) =  c("year","nat","nat_land", "nat_house", "nat_dom", "nat_foreign", "public", "public_ass", "public_debt", "private")
 ```
 
 ```{r tabTS3.2,  message=FALSE, cache=TRUE}
 ## Table TS3.1
-tab32 = read.xlsx("../Piketty2014FiguresTables/Chapter3TablesFigures.xlsx",sheetName="TS3.2",rowIndex=9:19,colIndex=1:10,header=FALSE)
+tab32 = read.xlsx("Piketty2014FiguresTables/Chapter3TablesFigures.xlsx",sheetName="TS3.2",rowIndex=9:19,colIndex=1:10,header=FALSE)
 names(tab32) =  c("year","nat","nat_land", "nat_house", "nat_dom", "nat_foreign", "public", "public_ass", "public_debt", "private")
 ```
 
