@@ -213,4 +213,9 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-Chapter8/.Rhistory
+
+#R specific
+*.RData
+*.rdb
+*.rdx
+.Rhistory
