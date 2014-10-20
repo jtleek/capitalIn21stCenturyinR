@@ -7,8 +7,14 @@ The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capit
 
 ### Loading relevant libraries and data
 
-This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), [scales](http://cran.r-project.org/web/packages/scales/index.html), and [ggplot2](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
+### This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), [scales](http://cran.r-project.org/web/packages/scales/index.html), and [ggplot2](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
 
+setwd("/Users/pacha/Dropbox/R/capitalIn21stCenturyinR/Chapter3")
+
+library(XLConnect)
+library(WriteXLS)
+
+excel.file <- file.path("Chapter3TablesFigures.xlsx")
 
 ```{r loadCh0,message=FALSE}
 library(ggplot2)
@@ -25,13 +31,13 @@ data from the excel file and name the data series.
 
 ```{r tabTS3.1, message=FALSE, cache=TRUE}
 ## Table TS3.1
-tab = read.xlsx("../Piketty2014FiguresTables/Chapter3TablesFigures.xlsx",sheetName="TS3.1",rowIndex=9:19,colIndex=1:10,header=FALSE)
+tab = read.xlsx("Chapter3TablesFigures.xlsx",sheetName="TS3.1",rowIndex=9:19,colIndex=1:10,header=FALSE)
 names(tab) =  c("year","nat","nat_land", "nat_house", "nat_dom", "nat_foreign", "public", "public_ass", "public_debt", "private")
 ```
 
 ```{r tabTS3.2,  message=FALSE, cache=TRUE}
 ## Table TS3.1
-tab32 = read.xlsx("../Piketty2014FiguresTables/Chapter3TablesFigures.xlsx",sheetName="TS3.2",rowIndex=9:19,colIndex=1:10,header=FALSE)
+tab32 = read.xlsx("Chapter3TablesFigures.xlsx",sheetName="TS3.2",rowIndex=9:19,colIndex=1:10,header=FALSE)
 names(tab32) =  c("year","nat","nat_land", "nat_house", "nat_dom", "nat_foreign", "public", "public_ass", "public_debt", "private")
 ```
 
@@ -102,7 +108,7 @@ run_33_34(tab32, "3.4", "France")
 
 
 ## Figures 3.5 and 3.6
-Let's make another function to create the plot for 3.3 and 3.4
+Let's make another function to create the plot for 3.5 and 3.6
 ```{r func3_5, fig.width=8, fig.height=4}
 run_35_36 = function(tab, num, country){
 fdat <- tab[, c("year","nat", "public", "private")]
@@ -115,13 +121,13 @@ qplot(year, percent, data=fdat, geom=c("line", "point"), colour = Capital_Type, 
 }
 ```
 
-Figure 3.3
+Figure 3.5
 
 ```{r fig3_5, dependson="tabTS3.1", fig.width=8, fig.height=4}
 run_35_36(tab, "3.5", "Britain")
 ```
 
-Figure 3.4
+Figure 3.6
 
 ```{r fig3_6, dependson="tabTS3.2", fig.width=8, fig.height=4}
 run_35_36(tab32, "3.6", "France")
