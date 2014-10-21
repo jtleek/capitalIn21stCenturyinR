@@ -20,5 +20,5 @@ request, please add yourself to the list of contributors below.
 * [Bruce Swihart](http://www.biostat.jhsph.edu/~bswihart/)
 * [Brian Schousek](https://plus.google.com/107712647868079948212)
 * [Mauricio Vargas](http://github.com/pachamaltese)
-* [Franz Mohr](http://reconometrics.wordpress.com/)
+* [Franz Mohr](http://econometricswithr.wordpress.com/)
 * [Zach Stednick](http://zachstednick.com)
