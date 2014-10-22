@@ -19,14 +19,9 @@ library(xlsx)
 library(reshape2)
 library(scales)
 
-## Download the data file into working directory
-
-download.file("http://piketty.pse.ens.fr/files/capital21c/en/xls/Chapter2TablesFigures.xlsx","chapter02.xlsx")
-
-
 ## Table TS2.1
 
-ts21 = read.xlsx("chapter02.xlsx",sheetName="TS2.2",rowIndex=8:17,colIndex=c(25,27:30),header=FALSE)
+ts21 = read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",sheetName="TS2.2",rowIndex=8:17,colIndex=c(25,27:30),header=FALSE)
 names(ts21) = c("year","Europe","America","Africa","Asia")
 ts21 = melt(ts21,id.vars="year")
 names(ts21) = c("year","Country","population")
@@ -34,14 +29,14 @@ names(ts21) = c("year","Country","population")
 
 ## Table TS2.2
 
-ts22 = read.xlsx("chapter02.xlsx",sheetName="TS2.2",rowIndex=8:20,colIndex=8:9,header=FALSE)
+ts22 = read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",sheetName="TS2.2",rowIndex=8:20,colIndex=8:9,header=FALSE)
 ts22[,3] = 1:13
 names(ts22) = c("period","growth","order")
 
 
 ## Table TS2.3
 
-ts23 = read.xlsx("chapter02.xlsx",sheetName="TS2.4",rowIndex=10:16,colIndex=4:6,header=FALSE)
+ts23 = read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",sheetName="TS2.4",rowIndex=10:16,colIndex=4:6,header=FALSE)
 names(ts23) = c("period","Western Europe","North America")
 ts23 = melt(ts23,id.vars="period")
 ts23[,4] = rep(1:7,2)
@@ -50,21 +45,21 @@ names(ts23) = c("period","Country","growth","order")
 
 ## Table TS2.4
 
-ts24 = read.xlsx("chapter02.xlsx",sheetName="TS2.4",rowIndex=7:18,colIndex=c(1,3),header=FALSE)
+ts24 = read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",sheetName="TS2.4",rowIndex=7:18,colIndex=c(1,3),header=FALSE)
 ts24[,3] = 1:12
 names(ts24) = c("period","growth","order")
 
 
 ## Table TS2.5
 
-ts25 = read.xlsx("chapter02.xlsx",sheetName="TS2.4",rowIndex=7:18,colIndex=c(1,2),header=FALSE)
+ts25 = read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",sheetName="TS2.4",rowIndex=7:18,colIndex=c(1,2),header=FALSE)
 ts25[,3] = 1:12
 names(ts25) = c("period","growth","order")
 
 
 ## Table TS2.6
 
-ts26 = read.xlsx("chapter02.xlsx",sheetName="TS2.5",rowIndex=8:14,colIndex=1:5,header=FALSE)
+ts26 = read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",sheetName="TS2.5",rowIndex=8:14,colIndex=1:5,header=FALSE)
 names(ts26) = c("period","France","Germany","US","Britain")
 ts26 = melt(ts26,id.vars="period")
 ts26[,4] = rep(1:7,4)
