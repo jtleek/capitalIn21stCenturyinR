@@ -1,0 +1,45 @@
+Chapter 11: Merit and Inheritance in the Long Run
+=================================================
+
+### Data provenance
+
+The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capital21c2.·
+
+### Loading relevant libraries and data
+
+This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), [scales](http://cran.r-project.org/web/packages/scales/index.html), [plyr](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
+
+
+```{r loadCh0,message=FALSE}
+library(ggplot2)
+library(xlsx)
+library(reshape2)
+### scales for percent of the axes
+library(scales)
+library(plyr)
+```
+
+## Figures 11.1 - 11.12 The age-wealth profile in France
+
+All figures from Table T11.1
+
+```{r tableT11.1, message=FALSE, cache=TRUE, warning=FALSE}
+table.ts11 <- read.xlsx("../Piketty2014FiguresTables//Chapter11TablesFigures.xlsx", sheetName="TS11.1", rowIndex=8:39, colIndex=1:13, header=FALSE)
+names(table.ts11) <- c("year", "Economic flow", "Fiscal flow",
+                       "disp_income_econ", "disp_income_fiscal", 
+                       "Mortality", "avg_death", 
+                       "ave_age_inheritors", "mu_ratio_avg_wealth",
+                       "mu_ratio_corrected", "nat_wealth_econ",
+                       "simulated_inheritance_s1", "simulated_inheritance_s2")
+table.ts11.melted <- melt(table.ts11, id.var="year")
+
+plot11.1 <- table.ts11.melted[table.ts11.melted$variable %in% c("Economic flow", "Fiscal flow"), ]
+names(plot11.1) <- c("Year", "Value", "percent")
+qplot(Year, percent, data=plot11.1, geom=c("line", "point"), color=Value, xlab="Year", ylab="Annual value of inheritance and gifts (% national income)") + xlim(1820, 2020) +
+  ggtitle("Figure 11.1. The annual inheritance flow as a fraction of national income, France 1820-2010")
+
+plot11.2 <- table.ts11.melted[table.ts11.melted$variable == "Mortality", ]
+names(plot11.2) <- c("Year", "Value", "percent")
+qplot(Year, percent * 100, data=plot11.2, geom=c("line", "point"), color=Value, xlab = "The mortality rate fell in France during the 20th century (rise of life expectancy), \n and should increase somewhat during the 21st century (baby-boom effect). ", ylab= "Adult mortality rate (%)")
+```
+
