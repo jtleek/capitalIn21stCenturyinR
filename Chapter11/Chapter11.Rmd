@@ -3,7 +3,7 @@ Chapter 11: Merit and Inheritance in the Long Run
 
 ### Data provenance
 
-The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capital21c2.�
+The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capital21c2.·
 
 ### Loading relevant libraries and data
 
@@ -28,14 +28,15 @@ table.ts11 <- read.xlsx("../Piketty2014FiguresTables//Chapter11TablesFigures.xls
 names(table.ts11) <- c("year", "Economic flow", "Fiscal flow",
                        "disp_income_econ", "disp_income_fiscal", 
                        "Adult Mortality", "Average death age", 
-                       "Average age inheritors", "mu_ratio_avg_wealth",
-                       "mu_ratio_corrected", "nat_wealth_econ",
+                       "Average age inheritors", "μ ratio Avg wealth",
+                       "μ ratio corrected", "Annual inheritance flows",
                        "simulated_inheritance_s1", "simulated_inheritance_s2")
 table.ts11.melted <- melt(table.ts11, id.var="year")
 
 plot11.1 <- table.ts11.melted[table.ts11.melted$variable %in% c("Economic flow", "Fiscal flow"), ]
 names(plot11.1) <- c("Year", "Value", "percent")
-qplot(Year, percent, data=plot11.1, geom=c("line", "point"), color=Value, xlab="Year", ylab="Annual value of inheritance and gifts (% national income)") + xlim(1820, 2020) +
+qplot(Year, percent, data=plot11.1, geom=c("line", "point"), color=Value, xlab="Year",
+      ylab="Annual value of inheritance and gifts (% national income)") + xlim(1820, 2020) +
   ggtitle("Figure 11.1. The annual inheritance flow as a fraction of national income, France 1820-2010")
 
 plot11.2 <- table.ts11.melted[table.ts11.melted$variable == "Adult Mortality", ]
@@ -45,7 +46,24 @@ qplot(Year, percent * 100, data=plot11.2, geom=c("line", "point"), color=Value, 
 
 plot11.3 <- table.ts11.melted[table.ts11.melted$variable %in% c("Average death age", "Average age inheritors"), ]
 names(plot11.3) <- c("Year", "Value", "Age")
-qplot(Year, Age, data=plot11.3, geom=c("line", "point"), color=Value, xlab = "Year ", ylab= "Average age in years") + xlim(1820,2100) +
-  theme(legend.position=c(0.2, 0.8), legend.background = element_rect(fill="transparent")) + ggtitle("Figure 11.3. Average age of decedents and inheritors, France 1820-2100")
+qplot(Year, Age, data=plot11.3, geom=c("line", "point"), color=Value, xlab = "Year", ylab= "Average age in years") +
+  xlim(1820,2100) +
+  theme(legend.position=c(0.2, 0.8), legend.background = element_rect(fill="transparent")) +
+  ggtitle("Figure 11.3. Average age of decedents and inheritors, France 1820-2100")
+
+plot11.4 <- table.ts11.melted[table.ts11.melted$variable %in% c("Annual inheritance flows", "Adult Mortality"), ]
+names(plot11.4) <- c("Year", "Value", "percent")
+qplot(Year, percent * 100, data=plot11.4, geom=c("line", "point"), color=Value, xlab = "Year", ylab= "Annual rate of transmission or mortality (%)
+") +
+  xlim(1820,2010) +
+  theme(legend.position=c(0.7, 0.8), legend.background = element_rect(fill="transparent"))
+
+plot11.5 <- table.ts11.melted[table.ts11.melted$variable %in% 
+                                c("μ ratio Avg wealth", "μ ratio corrected"), ]
+names(plot11.5) <- c("Year", "Value", "percent")
+qplot(Year, percent * 100, data=plot11.5, geom=c("line", "point"), color=Value, xlab = "Year", ylab= "Ratio between the average wealth of decedents and the living") + xlim(1820,2010) +
+  theme(legend.position=c(0.7, 0.8), legend.background = element_rect(fill="transparent"))
+
+plot11.6 <- 
 ```
 
