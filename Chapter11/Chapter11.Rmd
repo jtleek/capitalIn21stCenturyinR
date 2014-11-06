@@ -27,8 +27,8 @@ All figures from Table T11.1
 table.ts11 <- read.xlsx("../Piketty2014FiguresTables//Chapter11TablesFigures.xlsx", sheetName="TS11.1", rowIndex=8:39, colIndex=1:13, header=FALSE)
 names(table.ts11) <- c("year", "Economic flow", "Fiscal flow",
                        "disp_income_econ", "disp_income_fiscal", 
-                       "Mortality", "avg_death", 
-                       "ave_age_inheritors", "mu_ratio_avg_wealth",
+                       "Adult Mortality", "Average death age", 
+                       "Average age inheritors", "mu_ratio_avg_wealth",
                        "mu_ratio_corrected", "nat_wealth_econ",
                        "simulated_inheritance_s1", "simulated_inheritance_s2")
 table.ts11.melted <- melt(table.ts11, id.var="year")
@@ -38,8 +38,14 @@ names(plot11.1) <- c("Year", "Value", "percent")
 qplot(Year, percent, data=plot11.1, geom=c("line", "point"), color=Value, xlab="Year", ylab="Annual value of inheritance and gifts (% national income)") + xlim(1820, 2020) +
   ggtitle("Figure 11.1. The annual inheritance flow as a fraction of national income, France 1820-2010")
 
-plot11.2 <- table.ts11.melted[table.ts11.melted$variable == "Mortality", ]
+plot11.2 <- table.ts11.melted[table.ts11.melted$variable == "Adult Mortality", ]
 names(plot11.2) <- c("Year", "Value", "percent")
-qplot(Year, percent * 100, data=plot11.2, geom=c("line", "point"), color=Value, xlab = "The mortality rate fell in France during the 20th century (rise of life expectancy), \n and should increase somewhat during the 21st century (baby-boom effect). ", ylab= "Adult mortality rate (%)")
+qplot(Year, percent * 100, data=plot11.2, geom=c("line", "point"), color=Value, xlab = "The mortality rate fell in France during the 20th century (rise of life expectancy), \n and should increase somewhat during the 21st century (baby-boom effect). ", ylab= "Adult mortality rate (%)") + xlim(1820,2100) +
+  theme(legend.position=c(0.6, 0.8), legend.background = element_rect(fill="transparent"))
+
+plot11.3 <- table.ts11.melted[table.ts11.melted$variable %in% c("Average death age", "Average age inheritors"), ]
+names(plot11.3) <- c("Year", "Value", "Age")
+qplot(Year, Age, data=plot11.3, geom=c("line", "point"), color=Value, xlab = "Year ", ylab= "Average age in years") + xlim(1820,2100) +
+  theme(legend.position=c(0.2, 0.8), legend.background = element_rect(fill="transparent")) + ggtitle("Figure 11.3. Average age of decedents and inheritors, France 1820-2100")
 ```
 
