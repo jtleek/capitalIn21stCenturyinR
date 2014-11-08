@@ -26,7 +26,7 @@ All figures from Table T11.1
 ```{r tableT11.1, message=FALSE, cache=TRUE, warning=FALSE}
 table.ts11 <- read.xlsx("../Piketty2014FiguresTables//Chapter11TablesFigures.xlsx", sheetName="TS11.1", rowIndex=8:39, colIndex=c(1:13, 16:24), header=FALSE)
 names(table.ts11) <- c("year", "Economic flow", "Fiscal flow",
-                       "disp_income_econ", "disp_income_fiscal", 
+                       "Economic Flows", "Fiscal Flows", 
                        "Adult Mortality", "Average death age", 
                        "Average age inheritors", "μ ratio Avg wealth",
                        "μ ratio corrected", "Annual inheritance flows",
@@ -87,10 +87,8 @@ qplot(year, value * 100, data=subset(table.ts11.melted, variable %in%
   theme(legend.position=c(0.6, 0.8),
         legend.background = element_rect(fill="transparent")) +
   ggtitle("Figure 11.6. Observed and simulated inheritance flow, France 1820-2100")
-```
 
-Plots from Table S11.2
-```{r tableT11.2, message=FALSE, cache=TRUE, warning=FALSE}
+
   table.ts11.2 <- read.xlsx("../Piketty2014FiguresTables//Chapter11TablesFigures.xlsx", sheetName="TS11.2", rowIndex=9:34,
                           colIndex=c(1:9, 11), header=FALSE)
 
@@ -126,6 +124,23 @@ qplot(year, value, data=fig7.ts11.2.stacked,
     legend.background = element_rect(fill="transparent")) +
     ggtitle("Figure 11.7. The share of inherited wealth in total wealth, France 1850-2100")
 
+qplot(year, value * 100, data=subset(table.ts11.melted, variable %in%
+            c("Economic Flows", "Fiscal Flows")),
+  geom=c("line", "point"), color=variable, xlab = "Year",
+  ylab= "Annual value of inheritance and gifts (% household disposable income)") +
+  xlim(1820,2010) +
+  theme(legend.position=c(0.7, 0.8),
+        legend.background = element_rect(fill="transparent")) +
+  ggtitle("Figure 11.8. The annual inheritance flow as a fraction of household disposable income, France 1820-2010")
+
+qplot(year, value * 100, data=subset(table.ts11.melted, variable == "Inheritance share Scenario 1"),
+  geom=c("line", "point"), color=variable, xlab = "Year",
+  ylab= "Share of inheritance of the total ressources of each cohort") +
+  xlim(1820,2010) +
+  theme(legend.position=c(0.5, 0.8),
+        legend.background = element_rect(fill="transparent")) +
+  ggtitle("Figure 11.9. The share of inheritance in the total ressources \n
+          (inheritance and work) of cohorts born in 1790-2030")
 ```
 
 
