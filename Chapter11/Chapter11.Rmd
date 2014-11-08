@@ -141,6 +141,26 @@ qplot(year, value * 100, data=subset(table.ts11.melted, variable == "Inheritance
         legend.background = element_rect(fill="transparent")) +
   ggtitle("Figure 11.9. The share of inheritance in the total ressources \n
           (inheritance and work) of cohorts born in 1790-2030")
+
+qplot(year, value * 100, data=subset(table.ts11.melted, variable %in%
+            c("Living standard top 1% inheritance Scenario 1",
+                       "Living standard top 1% labor earners Scenario 1")),
+  geom=c("line", "point"), color=variable, xlab = "Year",
+  ylab= "Multiples of average income attained by bottom 50% wage earners
+") +
+  xlim(1790,2030) +
+  theme(legend.position=c(0.7, 0.8),
+        legend.background = element_rect(fill="transparent")) +
+  ggtitle("Figure 11.10. The dilemma of Rastignac for cohorts born in years 1790-2030")
+
+qplot(year, value * 100, data=subset(table.ts11.melted, variable == "Cohort fraction Scenario 1"),
+  geom=c("line", "point"), color=variable, xlab = "Year",
+  ylab= "Fraction of each cohort") +
+  xlim(1790,2030) +
+  theme(legend.position=c(0.5, 0.8),
+        legend.background = element_rect(fill="transparent")) +
+  ggtitle("Figure 11.11. Which fraction of a cohort receives in inheritance the \n equivalent of a lifetime labor income?")
+
 ```
 
 
