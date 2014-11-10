@@ -219,4 +219,4 @@ pip-log.txt
 *.rdb
 *.rdx
 .Rhistory
-
+*_packages
