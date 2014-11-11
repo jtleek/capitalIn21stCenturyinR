@@ -1,0 +1,54 @@
+Capital in the 21st Century: Chapter 13
+========================================================
+
+### Data provenance
+
+The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capital21c2. 
+
+### Loading relevant libraries and data
+
+This document depends on the [xlsx](http://cran.r-project.org/web/packages/xlsx/index.html), [reshape2](http://cran.r-project.org/web/packages/reshape2/index.html), and [ggplot2](http://cran.r-project.org/web/packages/ggplot2/index.html) packages.
+
+
+```{r loadCh12,message=FALSE, echo=FALSE}
+library(ggplot2)
+library(xlsx)
+library(reshape2)
+
+
+## Table TS12.3
+ts12.3 = read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
+                   sheetName="TS12.3", rowIndex=c(7:33), colIndex=c(1:7), header=FALSE)
+names(ts12.3) = c("Year", "Number of bilionaires", "Total wealth in $B",
+                   "Total wealth in % global private",
+                   "Number of billionaires per 100 mil people",
+                   "Share of top 1/20 mil", "Share of top 1/100 mil")
+ts12.3m = melt(ts12.3,id.vars="Year")
+```
+
+```{r,dependson="loadCh12",fig.height=4,fig.width=8}
+## Make Figure 12.1
+qplot(Year, value, data=subset(ts12.3m, variable %in% 
+  c("Number of bilionaires", "Total wealth in $B")), geom=c("line", "point"),
+  color=variable, xlab = "Year", ylab= "Total wealth of billionaires") +
+  xlim(1987,2013) +
+  theme(legend.position=c(0.2, 0.8),
+        legend.background = element_rect(fill="transparent")) +
+  ggtitle("Figure 12.1. The world billionaires according to Forbes, 1987-2013")
+```
+
+```{r,dependson="loadCh12",fig.height=6, fig.width=8}
+## Make Figure 12.2
+
+fig12.2 <- subset(ts12.3m, variable %in% 
+  c("Total wealth in % global private",
+    "Number of billionaires per 100 mil people"))
+fig12.2$variable <- as.character(fig12.2$variable)
+fig12.2a <- fig12.2[fig12.2$variable == "Total wealth in % global private", ]
+fig12.2b <- fig12.2[fig12.2$variable == "Number of billionaires per 100 mil people", ]
+p <- ggplot(data = fig12.2, mapping = aes(x = Year, y = value))
+p <- p + facet_grid(variable~., scale="free")
+p <- p + layer(data= fig12.2a, geom = c("line", "point"), stat = "identity")
+p <- p + layer(data= fig12.2b, geom = c("line", "point"), stat = "identity")
+p + ggtitle("Figure 12.2. Billionaires as a fraction of global population and wealth 1987-2013")
+```
