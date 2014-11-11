@@ -104,18 +104,6 @@ qplot(Year, value * 100, data=subset(ts12.4m, variable != "World"),
 
 ```{r,dependson="loadCh12",fig.height=6, fig.width=8}
 ## Make Figure 12.6
-qplot(Year, value * 100, data=subset(ts12.4m, variable == "World"),
-  geom=c("line", "point"),
-  color=variable, xlab = "Year", 
-ylab= "Value of private capital (% world income)") +
-  xlim(1870,2100) +
-  theme(legend.position=c(0.2, 0.8),
-        legend.background = element_rect(fill="transparent")) +
-  ggtitle("Figure 12.4. The world capital/income ratio, 1870-2100")
-```
-
-```{r,dependson="loadCh12",fig.height=6, fig.width=8}
-## Make Figure 12.6
 qplot(Year, value, data=ts12.5m,
    geom=c("line", "point"),
   color=variable, xlab = "Year",
