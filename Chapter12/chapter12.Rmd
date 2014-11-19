@@ -1,4 +1,4 @@
-Capital in the 21st Century: Chapter 13
+Capital in the 21st Century: Chapter 12
 ========================================================
 
 ### Data provenance
@@ -27,7 +27,7 @@ ts12.3m = melt(ts12.3,id.vars="Year")
 
 ## Table TS12.4
 ts12.4 <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
-                   sheetName="TS12.4", rowIndex=c(8:31), colIndex=c(1:6), header=FALSE)
+                   sheetName="TS12.4", rowIndex=c(81:104), colIndex=c(1:6), header=FALSE)
 names(ts12.4) <- c("Year", "World", "Europe",
                    "America", "Africa", "Asia")
 ts12.4m <- melt(ts12.4,id.vars="Year")
@@ -100,18 +100,6 @@ qplot(Year, value * 100, data=subset(ts12.4m, variable != "World"),
   color=variable, xlab = "Year",
   ylab= "Value of private capital (% world income)") +
   ggtitle("Figure 12.5. The distribution of world capital, 1870-2100")
-```
-
-```{r,dependson="loadCh12",fig.height=6, fig.width=8}
-## Make Figure 12.6
-qplot(Year, value * 100, data=subset(ts12.4m, variable == "World"),
-  geom=c("line", "point"),
-  color=variable, xlab = "Year", 
-ylab= "Value of private capital (% world income)") +
-  xlim(1870,2100) +
-  theme(legend.position=c(0.2, 0.8),
-        legend.background = element_rect(fill="transparent")) +
-  ggtitle("Figure 12.4. The world capital/income ratio, 1870-2100")
 ```
 
 ```{r,dependson="loadCh12",fig.height=6, fig.width=8}
