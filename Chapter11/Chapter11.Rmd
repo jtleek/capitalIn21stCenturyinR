@@ -23,7 +23,7 @@ library(scales)
 
 All figures from Table T11.1
 
-```{r tableT11.1, message=FALSE, cache=TRUE, warning=FALSE}
+```{r tableT11.1, fig.height=6, fig.width=8, message=FALSE, cache=TRUE, warning=FALSE}
 ts11 <- read.xlsx("../Piketty2014FiguresTables//Chapter11TablesFigures.xlsx", sheetName="TS11.1", rowIndex=8:39, colIndex=c(1:13, 16:24), header=FALSE)
 names(ts11) <- c("year", "Economic flow", "Fiscal flow",
                        "Economic Flows", "Fiscal Flows", 
@@ -92,9 +92,10 @@ qplot(year, value * 100, data=subset(ts11.melted, variable %in%
   theme(legend.position=c(0.6, 0.8),
         legend.background = element_rect(fill="transparent")) +
   ggtitle("Figure 11.6. Observed and simulated inheritance flow, France 1820-2100")
+```
 
-
-  ts11.2 <- read.xlsx("../Piketty2014FiguresTables//Chapter11TablesFigures.xlsx", sheetName="TS11.2", rowIndex=9:34,
+```{r tableT11.2, message=FALSE, cache=TRUE, warning=FALSE}
+ts11.2 <- read.xlsx("../Piketty2014FiguresTables//Chapter11TablesFigures.xlsx", sheetName="TS11.2", rowIndex=9:34,
                           colIndex=c(1:9, 11), header=FALSE)
 
 names(ts11.2) <- c("year", "Share of wealth Scenario 1",
@@ -121,6 +122,10 @@ names(fig7.ts11.2)[1] <- "year"
 
 fig7.ts11.2.stacked <- rbind(fig7.ts11.1, fig7.ts11.2)
 
+```
+
+
+```{r fig.height=6, fig.width=8,message=FALSE, cache=TRUE, warning=FALSE, echo=FALSE}
 qplot(year, value, data=fig7.ts11.2.stacked,
     geom=c("line", "point"), color=variable, xlab = "Year",
     ylab= "Cumulated value of inherited wealth (% total wealth of the living)") +
@@ -148,19 +153,22 @@ qplot(year, value * 100, data=subset(ts11.melted, variable == "Inheritance share
         legend.background = element_rect(fill="transparent")) +
   ggtitle("Figure 11.9. The share of inheritance in the total ressources \n
           (inheritance and work) of cohorts born in 1790-2030")
+```
 
+```{r Fig11.10, fig.height=6, fig.width=8,message=FALSE, cache=TRUE, warning=FALSE}
 qplot(year, value * 100, data=subset(ts11.melted, variable %in%
             c("Living standard top 1% inheritance Scenario 1",
                        "Living standard top 1% labor earners Scenario 1")),
   geom=c("line", "point"), color=variable, xlab = "Year",
-  ylab= "Multiples of average income attained by bottom 50% wage earners
-") +
+  ylab= "Multiples of average income attained by bottom 50% wage earners") +
   xlim(1790,2030) +
   theme(legend.position=c(0.7, 0.8),
         legend.background = element_rect(fill="transparent")) +
   ggtitle("Figure 11.10. The dilemma of Rastignac \n
           for cohorts born in years 1790-2030")
+```
 
+```{r Fig11.11, fig.height=6, fig.width=8, message=FALSE, cache=TRUE, warning=FALSE}
 qplot(year, value * 100, data=subset(ts11.melted, variable == "Cohort fraction Scenario 1"),
   geom=c("line", "point"), color=variable, xlab = "Year",
   ylab= "Fraction of each cohort") +
@@ -171,7 +179,7 @@ qplot(year, value * 100, data=subset(ts11.melted, variable == "Cohort fraction S
 
 ```
 
-```{r TS11.3, message=FALSE, cache=TRUE, warning=FALSE}
+```{r TS11.3, fig.height=6, fig.width=8, message=FALSE, cache=TRUE, warning=FALSE}
 ts11.3 <- read.xlsx("../Piketty2014FiguresTables//Chapter11TablesFigures.xlsx", sheetName="TS11.3", rowIndex=8:19, colIndex=c(1:3), header=FALSE)
 names(ts11.3) <- c('year', 'UK inheritance', 'Germany Inheritance')
 fig11.12 <- merge(ts11.3, ts11[c('year', "Economic flow")])
@@ -184,8 +192,3 @@ qplot(year, value, data=na.omit(fig11.12.melted),
   xlim(1900, 2010) +
   ggtitle("Figure 11.12. The inheritance flow in Europe 1900-2010")
 ```
-
-
-
-
-
