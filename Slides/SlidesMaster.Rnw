@@ -1,0 +1,705 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Author: https://github.com/jtleek/capitalIn21stCenturyinR
+%%% Author: knitr/beamer by Patrick Toche, December 2014
+%%% Author: data/content by Thomas Piketty, 2013-2014
+%%% This replicates a December 2014 presentation at Sao Paulo by Thomas Piketty
+%%% The .Rnw file is the 'master', other files produced by knitr compilation
+%%% To compile in R: library(knitr); knit("slides.Rnw");
+%%% To compile in Rstudio: 'Compile PDF' menu command
+%%% The 'pictures' directory contains images inserted with \includegraphics
+%%% The 'figures' directory contains pdf created and inserted by knitr
+%%% Delete the 'cache' directory to recreate pdf graphics
+%%% The 'SaoPaulo' directory contains pdf of original powerpoint for reference
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% \PassOptionsToPackage loads options for packages loaded by beamer class
+\PassOptionsToPackage{obeyspaces}{url}% url package loaded by hyperref
+\PassOptionsToPackage{usenames,dvipsnames,svgnames}{xcolor}% named colors
+\PassOptionsToPackage{%
+    unicode = {false}%
+    , colorlinks = {true}%
+    , linkcolor = {MidnightBlue}%
+    , filecolor = {MidnightBlue}%
+    , citecolor = {MidnightBlue}%
+    , urlcolor = {MidnightBlue}%
+    , breaklinks = {false}%
+    , plainpages = {true}% page number anchors as plain arabic
+    , bookmarks = {true}%
+    , bookmarksnumbered = {true}%
+    , bookmarksopen = {true}%
+    , backref = {false}%
+    , pdfusetitle = {false}% false required for \includeonlyframeslist hack
+    , pdfpagemode = {UseNone}% UseThumbs, UseOutlines, FullScreen, UseNone
+    , pdfpagetransition = {Wipe /Di -45}%
+    , pdfpagelayout = {SinglePage}%
+    , pdfpagelabels = {false}% fix for beamer bug for some classes
+    , pdfstartpage = {1}%
+    , pdfstartview = {FitV}%
+    , pdffitwindow = {false}%
+    , pdfcenterwindow = {true}%
+    , pdfmenubar = {true}%
+    , pdfdisplaydoctitle = {true}%
+}{hyperref}
+
+%%%%%%%%%% Preamble Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[t]{beamer}
+%%% Select frames to be included in presentation
+% \includeonlyframes{} takes a comma-separated list *without spaces*
+\input{Piketty2014Capital21cSaoPaulo}% list of frames for inclusion
+%\input{current}% frames being debugged
+
+%%%%%%%%%% Set Document Information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Capital in the 21st Century}
+\author[Thomas Piketty]{Thomas Piketty\inst{1}\inst{2}}
+\institute{$^1$Paris School of Economics \\
+  Sao Paulo, 26 November 2014 \bigskip\bigskip \\
+  $^2$translated to beamer via knitr by Patrick Toche \\
+  \href{mailto:contact@patricktoche.com}{contact@patricktoche.com} \\
+  Based on collaborative effort led by Jeff Leek \\
+  \url{https://github.com/jtleek/capitalIn21stCenturyinR} \\
+  All copyright claims with Professor Piketty
+}
+\date{December 2014}
+
+%%%%%%%%%% Set Beamer Options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usetheme{piketty}
+
+%%%%%%%%%% Load Latex Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage[flushleft]{threeparttable}
+\usepackage{adjustbox}
+
+%%%%%%%%%% Set Miscellani %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{secnumdepth}{3}%
+\setcounter{tocdepth}{3}%
+\setlength{\abovecaptionskip}{0pt}%
+\setlength{\belowcaptionskip}{0pt}%
+
+%%%%%%%%%% Load knitr Options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<'setup', include=FALSE>>=
+library(knitr)
+
+### Set compilation options
+# option warning = FALSE set locally for easy toggle on/off while debugging
+opts_chunk$set(echo = FALSE, comment = NA, concordance = TRUE, warning = FALSE, cache = TRUE)
+
+# Set smaller font size for chunks (for code display):
+opts_chunk$set(size = 'footnotesize')
+
+# Set figure size and resolution
+opts_chunk$set(dev = c('pdf','png'), fig.path = 'figures/color/', fig.align='center', fig.height = 5, fig.width = 10, dpi = 300)
+
+# evaluate fig.cap after a chunk is evaluated
+opts_knit$set(eval.after = 'fig.cap')
+
+# TeX styles in tex document, CSS styles in HTML document
+opts_knit$set(self.contained = TRUE)
+
+# Rename figures to remove -1 suffix
+local({
+  hook_plot = knit_hooks$get('plot')
+  knit_hooks$set(plot = function(x, options) {
+    name = sub('-1([.][a-z]{3,4})$', '\\1', x)
+    if (name != x) file.rename(x, name)
+    hook_plot(name, options)
+  })
+}) 
+
+### Load Libraries:
+# setwd("~/R/capital21c/Slides")# temp for convenience
+library(ggplot2)
+library(scales)
+library(xlsx)
+library(reshape2)
+library(RColorBrewer)
+
+### Set Color & Shape Scheme
+# shape scheme (is there a package for this?)
+shapePalette <- c(17, 2, 16, 1, 15, 0, 18, 5, 24)
+# color scheme (with RBrewerColor package)
+colorPalette <- colorRampPalette(brewer.pal(9, "Set1"))(9)
+# bw scheme (uncomment both lines to activate)
+   colorPalette <- rep("#000000", 9)# black and white figures in 'Piketty' style
+   opts_chunk$set(fig.path = 'figures/bw/') # save in sub-directory
+@
+
+<<'data', include=FALSE>>=
+### Load Data:
+# Piketty denotes TS1.1 the sheets for Chapter 1.1, etc.
+# I denote df1.1 the dataframe for Figure 1.1, etc.
+
+## Figure 1.1 / TS1.1 / See also TS8.1
+ts1.1 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
+  sheetName = "TSI.1", rowIndex = 7:107, colIndex = 1:2, header = FALSE)
+names(ts1.1) <- c("Year", "top_10_is")
+df1.1 <- melt(ts1.1, id.vars = "Year")
+
+## Figure 1.2 / TS1.2
+ts1.2 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
+  sheetName = "TSI.2", rowIndex = 6:20, colIndex = 1:4, header = FALSE)
+names(ts1.2) <- c("Year", "Germany", "France", "Britain")
+df1.2 <- melt(ts1.2, id.vars = "Year")
+
+## Figure 5.3 / TS5.1
+ts5.1 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.1", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(ts5.1) <-  c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
+df5.3 <- melt(ts5.1, id.vars = "Year")
+
+## Figure 5.3b / TS5.2
+ts5.2 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.2", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(ts5.2) <-  c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
+df5.3b <- melt(ts5.2, id.vars = "Year")
+
+## Figure 5.4 / TS5.12
+ts5.12 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.12", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(ts5.12) <- c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
+df5.4 <- melt(ts5.12, id.vars = "Year")
+
+## Figure 5.5 / TS5.1 + TS5.2
+df5.5 <- merge(df5.3, df5.3b, by = c("Year", "variable"))
+names(df5.5) <- c("Year", "variable", "Private", "Public")
+df5.5 <- melt(df5.5, id.vars = c("Year", "variable"))
+names(df5.5) <- c("Year", "variable", "Type", "value")
+
+## Figure 5.6 / TS5.11
+ts5.11 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.11", rowIndex = 5:45, colIndex = 1:9, header = FALSE)
+names(ts5.11) <- c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia")
+ts5.11 <- ts5.11[, c("Year", "US", "Japan", "Germany", "France", "UK", "Canada", "Australia")] # Drop Italy as data is empty
+df5.6 <- melt(ts5.11, id.vars = "Year")
+
+## Figure 5.7 / TS5.3 + TS5.5
+ts5.3 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.3", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(ts5.3) <- c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
+ts5.3 <- melt(ts5.3, id.vars = "Year")
+ts5.5 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.5", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(ts5.5) <- c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
+ts5.5 <- melt(ts5.5, id.vars = "Year")
+df5.7 <- merge(ts5.3, ts5.5, by = c("Year", "variable"))
+names(df5.7) <- c("Year", "variable", "National", "Foreign")
+df5.7 <- melt(df5.7, id.vars = c("Year", "variable"))
+names(df5.7) <- c("Year", "variable", "Type", "value")
+
+## Figure 5.8 / CTS12.3
+cts12.3 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS12.3", rowIndex = 5:28, colIndex = 1:2, header = FALSE)
+names(cts12.3) <- c("Year", "Capital")
+df5.8 <- melt(cts12.3, id.vars = "Year")
+# Create factors Observed / Projected
+df5.8$variable <- as.character(df5.8$variable)
+df5.8[which(df5.8$Year < "2011"),]$variable <- "Observed"
+df5.8[which(df5.8$Year > "2011"),]$variable <- "Projected"
+df5.8$variable <- as.factor(df5.8$variable) # a one-liner eluded me!
+
+## Figure 8.1 /  TS8.1
+ts8.1 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+  sheetName = "TS8.1", rowIndex = 16:116, colIndex = 1:6, header = FALSE)
+names(ts8.1) <- c("Year", "top_10_is", "top_1_is", "top_0.1_is", "top_10_ws", "top_1_ws")
+df8.1 <- ts8.1[, c("Year", "top_10_is", "top_10_ws")]
+names(df8.1) <- c("Year", "Income", "Wage")
+df8.1 <- melt(df8.1, id.vars = c("Year"))
+# remove years < 1910, which have many NAs: start rowIndex at 16
+
+## Figure 8.5 /  TS8.2
+ts8.2 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+  sheetName = "TS8.2", rowIndex = 16:116, colIndex = 1:11, header = FALSE)
+names(ts8.2) <- c("Year",
+  "top_10_is","top_10_5_is", "top_5_1_is","top_1_is", "top_0.1_is",
+  "top_10_is_wok", "top_1_is_wok", "top_0.1_is_wok", 
+  "top_10_ws", "top_1_ws")
+  # is = income share
+  # wok = without kapital gains
+  # ws = wage share
+df8.5 <- ts8.2[, c("Year", "top_10_is", "top_10_is_wok")]
+names(df8.5) <- c("Year", "Including capital gains", "Excluding capital gains")
+df8.5 <- melt(df8.5, id.vars = "Year")
+# remove years < 1910, which have many NAs: start rowIndex at 16
+
+## Figure 9.8 / USA + EUROPE / TS8.1 + TS9.4
+# USA
+df8.2b <- ts8.2[, c("Year", "top_10_is")]
+names(df8.2b) <- c("Year", "US")
+# Europe
+ts9.4 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
+  sheetName = "TS9.4", rowIndex = 16:116, colIndex = 1:3, header = FALSE)
+names(ts9.4) <- c("Year", "Including Sweden", "Excluding Sweden")
+df9.4b <- ts9.4[, c("Year", "Including Sweden")]
+names(df9.4b) <- c("Year", "Europe")
+df9.8 <- merge(df8.2b, df9.4b, by = c("Year"))
+df9.8 <- melt(df9.8, id.vars = "Year")
+
+## Figure 14.1 / TS14.1
+ts14.1 = read.xlsx("../Github/Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
+  sheetName = "TS14.1", rowIndex = 5:118, colIndex = c(1:5, 7:16), header = FALSE)
+names(ts14.1) = c("Year", "US", "UK", "Germany", "France", "US (top marginal rate on earned income)", "US (top effective rate)", "UK (top marginal rate on earned income)", "France (income tax)", "France (CSG)", "Japan (Saez-Moriguchi Table A0)")
+df14.1 <- ts14.1[, c("Year", "US", "UK", "Germany", "France")]
+df14.1 <- melt(df14.1, id.vars = "Year")
+
+## Figure 14.2 / TS14.2
+ts14.2 = read.xlsx("../Github/Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
+  sheetName = "TS14.2", rowIndex = 5:118, colIndex = c(1:5), header = FALSE)
+names(ts14.2) = c("Year", "US", "UK", "Germany", "France")
+df14.2 <- melt(ts14.2, id.vars = "Year")
+@
+
+
+%%%%%%%%%% Start of Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=TitlePage_1]
+\maketitle% first slide with title/author information
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Introduction_1]
+\begin{itemize}
+\item
+This presentation is based upon Capital in the 21st century (Harvard University Press, March 2014)
+\item
+This book studies the global dynamics of income and wealth distribution since 18c in 20+ countries; I use historical data collected over the past 15 years with Atkinson, Saez, Postel-Vinay, Rosenthal, Alvaredo, Zucman, and 30+ others; I try to shift attention from rising income inequality to rising wealth inequality
+\item
+The book includes four parts:
+\begin{itemize}
+\item
+Part 1. Income and capital
+\item
+Part 2. The dynamics of the capital/income ratio 
+\item
+Part 3. The structure of inequalities
+\item
+Part 4. Regulating capital in the 21st century
+\end{itemize}
+\item 
+In this presentation I will present some results from Parts 2 \& 3, focusing upon the long-run evolution of capital/income ratios and wealth concentration (all graphs and series are available on line:
+see http://piketty.pse.ens.fr/capital21c)
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=WTID]
+\frametitle{The World Top Incomes Database}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\includegraphics[width=0.9\textwidth]
+{pictures/WorldTopIncomesDatabase}
+\caption{\textbf{\url{http://topincomes.parisschoolofeconomics.eu}}}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_1,fragile]
+\frametitle{Figure 1.1. Income inequality in the United States, 1910-2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.1.1, out.width='1\\linewidth'>>=
+ggplot(data = df1.1, aes(x = Year, y = value)) + geom_line(colour = colorPalette[1]) + geom_point(shape = shapePalette[1], size = 3, colour = colorPalette[1]) + ylab("Share of top decile in national income") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.3, .5, by = .05))
+@
+\caption{The top decile share in U.S. national income dropped from 45--50\% in the 1910s--1920s to less than 35\% in the 1950s (this is the
+1950 1960 fall documented by Kuznets); it then rose from less than 35\% in the 1970s to 45--50\% in the 2000s--2010s.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_5,fragile]
+\frametitle{Figure 1.1/8.5. Income inequality in the United States, 1910-2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.8.5, out.width='1\\linewidth'>>=
+ggplot(data = df8.5, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in national income") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.3, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in national income", values = shapePalette[1:2]) + scale_colour_manual(name = "Share of top decile in national income", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.6, .75), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The top decile share in U.S. national income dropped from 45--50\% in the 1910s--1920s to less than 35\% in the 1950s (this is the
+1950 1960 fall documented by Kuznets); it then rose from less than 35\% in the 1970s to 45--50\% in the 2000s--2010s. This is actually Figure 8.5 in the book.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_1,fragile]
+\frametitle{Figure 8.1. Income inequality in France, 1910-2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.8.1, out.width='1\\linewidth'>>=
+ggplot(data = df8.1, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total(incomes or wages)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.2, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in total", values = shapePalette[1:2]) + scale_colour_manual(name = "Share of top decile in total", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.7, .75), legend.background = element_rect(colour = 'black')) 
+@
+\caption{Inequality of total income (labor and capital) has dropped in France during the twentieth century, while wage inequality has remained the same.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_2,fragile]
+\frametitle{Figure 1.2. The capital-income ratio in Europe, 1870-2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.1.2, out.width='1\\linewidth'>>=
+ggplot(data = df1.2, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Market value of private capital (% national income)") + xlab("") + theme_bw() + scale_x_continuous(breaks = pretty_breaks(n = 8)) + scale_y_continuous(labels = percent, breaks = seq(1, 8, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .75), legend.background = element_rect(colour = 'black')) 
+@
+\caption{Aggregate private wealth was worth about 6--7 years of national income in Europe in 1910, between 2 and 3 years in 1950, and between 4 and 6 years in 2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=ThreePoints,fragile]
+\frametitle{This presentation: three points}
+\begin{enumerate}
+\item
+The return of a patrimonial (or wealth-based) society in the Old World (Europe, Japan). Wealth-income ratios seem to be returning to very high levels in low growth countries.
+\medskip\newline
+Intuition: in a slow-growth society, wealth accumulated in the past can naturally become very important. In the very long run, this can be relevant for the entire world.
+\item 
+The future of wealth concentration: with high r-g during 21c (r = `net-of-tax rate of return', g = `growth rate'), then wealth inequality might reach or surpass 19c oligarchic levels; conversely, suitable institutions can allow to democratize wealth.
+\item
+Inequality in America (``meritocratic extremism''): is the New World developing a new inequality model that is based upon extreme labor income inequality more than upon wealth inequality? Is it more merit-based, or can it become the worst of all worlds?
+\end{enumerate}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=BrasilVersus]
+\frametitle{Brasil vs Europe--US--Japan}
+\begin{itemize}
+\item
+Top income shares: income inequality is known to be high in Brasil; but it is probably underestimated (problem with household surveys); little access to fiscal data in Brasil
+\item 
+Wealth-income ratios: probably a strong rise in Brasil (real estate prices), but we do not really know
+\item
+Wealth inequality: probably very high, but we do not really know; no access to property tax and inheritance tax statistics
+\item
+Like other countries, Brasil needs more transparency about income and wealth; progressive tax on income, inheritance and wealth would be a powerful way to produce information about how the different income and wealth groups are benefiting from growth
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=BrazilUSTop1]
+\frametitle{Top 1\% income share: Brazil and US, 2006--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\includegraphics[width=\textwidth]
+{pictures/Top1BrazilVsUSA}
+\caption{To Do: Get Data to Recreate Figure}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=BrazilUSTop10]
+\frametitle{Top 10\% income share: Brazil and US, 2006--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\includegraphics[width=\textwidth]
+{pictures/Top10BrazilVsUSA}
+\caption{To Do: Get Data to Recreate Figure}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=BrazilInequality]
+\frametitle{Income Inequality in Brazil: 1976--2013}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\includegraphics[width=\textwidth]
+{pictures/IncomeInequalityBrazil}
+\caption{To Do: Get Data to Recreate Figure}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\againframe{ThreePoints}% This seems to be buggy
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_3]
+\frametitle{Figure 5.3: Private capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.5.3, out.width='1\\linewidth'>>=
+# Spain included, to remove replace df with df[df['variable'] != "Spain",]
+ggplot(data = df5.3, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of private capital (% national income)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(2, 8, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.15, .86), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 3)) 
+@
+\caption{Private capital is worth between 2 and 3.5 years of national income in rich countries in 1970, and between 4 and 7 years of national income in 2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_4]
+\frametitle{Figure 5.4: Private capital in rich countries (ratio), 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.5.4, out.width='1\\linewidth'>>=
+# Spain included, to remove replace df with df[df['variable'] != "Spain",]
+ggplot(data = df5.4, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Private capital (% disposable household income)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(3, 10, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.15, .86), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 3)) 
+@
+\caption{Expressed in years of household disposable income (about 70--80\% of national income), the capital/income ratio appears to be larger than when it is expressed in years of national income.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_3b]
+\frametitle{Figure 5.3b: Public capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.5.3b, out.width='1\\linewidth'>>=
+ggplot(data = df5.3b, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of public capital (% national income)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(-.5, 1, by = .25)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.15, .14), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 3)) 
+@
+\caption{In France, Britain, Germany, and the United States, government deficits exceeded public investment by 2--3\% of national income on average over the period 1970--2010, compared with more than 6\% in Italy.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_5]
+\frametitle{Figure 5.5: Private and public capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.5.5, out.width='1\\linewidth', out.height='0.75\\textheight'>>=
+ggplot(data = df5.5, aes(x = Year, y = value, group = interaction(variable,Type), shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of capital (% national income)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(-1, 8, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.15, .86), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 3)) 
+@
+\caption{In Italy, private capital rose from 240\% to 680\% in national income between 1970 and 2010, while public capital dropped from 20\% to -70\%.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_6]
+\frametitle{Figure 5.6: Market value and book value of corporations, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.5.6, out.width='1\\linewidth'>>=
+ggplot(data = df5.6, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("ratio between market value and book value of corporations") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(0, 1.6, by = .2)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.12, .8), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{Tobin's Q (i.e. the ratio between market value and book value of corporations) has risen in rich countries since the 1970s--1980s.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_7]
+\frametitle{Figure 5.7: National capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.5.7, out.width='1\\linewidth', out.height='0.75\\textheight'>>=
+ggplot(data = df5.7, aes(x = Year, y = value, group = interaction(variable,Type), shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of capital (% national income)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(-1, 8, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.12, .8), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{Net foreign assets held by Japan and Germany are worth between 6 months and one year of national income in 2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_8]
+\frametitle{Figure 5.8: The world capital/income ratio, 1870--2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.5.8, out.width='1\\linewidth'>>=
+ggplot(data = df5.8, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of capital (% national income)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1870, 2100, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(2.5, 7, by = .5)) + scale_shape_manual(name = "World capital/income ratio", values = shapePalette) + scale_colour_manual(name = "World capital/income ratio", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .8), legend.background = element_rect(colour = 'black'))
+@
+\caption{According to simulations (central scenario), the world capital/income ratio could be close to 700 percent by the end of the twenty-first century.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Table_12_1]
+\frametitle{Table 12.1: The growth rate of top global wealth, 1987--2013}
+\begin{table}[t]
+%\caption{The growth rate of top global wealth, 1987--2013}
+\adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
+           max width=\textwidth}{%
+\begin{threeparttable}
+\centering
+\begin{tabular}{@{}lc@{}}
+\toprule
+    & Average real growth rate per year  \\
+    & (after deduction of inflation) (\%) \\
+\midrule
+    The top 1/(100 million) highest wealth holders \tnote{a}   & 6.8  \\
+    The top 1/(20 million)  highest wealth holders \tnote{b}   & 6.4  \\
+    Average world wealth per adult                             & 2.1  \\
+    Average world income per adult                             & 1.4  \\
+    World adult population                                     & 1.9  \\
+    World GDP                                                  & 3.3  \\
+\midrule
+\end{tabular}
+\begin{tablenotes}
+    \item Between 1987 and 2013, the highest global wealth fractiles have grown at 6--7\% per year versus 2.1\% for average world wealth, and 1.4\% for average world income. All growth rates are net of inflation (2.3\% per year between 1987 and 2013).
+    \item[a] About 30 adults out of 3 billion in the 1980s, and 45 adults out of 4.5 billion in 2010.
+    \item[b] About 150 adults out of 3 billion in the 1980s, and 225 adults out of 4.5 billion in the 2010s.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Table_12_2]
+\frametitle{Table 12.2: The return on the capital endowments of U.S. universities, 1980--2010}
+\begin{table}[t]
+%\caption{The return on the capital endowments of U.S. universities, 1980--2010}
+\adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
+           max width=\textwidth}{%
+\begin{threeparttable}
+\centering
+\begin{tabular}{@{}lc@{}}
+\toprule
+    & Average real annual rate of return                           \\
+    & (after deduction of inflation and all                        \\
+    & administrative costs and financial fees) (\%)                \\
+\midrule
+    All universities (850)                                & 8.2    \\
+    Harvard, Yale, and Princeton                          & 10.2   \\
+    Endowments higher than \$1 billion (60)               & 8.8    \\
+    Endowments between \$500 million and 1 billion (66)   & 7.8    \\
+    Endowments between \$100 and \$500 million (226)      & 7.1    \\
+    Endowments less than \$100 million (498)              & 6.2    \\
+\midrule
+\end{tabular}
+\begin{tablenotes}
+    \item Between 1980 and 2010, U.S. universities earned an average real rate of return of 8.2\% on their capital endowments, and more for the greater endowments. All returns are reported net of inflation (2.4\% per year between 1980 and 2010) and net of administrative costs and financial fees.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_8]
+\frametitle{Figure 9.8: Income inequality: Europe vs. United States, 1900--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.9.8, out.width='1\\linewidth'>>=
+ggplot(data = df9.8, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in national income") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.25, .5, by = .05)) + scale_shape_manual(name = "Share of top decile \n in national income", values = shapePalette[1:2]) + scale_colour_manual(name = "Share of top decile \n in national income", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.6, .75), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The top decile income share was higher in Europe than in the U.S. in 1900-2010. It is much higher in the U.S. in 2000-2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_14_1]
+\frametitle{Figure 14.1: Top income tax rates, 1900--2013}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.14.1, out.width='1\\linewidth'>>=
+ggplot(data = df14.1, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Marginal tax rate applying to the highest incomes") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .14), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{The top marginal tax rate of the income tax (applying to the highest incomes) in the U.S. dropped from 70\% in 1980 to 28\% in 1988.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_14_2]
+\frametitle{Figure 14.2: Top inheritance tax rates, 1900--2013}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.14.2, out.width='1\\linewidth'>>=
+ggplot(data = df14.2, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Marginal tax rate applying to the highest inheritances") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.12, .86), legend.background = element_rect(colour = 'black'))  + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{The top marginal tax rate of the inheritance tax (applying to the highest inheritances) in the U.S. dropped from 70\% in 1980 to 35\% in 2013.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Conclusions_1,shrink=7]
+\frametitle{Conclusions}
+\begin{itemize}
+\item
+The history of income and wealth inequality is always political, chaotic and unpredictable; it involves national identities and sharp reversals; nobody can predict the reversals of the future
+\item
+Marx: with $g=0$, $\beta\rightarrow\infty$, $r\rightarrow 0$ : revolution, war
+\item
+My conclusions are less apocalyptic: with $g>0$, at least we have a steady state $\beta=s/g$
+\item
+But with $g>0$ \& small, this steady-state can be rather gloomy: it can involve a very large capital-income ratio $\beta$ and capital share $\alpha$, as well as extreme wealth concentration due to high $r-g$
+\item
+This has nothing to do with a market imperfection: the more perfect the capital market, the higher $r-g$
+\item
+The ideal solution: progressive wealth tax at the global scale, based upon automatic exchange of bank information
+\item
+Other solutions involve authoritarian political \& capital controls (China, Russia..), or perpetual population growth (US), or inflation, or some mixture of all
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}

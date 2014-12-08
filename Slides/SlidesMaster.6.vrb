@@ -1,0 +1,17 @@
+\frametitle{Figure 8.1. Income inequality in France, 1910-2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_1}
+
+}
+
+
+
+\end{knitrout}
+\caption{Inequality of total income (labor and capital) has dropped in France during the twentieth century, while wage inequality has remained the same.}
+\end{minipage}
+\end{figure}

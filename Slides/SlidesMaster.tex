@@ -28,7 +28,7 @@
     , bookmarksnumbered = {true}%
     , bookmarksopen = {true}%
     , backref = {false}%
-    , pdfusetitle = {true}%
+    , pdfusetitle = {false}% false required for \includeonlyframeslist hack
     , pdfpagemode = {UseNone}% UseThumbs, UseOutlines, FullScreen, UseNone
     , pdfpagetransition = {Wipe /Di -45}%
     , pdfpagelayout = {SinglePage}%
@@ -42,7 +42,60 @@
 }{hyperref}
 
 %%%%%%%%%% Preamble Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\documentclass[t]{beamer}
+\documentclass[t]{beamer}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+%%% Select frames to be included in presentation
+% \includeonlyframes{} takes a comma-separated list *without spaces*
+\input{Piketty2014Capital21cSaoPaulo}% list of frames for inclusion
+%\input{current}% frames being debugged
 
 %%%%%%%%%% Set Document Information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title{Capital in the 21st Century}
@@ -74,158 +127,24 @@
 \setlength{\belowcaptionskip}{0pt}%
 
 %%%%%%%%%% Load knitr Options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-<<setup, include=FALSE>>=
-library(knitr)
 
-### Set compilation options
-# option warning = FALSE set locally for easy toggle on/off while debugging
-opts_chunk$set(echo = FALSE, comment = NA, concordance = TRUE)
 
-# Set figure size and resolution
-opts_chunk$set(dev = c('pdf','png'), fig.path = 'figures/color/', fig.height = 5, fig.width = 10, dpi = 300)
 
-# evaluate fig.cap after a chunk is evaluated
-opts_knit$set(eval.after = 'fig.cap')
-
-# Rename figures to remove -1 suffix
-local({
-  hook_plot = knit_hooks$get('plot')
-  knit_hooks$set(plot = function(x, options) {
-    name = sub('-1([.][a-z]{3,4})$', '\\1', x)
-    if (name != x) file.rename(x, name)
-    hook_plot(name, options)
-  })
-}) 
-
-# Set smaller font size for chunks (for code display):
-opts_chunk$set(size = 'footnotesize')
-
-### Load Libraries:
-# setwd("~/R/capital21c/Slides")# temp for convenience
-library(ggplot2)
-library(scales)
-library(xlsx)
-library(reshape2)
-library(RColorBrewer)
-
-### Set Color & Shape Scheme
-# shape scheme (is there a package for this?)
-shapePalette <- c(17, 2, 16, 1, 15, 0, 18, 5, 24)
-# color scheme (with RBrewerColor package)
-colorPalette <- colorRampPalette(brewer.pal(9, "Set1"))(9)
-# bw scheme (uncomment both lines to activate)
-  # colorPalette <- rep("#000000", 9)# black and white figures in 'Piketty' style
-  # opts_chunk$set(fig.path = 'figures/bw/') # save in sub-directory
-
-### Load Data:
-# Piketty denotes TS1.1 the sheets for Chapter 1.1, etc.
-# I denote df1.1 the dataframe for Figure 1.1, etc.
-
-## Figure 1.1 / TS1.1 / See also TS8.1
-ts1.1 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
-  sheetName = "TSI.1", rowIndex = 7:107, colIndex = 1:2, header = FALSE)
-names(ts1.1) <- c("Year", "top_10_is")
-df1.1 <- melt(ts1.1, id.vars = c("Year"))
-names(df1.1) <- c("Year", "variable", "value")
-
-## Figure 1.2 / TS1.2
-ts1.2 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
-  sheetName = "TSI.2", rowIndex = 6:20, colIndex = 1:4, header = FALSE)
-names(ts1.2) <- c("Year", "Germany", "France", "Britain")
-df1.2 <- melt(ts1.2, id.vars = c("Year"))
-names(df1.2) <- c("Year", "variable", "value")
-
-## Figure 5.3 / TS5.1
-ts5.1 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
-  sheetName = "TS5.1", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
-names(ts5.1) <-  c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
-df5.3 <- melt(ts5.1, id.var = "Year")
-names(df5.3) <- c("Year", "variable", "Private")
-
-## Figure 5.3b / TS5.2
-ts5.2 <-read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
-  sheetName = "TS5.2", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
-names(ts5.2) <-  c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
-df5.3b <- melt(ts5.2, id.var = "Year")
-names(df5.3b) <- c("Year", "variable", "Public")
-
-## Figure 5.4 / TS5.12
-ts5.12 <-read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
-  sheetName = "TS5.12", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
-names(ts5.12) <-  c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
-df5.4 <- melt(ts5.12, id.var = "Year")
-names(df5.4) <- c("Year", "variable", "Private")
-
-## Figure 5.5 / TS5.1 + TS5.2
-df5.5 <- merge(df5.3, df5.3b, by = c("Year", "variable"))
-df5.5 <- melt(df5.5, id.var = c("Year", "variable"))
-names(df5.5) <- c("Year", "variable", "Type", "Capital")
-
-## Figure 8.1 /  TS8.1
-ts8.1 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
-  sheetName = "TS8.1", rowIndex = 16:116, colIndex = 1:6, header = FALSE)
-names(ts8.1) <- c("Year", "top_10_is", "top_1_is", "top_0.1_is", "top_10_ws", "top_1_ws")
-df8.1 <- ts8.1[, c("Year", "top_10_is", "top_10_ws")]
-names(df8.1) <- c("Year", "Income", "Wage")
-df8.1 <- melt(df8.1, id = c("Year"))
-# remove years < 1910, which have many NAs: start rowIndex at 16
-
-## Figure 8.5 /  TS8.2
-ts8.2 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
-  sheetName = "TS8.2", rowIndex = 16:116, colIndex = 1:11, header = FALSE)
-names(ts8.2) <- c("Year",
-  "top_10_is","top_10_5_is", "top_5_1_is","top_1_is", "top_0.1_is",
-  "top_10_is_wok", "top_1_is_wok", "top_0.1_is_wok", 
-  "top_10_ws", "top_1_ws")
-  # is = income share
-  # wok = without kapital gains
-  # ws = wage share
-
-## Figure 8.5
-df8.5 <- ts8.2[, c("Year", "top_10_is", "top_10_is_wok")]
-names(df8.5) <- c("Year", "Including capital gains", "Excluding capital gains")
-df8.5 <- melt(df8.5, id = c("Year"))
-# remove years < 1910, which have many NAs: start rowIndex at 16
-
-## Figure 9.8 / USA + EUROPE / TS8.1 + TS9.4
-# USA
-df8.2b <- ts8.2[, c("Year", "top_10_is")]
-names(df8.2b) <- c("Year", "value")
-# Europe
-ts9.4 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
-  sheetName = "TS9.4", rowIndex = 16:116, colIndex = 1:3, header = FALSE)
-names(ts9.4) <- c("Year", "Including Sweden", "Excluding Sweden")
-df9.4b <- ts9.4[, c("Year", "Including Sweden")]
-names(df9.4b) <- c("Year", "value")
-df9.8 <- merge(df8.2b, df9.4b, by = c("Year"))
-names(df9.8) <- c("Year", "US", "Europe")
-df9.8 <- melt(df9.8, id.var = c("Year"))
-
-## Figure 14.1 / TS14.1
-ts14.1 = read.xlsx("../Github/Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
-  sheetName = "TS14.1", rowIndex = 5:118, colIndex = c(1:5, 7:16), header = FALSE)
-names(ts14.1) = c("Year", "US", "UK", "Germany", "France", "US (top marginal rate on earned income)", "US (top effective rate)", "UK (top marginal rate on earned income)", "France (income tax)", "France (CSG)", "Japan (Saez-Moriguchi Table A0)")
-df14.1 <- ts14.1[, c("Year", "US", "UK", "Germany", "France")]
-df14.1 <- melt(df14.1, id.var = "Year")
-names(df14.1) <- c("Year", "variable", "Rate")
-
-## Figure 14.2 / TS14.2
-ts14.2 = read.xlsx("../Github/Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
-  sheetName = "TS14.2", rowIndex = 5:118, colIndex = c(1:5), header = FALSE)
-names(ts14.2) = c("Year", "US", "UK", "Germany", "France")
-df14.2 <- melt(ts14.2, id.var = "Year")
-names(df14.2) <- c("Year", "variable", "Rate")
-@
 
 
 %%%%%%%%%% Start of Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 
-% first slide with title/author information
-\maketitle
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=TitlePage_1]
+\maketitle% first slide with title/author information
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Introduction1]
+\begin{frame}[label=Introduction_1]
 \begin{itemize}
 \item
 This presentation is based upon Capital in the 21st century (Harvard University Press, March 2014)
@@ -267,14 +186,21 @@ see http://piketty.pse.ens.fr/capital21c)
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Fig11,fragile]
+\begin{frame}[label=Figure_1_1,fragile]
 \frametitle{Figure 1.1. Income inequality in the United States, 1910-2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.1.1, out.width='1\\linewidth', dev='pdf', fig.align='center', cache = TRUE>>=
-ggplot(data = df1.1, aes(x = Year, y = value)) + geom_line(colour = colorPalette[1]) + geom_point(shape = shapePalette[1], size = 3, colour = colorPalette[1]) + ylab("Share of top decile in national income") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(.3, .5, by = .05)) + scale_x_continuous(breaks = seq(1910, 2010, by = 10))
-@
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_1} 
+
+}
+
+
+
+\end{knitrout}
 \caption{The top decile share in U.S. national income dropped from 45--50\% in the 1910s--1920s to less than 35\% in the 1950s (this is the
 1950 1960 fall documented by Kuznets); it then rose from less than 35\% in the 1970s to 45--50\% in the 2000s--2010s.}
 \end{minipage}
@@ -283,16 +209,22 @@ ggplot(data = df1.1, aes(x = Year, y = value)) + geom_line(colour = colorPalette
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Fig85,fragile]
+\begin{frame}[label=Figure_8_5,fragile]
 \frametitle{Figure 1.1/8.5. Income inequality in the United States, 1910-2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.8.5, out.width='1\\linewidth', dev='pdf', fig.align='center', cache = TRUE>>=
-ggplot(data = df8.5, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in national income") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(.3, .5, by = .05)) + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_shape_manual(name = "Share of top decile in national income", values = shapePalette[1:2]) + scale_colour_manual(name = "Share of top decile in national income", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.6, .75), legend.background = element_rect(colour = 'black')) 
-@
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_5} 
+
+}
+
+
+
+\end{knitrout}
 \caption{The top decile share in U.S. national income dropped from 45--50\% in the 1910s--1920s to less than 35\% in the 1950s (this is the
 1950 1960 fall documented by Kuznets); it then rose from less than 35\% in the 1970s to 45--50\% in the 2000s--2010s. This is actually Figure 8.5 in the book.}
 \end{minipage}
@@ -302,14 +234,44 @@ ggplot(data = df8.5, aes(x = Year, y = value, group = variable, shape = variable
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Fig12,fragile]
+\begin{frame}[label=Figure_8_1,fragile]
+\frametitle{Figure 8.1. Income inequality in France, 1910-2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_1} 
+
+}
+
+
+
+\end{knitrout}
+\caption{Inequality of total income (labor and capital) has dropped in France during the twentieth century, while wage inequality has remained the same.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_2,fragile]
 \frametitle{Figure 1.2. The capital-income ratio in Europe, 1870-2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.1.2, out.width='1\\linewidth', dev='pdf', fig.align='center', cache = TRUE>>=
-ggplot(data = df1.2, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Market value of private capital (% national income)") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = pretty_breaks(n = 5)) + scale_x_continuous(breaks = pretty_breaks(n = 8)) + scale_shape_manual(name = "Country", values = shapePalette[1:3]) + scale_colour_manual(name = "Country", values = colorPalette[1:3]) + theme(legend.key = element_blank(), legend.position = c(.75, .75), legend.background = element_rect(colour = 'black')) 
-@
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_2} 
+
+}
+
+
+
+\end{knitrout}
 \caption{Aggregate private wealth was worth about 6--7 years of national income in Europe in 1910, between 2 and 3 years in 1950, and between 4 and 6 years in 2010.}
 \end{minipage}
 \end{figure}
@@ -402,15 +364,21 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure53]
+\begin{frame}[label=Figure_5_3]
 \frametitle{Figure 5.3: Private capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.5.3, out.width='1\\linewidth', dev='pdf', fig.align='center', cache = TRUE, warning = FALSE>>=
-# Spain included, to remove replace df with df[df['variable'] != "Spain",]
-ggplot(data = df5.3, aes(x = Year, y = Private, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of private capital (% national income)") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = pretty_breaks(n = 6)) + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_shape_manual(name = "Country", values = shapePalette[1:9]) + scale_colour_manual(name = "Country", values = colorPalette[1:9]) + theme(legend.key = element_blank(), legend.position = c(.15, .86), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 3)) 
-@
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_3} 
+
+}
+
+
+
+\end{knitrout}
 \caption{Private capital is worth between 2 and 3.5 years of national income in rich countries in 1970, and between 4 and 7 years of national income in 2010.}
 \end{minipage}
 \end{figure}
@@ -419,15 +387,21 @@ ggplot(data = df5.3, aes(x = Year, y = Private, group = variable, shape = variab
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure54]
+\begin{frame}[label=Figure_5_4]
 \frametitle{Figure 5.4: Private capital in rich countries (ratio), 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.5.4, out.width='1\\linewidth', dev='pdf', fig.align='center', cache = TRUE, warning = FALSE>>=
-# Spain included, to remove replace df with df[df['variable'] != "Spain",]
-ggplot(data = df5.4, aes(x = Year, y = Private, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Private capital (% disposable household income)") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = pretty_breaks(n = 6)) + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_shape_manual(name = "Country", values = shapePalette[1:9]) + scale_colour_manual(name = "Country", values = colorPalette[1:9]) + theme(legend.key = element_blank(), legend.position = c(.15, .86), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 3))
-@
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_4} 
+
+}
+
+
+
+\end{knitrout}
 \caption{Expressed in years of household disposable income (about 70--80\% of national income), the capital/income ratio appears to be larger than when it is expressed in years of national income.}
 \end{minipage}
 \end{figure}
@@ -436,14 +410,21 @@ ggplot(data = df5.4, aes(x = Year, y = Private, group = variable, shape = variab
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure55a]
+\begin{frame}[label=Figure_5_3b]
 \frametitle{Figure 5.3b: Public capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.5.3b, out.width='1\\linewidth', dev='pdf', fig.align='center', cache = TRUE, warning = FALSE>>=
-ggplot(data = df5.3b, aes(x = Year, y = Public, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of public capital (% national income)") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = pretty_breaks(n = 6)) + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_shape_manual(name = "Country", values = shapePalette[1:9]) + scale_colour_manual(name = "Country", values = colorPalette[1:9]) + theme(legend.key = element_blank(), legend.position = c(.15, .14), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 3))
-@
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_3b} 
+
+}
+
+
+
+\end{knitrout}
 \caption{In France, Britain, Germany, and the United States, government deficits exceeded public investment by 2--3\% of national income on average over the period 1970--2010, compared with more than 6\% in Italy.}
 \end{minipage}
 \end{figure}
@@ -452,14 +433,21 @@ ggplot(data = df5.3b, aes(x = Year, y = Public, group = variable, shape = variab
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure55]
+\begin{frame}[label=Figure_5_5]
 \frametitle{Figure 5.5: Private and public capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.5.5, out.width='1\\linewidth', out.height='0.75\\textheight', dev='pdf', fig.align='center', cache = TRUE, warning = FALSE>>=
-ggplot(data = df5.5, aes(x = Year, y = Capital, group = interaction(variable,Type), shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of capital (% national income)") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = pretty_breaks(n = 6)) + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_shape_manual(name = "Country", values = shapePalette[1:9]) + scale_colour_manual(name = "Country", values = colorPalette[1:9]) + theme(legend.key = element_blank(), legend.position = c(.15, .86), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 3)) 
-@
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth,height=0.75\textheight]{figures/bw/Figure_5_5} 
+
+}
+
+
+
+\end{knitrout}
 \caption{In Italy, private capital rose from 240\% to 680\% in national income between 1970 and 2010, while public capital dropped from 20\% to -70\%.}
 \end{minipage}
 \end{figure}
@@ -468,7 +456,76 @@ ggplot(data = df5.5, aes(x = Year, y = Capital, group = interaction(variable,Typ
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Table121]
+\begin{frame}[label=Figure_5_6]
+\frametitle{Figure 5.6: Market value and book value of corporations, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_6} 
+
+}
+
+
+
+\end{knitrout}
+\caption{Tobin's Q (i.e. the ratio between market value and book value of corporations) has risen in rich countries since the 1970s--1980s.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_7]
+\frametitle{Figure 5.7: National capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth,height=0.75\textheight]{figures/bw/Figure_5_7} 
+
+}
+
+
+
+\end{knitrout}
+\caption{Net foreign assets held by Japan and Germany are worth between 6 months and one year of national income in 2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_8]
+\frametitle{Figure 5.8: The world capital/income ratio, 1870--2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_8} 
+
+}
+
+
+
+\end{knitrout}
+\caption{According to simulations (central scenario), the world capital/income ratio could be close to 700 percent by the end of the twenty-first century.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Table_12_1]
 \frametitle{Table 12.1: The growth rate of top global wealth, 1987--2013}
 \begin{table}[t]
 %\caption{The growth rate of top global wealth, 1987--2013}
@@ -501,7 +558,7 @@ ggplot(data = df5.5, aes(x = Year, y = Capital, group = interaction(variable,Typ
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Table122]
+\begin{frame}[label=Table_12_2]
 \frametitle{Table 12.2: The return on the capital endowments of U.S. universities, 1980--2010}
 \begin{table}[t]
 %\caption{The return on the capital endowments of U.S. universities, 1980--2010}
@@ -533,14 +590,21 @@ ggplot(data = df5.5, aes(x = Year, y = Capital, group = interaction(variable,Typ
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure98]
+\begin{frame}[label=Figure_9_8]
 \frametitle{Figure 9.8: Income inequality: Europe vs. United States, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.9.8, out.width='1\\linewidth', dev='pdf', fig.align='center', cache = TRUE>>=
-ggplot(data = df9.8, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in national income") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(.25, .5, by = .05)) + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_shape_manual(name = "Share of top decile \n in national income", values = shapePalette[1:2]) + scale_colour_manual(name = "Share of top decile \n in national income", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.6, .75), legend.background = element_rect(colour = 'black')) 
-@
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_9_8} 
+
+}
+
+
+
+\end{knitrout}
 \caption{The top decile income share was higher in Europe than in the U.S. in 1900-2010. It is much higher in the U.S. in 2000-2010.}
 \end{minipage}
 \end{figure}
@@ -549,14 +613,21 @@ ggplot(data = df9.8, aes(x = Year, y = value, group = variable, shape = variable
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure141]
+\begin{frame}[label=Figure_14_1]
 \frametitle{Figure 14.1: Top income tax rates, 1900--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.14.1, out.width='1\\linewidth', dev='pdf', fig.align='center', cache = TRUE, warning = FALSE>>=
-ggplot(data = df14.1, aes(x = Year, y = Rate, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Marginal tax rate applying to the highest incomes") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Country", values = shapePalette[1:4]) + scale_colour_manual(name = "Country", values = colorPalette[1:4]) + theme(legend.key = element_blank(), legend.position = c(.5, .14), legend.background = element_rect(colour = 'black')) + guides(shape = guide_legend(ncol = 2)) 
-@
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_14_1} 
+
+}
+
+
+
+\end{knitrout}
 \caption{The top marginal tax rate of the income tax (applying to the highest incomes) in the U.S. dropped from 70\% in 1980 to 28\% in 1988.}
 \end{minipage}
 \end{figure}
@@ -565,14 +636,21 @@ ggplot(data = df14.1, aes(x = Year, y = Rate, group = variable, shape = variable
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure142]
+\begin{frame}[label=Figure_14_2]
 \frametitle{Figure 14.2: Top inheritance tax rates, 1900--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.14.2, out.width='1\\linewidth', dev='pdf', fig.align='center', cache = TRUE, warning = FALSE>>=
-ggplot(data = df14.2, aes(x = Year, y = Rate, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Marginal tax rate applying to the highest inheritances") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Country", values = shapePalette[1:4]) + scale_colour_manual(name = "Country", values = colorPalette[1:4]) + theme(legend.key = element_blank(), legend.position = c(.12, .86), legend.background = element_rect(colour = 'black'))  + guides(shape = guide_legend(ncol = 2)) 
-@
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_14_2} 
+
+}
+
+
+
+\end{knitrout}
 \caption{The top marginal tax rate of the inheritance tax (applying to the highest inheritances) in the U.S. dropped from 70\% in 1980 to 35\% in 2013.}
 \end{minipage}
 \end{figure}
@@ -581,7 +659,7 @@ ggplot(data = df14.2, aes(x = Year, y = Rate, group = variable, shape = variable
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Conclusions1]
+\begin{frame}[label=Conclusions_1,shrink=7]
 \frametitle{Conclusions}
 \begin{itemize}
 \item
