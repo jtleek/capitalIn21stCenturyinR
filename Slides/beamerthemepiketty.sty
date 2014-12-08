@@ -1,0 +1,28 @@
+\renewcommand\sfdefault{phv}
+\renewcommand\familydefault{\sfdefault}
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\useoutertheme{default}
+%\setbeamercolor{structure}{fg = gray}
+\setbeamerfont{title}{size = \Huge}
+\setbeamerfont{frametitle}{size = \large}
+\setbeamercolor{frametitle}{fg = MidnightBlue}
+\setbeamerfont{frametitle}{series = \bfseries}
+\setbeamerfont{frametitle}{size = \normalsize}
+\setbeamercolor{normal text}{bg = white, fg = black}
+%\setbeamertemplate{background canvas}[vertical shading][bottom = white, middle = black!50, top = black]
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}[text line]{%
+  \parbox{\linewidth}{\vspace*{-8pt}
+  {\scriptsize \url{http://piketty.pse.ens.fr/fr/capital21c}}
+  \hfill\insertshortauthor\hfill\insertpagenumber}}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+\setbeamerfont{caption}{size = \footnotesize}
+\setbeamercolor{caption}{fg = MidnightBlue!60!Gray}
+\setbeamertemplate{itemize item}{\color{MidnightBlue}}
+\setbeamertemplate{itemize items}[square]
+\setbeamertemplate{itemize subitem}{\color{MidnightBlue}}
+\setbeamertemplate{itemize subitems}[triangle]
+% Custom enumerate environment% Probably best avoided
+%\newcommand\Part{\stepcounter{enumi}\item[Part\,\theenumi.]}
