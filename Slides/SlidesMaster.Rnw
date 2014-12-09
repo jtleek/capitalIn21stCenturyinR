@@ -98,7 +98,7 @@ opts_knit$set(eval.after = 'fig.cap')
 opts_knit$set(self.contained = TRUE)
 
 # Rename figures to remove -1 suffix
-local({
+local({# only works for pdf
   hook_plot = knit_hooks$get('plot')
   knit_hooks$set(plot = function(x, options) {
     name = sub('-1([.][a-z]{3,4})$', '\\1', x)
@@ -131,31 +131,31 @@ colorPalette <- colorRampPalette(brewer.pal(9, "Set1"))(9)
 # I denote df1.1 the dataframe for Figure 1.1, etc.
 
 ## Figure 1.1 / TS1.1 / See also TS8.1
-ts1.1 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
+ts1.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
   sheetName = "TSI.1", rowIndex = 7:107, colIndex = 1:2, header = FALSE)
 names(ts1.1) <- c("Year", "top_10_is")
 df1.1 <- melt(ts1.1, id.vars = "Year")
 
 ## Figure 1.2 / TS1.2
-ts1.2 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
+ts1.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
   sheetName = "TSI.2", rowIndex = 6:20, colIndex = 1:4, header = FALSE)
 names(ts1.2) <- c("Year", "Germany", "France", "Britain")
 df1.2 <- melt(ts1.2, id.vars = "Year")
 
 ## Figure 5.3 / TS5.1
-ts5.1 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+ts5.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.1", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
 names(ts5.1) <-  c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
 df5.3 <- melt(ts5.1, id.vars = "Year")
 
 ## Figure 5.3b / TS5.2
-ts5.2 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+ts5.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.2", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
 names(ts5.2) <-  c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
 df5.3b <- melt(ts5.2, id.vars = "Year")
 
 ## Figure 5.4 / TS5.12
-ts5.12 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+ts5.12 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.12", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
 names(ts5.12) <- c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
 df5.4 <- melt(ts5.12, id.vars = "Year")
@@ -167,18 +167,18 @@ df5.5 <- melt(df5.5, id.vars = c("Year", "variable"))
 names(df5.5) <- c("Year", "variable", "Type", "value")
 
 ## Figure 5.6 / TS5.11
-ts5.11 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+ts5.11 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.11", rowIndex = 5:45, colIndex = 1:9, header = FALSE)
 names(ts5.11) <- c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia")
 ts5.11 <- ts5.11[, c("Year", "US", "Japan", "Germany", "France", "UK", "Canada", "Australia")] # Drop Italy as data is empty
 df5.6 <- melt(ts5.11, id.vars = "Year")
 
 ## Figure 5.7 / TS5.3 + TS5.5
-ts5.3 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+ts5.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.3", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
 names(ts5.3) <- c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
 ts5.3 <- melt(ts5.3, id.vars = "Year")
-ts5.5 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+ts5.5 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.5", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
 names(ts5.5) <- c("Year", "US", "Japan", "Germany", "France", "UK", "Italy", "Canada", "Australia", "Spain")
 ts5.5 <- melt(ts5.5, id.vars = "Year")
@@ -188,7 +188,7 @@ df5.7 <- melt(df5.7, id.vars = c("Year", "variable"))
 names(df5.7) <- c("Year", "variable", "Type", "value")
 
 ## Figure 5.8 / CTS12.3
-cts12.3 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+cts12.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "CTS12.3", rowIndex = 5:28, colIndex = 1:2, header = FALSE)
 names(cts12.3) <- c("Year", "Capital")
 df5.8 <- melt(cts12.3, id.vars = "Year")
@@ -200,7 +200,7 @@ df5.8$variable <- as.factor(df5.8$variable) # a one-liner eluded me!
 
 ## Figure 8.1 /  TS8.1
 # remove years < 1910, which have many NAs: start rowIndex at 16
-ts8.1 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+ts8.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
   sheetName = "TS8.1", rowIndex = 16:116, colIndex = 1:6, header = FALSE)
 names(ts8.1) <- c("Year", "top_10_is", "top_1_is", "top_0.1_is", "top_10_ws", "top_1_ws")
 df8.1 <- ts8.1[, c("Year", "top_10_is", "top_10_ws")]
@@ -209,7 +209,7 @@ df8.1 <- melt(df8.1, id.vars = c("Year"))
 
 ## Figure 8.5 /  TS8.2
 # remove years < 1910, which have many NAs: start rowIndex at 16
-ts8.2 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+ts8.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
   sheetName = "TS8.2", rowIndex = 16:116, colIndex = 1:11, header = FALSE)
 names(ts8.2) <- c("Year",
   "top_10_is","top_10_5_is", "top_5_1_is","top_1_is", "top_0.1_is",
@@ -224,7 +224,7 @@ df8.5 <- melt(df8.5, id.vars = "Year")
 
 ## Figure 8.7 /  TS8.2
 # remove years < 1910, which have many NAs: start rowIndex at 16
-ts8.2 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+ts8.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
   sheetName = "TS8.2", rowIndex = 16:116, colIndex = 1:11, header = FALSE)
 names(ts8.2) <- c("Year", "top_10_is", "top_10_5_is", "top_5_1_is", "top_1_is", "top_0.1_is", "top_10_is_wk", "top_1_is_wk", "top_0.1_is_nk", "top_10_ws", "top_1_ws")
 df8.7 <- ts8.2[, c("Year", "top_10_is", "top_10_ws")]
@@ -237,7 +237,7 @@ df8.7 <- melt(df8.7, id.vars = c("Year"))
 df8.2b <- ts8.2[, c("Year", "top_10_is")]
 names(df8.2b) <- c("Year", "US")
 # Europe
-ts9.4 <- read.xlsx("../Github/Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
+ts9.4 <- read.xlsx("../Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
   sheetName = "TS9.4", rowIndex = 16:116, colIndex = 1:3, header = FALSE)
 names(ts9.4) <- c("Year", "Including Sweden", "Excluding Sweden")
 df9.4b <- ts9.4[, c("Year", "Including Sweden")]
@@ -246,14 +246,14 @@ df9.8 <- merge(df8.2b, df9.4b, by = c("Year"))
 df9.8 <- melt(df9.8, id.vars = "Year")
 
 ## Figure 14.1 / TS14.1
-ts14.1 = read.xlsx("../Github/Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
+ts14.1 = read.xlsx("../Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
   sheetName = "TS14.1", rowIndex = 5:118, colIndex = c(1:5, 7:16), header = FALSE)
 names(ts14.1) = c("Year", "US", "UK", "Germany", "France", "US (top marginal rate on earned income)", "US (top effective rate)", "UK (top marginal rate on earned income)", "France (income tax)", "France (CSG)", "Japan (Saez-Moriguchi Table A0)")
 df14.1 <- ts14.1[, c("Year", "US", "UK", "Germany", "France")]
 df14.1 <- melt(df14.1, id.vars = "Year")
 
 ## Figure 14.2 / TS14.2
-ts14.2 = read.xlsx("../Github/Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
+ts14.2 = read.xlsx("../Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
   sheetName = "TS14.2", rowIndex = 5:118, colIndex = c(1:5), header = FALSE)
 names(ts14.2) = c("Year", "US", "UK", "Germany", "France")
 df14.2 <- melt(ts14.2, id.vars = "Year")
