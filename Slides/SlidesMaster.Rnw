@@ -45,8 +45,8 @@
 \documentclass[t]{beamer}
 %%% Select frames to be included in presentation
 % \includeonlyframes{} takes a comma-separated list *without spaces*
-\input{Piketty2014Capital21cSaoPaulo}% list of frames for inclusion
-%\input{current}% frames being debugged
+%\input{Piketty2014Capital21cSaoPaulo}% list of frames for inclusion
+\input{current}% frames being debugged
 
 %%%%%%%%%% Set Document Information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title{Capital in the 21st Century}
@@ -108,7 +108,7 @@ local({# only works for pdf
 }) 
 
 ### Load Libraries:
-# setwd("~/R/capital21c/Slides")# temp for convenience
+# setwd("~/R/capital21c/Github/Slides")# temp for convenience
 library(ggplot2)
 library(scales)
 library(xlsx)
@@ -198,16 +198,44 @@ df5.8[which(df5.8$Year < "2011"),]$variable <- "Observed"
 df5.8[which(df5.8$Year > "2011"),]$variable <- "Projected"
 df5.8$variable <- as.factor(df5.8$variable) # a one-liner eluded me!
 
-## Figure 8.1 /  TS8.1
+## Figure 8.1 /  TS8.1 / France
 # remove years < 1910, which have many NAs: start rowIndex at 16
 ts8.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
   sheetName = "TS8.1", rowIndex = 16:116, colIndex = 1:6, header = FALSE)
 names(ts8.1) <- c("Year", "top_10_is", "top_1_is", "top_0.1_is", "top_10_ws", "top_1_ws")
 df8.1 <- ts8.1[, c("Year", "top_10_is", "top_10_ws")]
-names(df8.1) <- c("Year", "Income", "Wage")
+names(df8.1) <- c("Year", "Incomes", "Wages")
 df8.1 <- melt(df8.1, id.vars = c("Year"))
 
-## Figure 8.5 /  TS8.2
+## Figure 8.2 /  TS8.1 / France
+df8.2 <- ts8.1[, c("Year", "top_1_is", "top_1_ws")]
+names(df8.2) <- c("Year", "Incomes", "Wages")
+df8.2 <- melt(df8.2, id.vars = c("Year"))
+
+## Figure 8.3 /  TS8.3 / France
+ts8.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+  sheetName = "TS8.3", rowIndex = c(6:11,15:20,24:29), colIndex = 1:7, header = FALSE)
+names(ts8.3) <- c("Quantile", "Labor Income", "Capital Income", "Mixed Income", "Labor Income", "Capital Income", "Mixed Income")
+ts8.3 <- rbind(ts8.3[,1:4], ts8.3[,c(1,5:7)])
+ts8.3[c(1:6,19:24), "Country"] <- "France"
+ts8.3[c(7:12,13:18,25:30,31:36), "Country"] <- "US"
+ts8.3[1:6, "Year"] <- "1932"
+ts8.3[c(7:12,13:18), "Year"] <- "1929"
+ts8.3[19:24, "Year"] <- "2005"
+ts8.3[c(25:30,31:36), "Year"] <- "2007"
+ts8.3[c(1:6,13:18,19:24,31:36), "Type"] <- "Excluding capital gains"
+ts8.3[c(7:12,25:30), "Type"] <- "Including capital gains"
+ts8.3[, c("Country","Year","Type")] <- lapply(ts8.3[, c("Country","Year","Type")] , factor)
+df8.3 <- melt(ts8.3, id.vars = c("Quantile", "Country", "Year", "Type"))
+df8.3 <- subset(df8.3, Country == "France" & Year == "1932" & Type == "Excluding capital gains")
+df8.3 <- df8.3[, c("Quantile", "variable", "value")]
+
+## Figure 8.4 /  TS8.3 / France
+df8.4 <- melt(ts8.3, id.vars = c("Quantile", "Country", "Year", "Type"))
+df8.4 <- subset(df8.4, Country == "France" & Year == "2005" & Type == "Excluding capital gains")
+df8.4 <- df8.4[, c("Quantile", "variable", "value")]
+
+## Figure 8.5 /  TS8.2 / USA
 # remove years < 1910, which have many NAs: start rowIndex at 16
 ts8.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
   sheetName = "TS8.2", rowIndex = 16:116, colIndex = 1:11, header = FALSE)
@@ -222,14 +250,30 @@ df8.5 <- ts8.2[, c("Year", "top_10_is", "top_10_is_wok")]
 names(df8.5) <- c("Year", "Including capital gains", "Excluding capital gains")
 df8.5 <- melt(df8.5, id.vars = "Year")
 
-## Figure 8.7 /  TS8.2
-# remove years < 1910, which have many NAs: start rowIndex at 16
-ts8.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
-  sheetName = "TS8.2", rowIndex = 16:116, colIndex = 1:11, header = FALSE)
-names(ts8.2) <- c("Year", "top_10_is", "top_10_5_is", "top_5_1_is", "top_1_is", "top_0.1_is", "top_10_is_wk", "top_1_is_wk", "top_0.1_is_nk", "top_10_ws", "top_1_ws")
-df8.7 <- ts8.2[, c("Year", "top_10_is", "top_10_ws")]
-names(df8.7) <- c("Year", "Income", "Wage")
+## Figure 8.6 /  TS8.2 / USA
+df8.6 <- ts8.2[, c("Year", "top_1_is", "top_5_1_is", "top_10_5_is")]
+names(df8.6) <- c("Year", "Top 1% (above $352,000)", "Top 5%-1% (between $150,000 and $350,000)", "Top 10%-5% (between $108,000 and $150,000)")
+df8.6 <- melt(df8.6, id.vars = "Year")
+
+## Figure 8.7 /  TS8.2 / USA
+df8.7 <- ts8.2[, c("Year", "top_10_is", "top_10_is_wok", "top_10_ws")]
+names(df8.7) <- c("Year", "Incomes", "Incomes (Excluding capital gains)", "Wages")
 df8.7 <- melt(df8.7, id.vars = c("Year"))
+
+## Figure 8.8 /  TS8.2 / USA
+df8.8 <- ts8.2[, c("Year", "top_1_is", "top_1_is_wok", "top_1_ws")]
+names(df8.8) <- c("Year", "Incomes", "Incomes (Excluding capital gains)", "Wages")
+df8.8 <- melt(df8.8, id.vars = c("Year"))
+
+## Figure 8.9 /  TS8.3 / USA
+df8.9 <- melt(ts8.3, id.vars = c("Quantile", "Country", "Year", "Type"))
+df8.9 <- subset(df8.9, Country == "US" & Year == "1929" & Type == "Including capital gains")
+df8.9 <- df8.9[, c("Quantile", "variable", "value")]
+
+## Figure 8.10 /  TS8.3 / USA
+df8.10 <- melt(ts8.3, id.vars = c("Quantile", "Country", "Year", "Type"))
+df8.10 <- subset(df8.10, Country == "US" & Year == "2007" & Type == "Including capital gains")
+df8.10 <- df8.10[, c("Quantile", "variable", "value")]
 
 ## Figure 9.8 / USA + EUROPE / TS8.1 + TS9.4
 # remove years < 1910, which have many NAs: start rowIndex at 16
@@ -314,7 +358,7 @@ see http://piketty.pse.ens.fr/capital21c)
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_1_1,fragile]
-\frametitle{Figure 1.1. Income inequality in the United States, 1910-2012}
+\frametitle{Figure 1.1. Income inequality in the United States, 1910--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -330,16 +374,15 @@ ggplot(data = df1.1, aes(x = Year, y = value)) + geom_line(colour = colorPalette
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_8_5,fragile]
-\frametitle{Figure 1.1/8.5. Income inequality in the United States, 1910-2012}
+\begin{frame}[label=Figure_1_2,fragile]
+\frametitle{Figure 1.2. The capital-income ratio in Europe, 1870--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.8.5, out.width='1\\linewidth'>>=
-ggplot(data = df8.5, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in national income") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.3, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in national income", values = shapePalette[1:2]) + scale_colour_manual(name = "Share of top decile in national income", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.6, .75), legend.background = element_rect(colour = 'black')) 
+<<Figure.1.2, out.width='1\\linewidth'>>=
+ggplot(data = df1.2, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Market value of private capital (% national income)") + xlab("") + theme_bw() + scale_x_continuous(breaks = pretty_breaks(n = 8)) + scale_y_continuous(labels = percent, breaks = seq(1, 8, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .75), legend.background = element_rect(colour = 'black')) 
 @
-\caption{The top decile share in U.S. national income dropped from 45--50\% in the 1910s--1920s to less than 35\% in the 1950s (this is the
-1950 1960 fall documented by Kuznets); it then rose from less than 35\% in the 1970s to 45--50\% in the 2000s--2010s. This is actually Figure 8.5 in the book.}
+\caption{Aggregate private wealth was worth about 6--7 years of national income in Europe in 1910, between 2 and 3 years in 1950, and between 4 and 6 years in 2010.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -348,14 +391,95 @@ ggplot(data = df8.5, aes(x = Year, y = value, group = variable, shape = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_8_1,fragile]
-\frametitle{Figure 8.1. Income inequality in France, 1910-2010}
+\frametitle{Figure 8.1. Income inequality in France, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<Figure.8.1, out.width='1\\linewidth'>>=
-ggplot(data = df8.1, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total(incomes or wages)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.2, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in total", values = shapePalette[1:2]) + scale_colour_manual(name = "Share of top decile in total", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.7, .75), legend.background = element_rect(colour = 'black')) 
+ggplot(data = df8.1, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total (incomes or wages)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.2, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in total", values = shapePalette) + scale_colour_manual(name = "Share of top decile in total", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.7, .75), legend.background = element_rect(colour = 'black')) 
 @
 \caption{Inequality of total income (labor and capital) has dropped in France during the twentieth century, while wage inequality has remained the same.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_2,fragile]
+\frametitle{Figure 8.2. The fall of rentiers in France, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.8.2, out.width='1\\linewidth'>>=
+ggplot(data = df8.2, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total (incomes or wages)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, .22, by = .02)) + scale_shape_manual(name = "Share of top percentile in total", values = shapePalette) + scale_colour_manual(name = "Share of top percentile in total", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.7, .75), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The fall in the top percentile share (the top 1 percent highest incomes) in France between 1914 and 1945 is due to the fall of top capital incomes.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_3,fragile]
+\frametitle{Figure 8.3. The composition of top incomes in France in 1932}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.8.3, out.width='1\\linewidth'>>=
+ggplot(data = df8.3, aes(x = Quantile, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share in total income of various fractiles") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Type of income", values = shapePalette) + scale_colour_manual(name = "Type of income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Labor income becomes less and less important as one goes up within the top decile of total income. Notes: (i)~``P90--95'' includes individuals between percentiles 90 to 95, ``P95--99'' includes the next 4 percent, ``P99--99.5'' the next 0.5 percent, etc.; (ii)~Labor income: wages, bonuses, pensions. Capital income: dividends, interest, rent. Mixed income: self-employment income.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_4,fragile]
+\frametitle{Figure 8.4. The composition of top incomes in France in 2005}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.8.4, out.width='1\\linewidth'>>=
+ggplot(data = df8.4, aes(x = Quantile, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share in total income of various fractiles") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Type of income", values = shapePalette) + scale_colour_manual(name = "Type of income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Capital income becomes dominant at the level of the top 0.1 percent in France in 2005, as opposed to the top 0.5 percent in 1932.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_5,fragile]
+\frametitle{Figure 8.5. Income inequality in the United States, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.8.5, out.width='1\\linewidth'>>=
+ggplot(data = df8.5, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in national income") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.3, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in total income", values = shapePalette) + scale_colour_manual(name = "Share of top decile in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .75), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The top decile share in U.S. national income dropped from 45--50\% in the 1910s--1920s to less than 35\% in the 1950s (this is the
+1950 1960 fall documented by Kuznets); it then rose from less than 35\% in the 1970s to 45--50\% in the 2000s--2010s.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_6,fragile]
+\frametitle{Figure 8.6. Decomposition of the top decile, United States, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.8.6, out.width='1\\linewidth'>>=
+ggplot(data = df8.6, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of the different groups in total income") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0.05, .25, by = .05)) + scale_shape_manual(name = "Annual incomes in 2010", values = shapePalette) + scale_colour_manual(name = "Annual incomes in 2010", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .85), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The rise of the top decile income share since the 1970s is mostly due to the top percentile.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -367,9 +491,9 @@ ggplot(data = df8.1, aes(x = Year, y = value, group = variable, shape = variable
 \frametitle{Figure 8.7. High incomes and high wages in the United States, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
-\centering
+\centering % To Do: add 'excluding capital gains'
 <<Figure.8.7, out.width='1\\linewidth'>>=
-ggplot(data = df8.7, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total(incomes or wages)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.2, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in total", values = shapePalette[1:2]) + scale_colour_manual(name = "Share of top decile in total", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.55, .75), legend.background = element_rect(colour = 'black')) 
+ggplot(data = df8.7, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total (incomes or wages)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.2, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in total", values = shapePalette) + scale_colour_manual(name = "Share of top decile in total", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .75), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The rise of income inequality since the 1970s is largely due to the rise of wage inequality.}
 \end{minipage}
@@ -379,15 +503,47 @@ ggplot(data = df8.7, aes(x = Year, y = value, group = variable, shape = variable
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_1_2,fragile]
-\frametitle{Figure 1.2. The capital-income ratio in Europe, 1870-2012}
+\begin{frame}[label=Figure_8_8,fragile]
+\frametitle{Figure 8.8. The transformation of the top 1 percent in the United States, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering % To Do: add 'excluding capital gains'
+<<Figure.8.8, out.width='1\\linewidth'>>=
+ggplot(data = df8.8, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total (incomes or wages)") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, .3, by = .02)) + scale_shape_manual(name = "Share of top percentile in total", values = shapePalette) + scale_colour_manual(name = "Share of top percentile in total", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .75), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The rise in the top 1 percent highest incomes since the 1970s is largely due to the rise in the top 1 percent highest wages.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_9,fragile]
+\frametitle{Figure 8.9. The composition of top incomes in the United States in 1929}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<Figure.1.2, out.width='1\\linewidth'>>=
-ggplot(data = df1.2, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Market value of private capital (% national income)") + xlab("") + theme_bw() + scale_x_continuous(breaks = pretty_breaks(n = 8)) + scale_y_continuous(labels = percent, breaks = seq(1, 8, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .75), legend.background = element_rect(colour = 'black')) 
+<<Figure.8.9, out.width='1\\linewidth'>>=
+ggplot(data = df8.9, aes(x = Quantile, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share in total income of various fractiles") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Type of income", values = shapePalette) + scale_colour_manual(name = "Type of income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
 @
-\caption{Aggregate private wealth was worth about 6--7 years of national income in Europe in 1910, between 2 and 3 years in 1950, and between 4 and 6 years in 2010.}
+\caption{Labor income becomes less and less important as one moves up within the top income decile.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_10,fragile]
+\frametitle{Figure 8.10. The composition of top incomes in the United States in 2007}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<Figure.8.10, out.width='1\\linewidth'>>=
+ggplot(data = df8.10, aes(x = Quantile, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share in total income of various fractiles") + xlab("") + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Type of income", values = shapePalette) + scale_colour_manual(name = "Type of income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Capital income becomes dominant at the level of top 0.1 percent in 2007, as opposed to the top 1 percent in 1929.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -666,7 +822,7 @@ ggplot(data = df5.8, aes(x = Year, y = value, group = variable, shape = variable
 <<Figure.9.8, out.width='1\\linewidth'>>=
 ggplot(data = df9.8, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in national income") + xlab("") + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.25, .5, by = .05)) + scale_shape_manual(name = "Share of top decile \n in national income", values = shapePalette[1:2]) + scale_colour_manual(name = "Share of top decile \n in national income", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.6, .75), legend.background = element_rect(colour = 'black')) 
 @
-\caption{The top decile income share was higher in Europe than in the U.S. in 1900-2010. It is much higher in the U.S. in 2000-2010.}
+\caption{The top decile income share was higher in Europe than in the U.S. in 1900--2010. It is much higher in the U.S. in 2000--2010.}
 \end{minipage}
 \end{figure}
 \end{frame}
