@@ -1,17 +1,17 @@
-\frametitle{Figure 1.2. The capital-income ratio in Europe, 1870-2012}
+\frametitle{Figure 8.7. High incomes and high wages in the United States, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_2}
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_7}
 
 }
 
 
 
 \end{knitrout}
-\caption{Aggregate private wealth was worth about 6--7 years of national income in Europe in 1910, between 2 and 3 years in 1950, and between 4 and 6 years in 2010.}
+\caption{The rise of income inequality since the 1970s is largely due to the rise of wage inequality.}
 \end{minipage}
 \end{figure}
