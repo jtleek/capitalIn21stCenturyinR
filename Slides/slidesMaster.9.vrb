@@ -1,0 +1,17 @@
+\frametitle{Figure 8.4. The composition of top incomes in France in 2005}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_4}
+
+}
+
+
+
+\end{knitrout}
+\caption{Capital income becomes dominant at the level of the top 0.1 percent in France in 2005, as opposed to the top 0.5 percent in 1932.}
+\end{minipage}
+\end{figure}

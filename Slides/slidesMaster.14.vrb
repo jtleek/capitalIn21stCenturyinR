@@ -1,0 +1,17 @@
+\frametitle{Figure 8.9. The composition of top incomes in the United States in 1929}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_9}
+
+}
+
+
+
+\end{knitrout}
+\caption{Labor income becomes less and less important as one moves up within the top income decile.}
+\end{minipage}
+\end{figure}

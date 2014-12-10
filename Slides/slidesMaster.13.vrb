@@ -1,0 +1,17 @@
+\frametitle{Figure 8.8. The transformation of the top 1 percent in the United States, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering % To Do: add 'excluding capital gains'
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_8}
+
+}
+
+
+
+\end{knitrout}
+\caption{The rise in the top 1 percent highest incomes since the 1970s is largely due to the rise in the top 1 percent highest wages.}
+\end{minipage}
+\end{figure}
