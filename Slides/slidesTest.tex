@@ -1,0 +1,24 @@
+\PassOptionsToPackage{usenames,dvipsnames,svgnames}{xcolor}% named colors
+\documentclass{beamer}
+\usepackage[T1]{fontenc}% font encoding, load before inputenc
+\usepackage[utf8]{inputenc}% character inputing, load after fontenc
+\usepackage{eurosym}% \euro{} in text mode / $\euro$ in math mode 
+\DeclareRobustCommand{\officialeuro}{% support for \euro in math mode
+  \ifmmode\expandafter\text\fi
+  {\fontencoding{U}\fontfamily{eurosym}\selectfont e}}
+\setbeamertemplate{navigation symbols}{}
+\beamerdefaultoverlayspecification{<+->}% {} to suppress overlays
+
+\setbeamercolor{frametitle}{fg = RoyalBlue}
+\setbeamercolor{itemize item}{fg = RoyalBlue}
+\setbeamercolor{itemize subitem}{fg = MidnightBlue}
+\setbeamercolor{itemize subsubitem}{fg = black}
+\setbeamercolor{enumerate item}{fg = RoyalBlue}
+\setbeamercolor{enumerate subitem}{fg = MidnightBlue}
+\setbeamercolor{enumerate subsubitem}{fg = black}
+
+\begin{document}
+
+
+
+\end{document}

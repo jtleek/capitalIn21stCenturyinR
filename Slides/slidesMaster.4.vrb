@@ -1,11 +1,11 @@
-\frametitle{Figure 1.1. Income inequality in the United States, 1910--2012}
+\frametitle{Figure I.1: Income inequality in the United States, 1910--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_1}
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_0_1}
 
 }
 

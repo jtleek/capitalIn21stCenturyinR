@@ -1,11 +1,11 @@
-\frametitle{Figure 1.2. The capital-income ratio in Europe, 1870--2012}
+\frametitle{Figure I.2. The capital--income ratio in Europe, 1870--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_2}
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_0_2}
 
 }
 

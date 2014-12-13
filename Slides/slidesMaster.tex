@@ -94,7 +94,7 @@
 \usepackage{alltt}
 %%% Select frames to be included in presentation
 % \includeonlyframes{} takes a comma-separated list *without spaces*
-\input{slidesPikettySaoPaulo2014}% list of frames for inclusion
+%\input{slidesPikettySaoPaulo2014}% list of frames for inclusion
 %\input{slidesCurrent}% frames being debugged
 
 %%%%%%%%%% Set Document Information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,17 +114,20 @@
 \usetheme{piketty}
 
 %%%%%%%%%% Load Latex Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage[T1]{fontenc}
+\usepackage[T1]{fontenc}% font encoding, load before inputenc
+\usepackage[utf8]{inputenc}% character inputing, load after fontenc
 \usepackage{lmodern}
-\usepackage{booktabs}
-\usepackage[flushleft]{threeparttable}
-\usepackage{adjustbox}
+\usepackage{booktabs}% fancy tables
+\usepackage[flushleft]{threeparttable}% fancy tables
+\usepackage{adjustbox}% combine with threeparttable package
+\usepackage{verbatim}% pass text as unprocessed strings / comment out
 
 %%%%%%%%%% Set Miscellani %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \setcounter{secnumdepth}{3}%
 \setcounter{tocdepth}{3}%
 \setlength{\abovecaptionskip}{0pt}%
 \setlength{\belowcaptionskip}{0pt}%
+\renewcommand{\insertpagenumber}{}% suppress page numbers
 
 %%%%%%%%%% Load knitr Options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -146,6 +149,7 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Introduction_1]
+\frametitle{Presention layout}
 \begin{itemize}
 \item
 This presentation is based upon Capital in the 21st century (Harvard University Press, March 2014)
@@ -164,8 +168,7 @@ Part 3. The structure of inequalities
 Part 4. Regulating capital in the 21st century
 \end{itemize}
 \item 
-In this presentation I will present some results from Parts 2 \& 3, focusing upon the long-run evolution of capital/income ratios and wealth concentration (all graphs and series are available on line:
-see http://piketty.pse.ens.fr/capital21c)
+I will present some results from Parts 2 \& 3, focusing upon the long-run evolution of capital/income ratios and wealth concentration (\href{all graphs and series are available online}{http://piketty.pse.ens.fr/capital21c}.
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,15 +190,15 @@ see http://piketty.pse.ens.fr/capital21c)
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_1_1,fragile]
-\frametitle{Figure 1.1. Income inequality in the United States, 1910--2012}
+\begin{frame}[label=Figure_0_1,fragile]
+\frametitle{Figure I.1: Income inequality in the United States, 1910--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_0_1} 
 
 }
 
@@ -211,15 +214,15 @@ see http://piketty.pse.ens.fr/capital21c)
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_1_2,fragile]
-\frametitle{Figure 1.2. The capital-income ratio in Europe, 1870--2012}
+\begin{frame}[label=Figure_0_2,fragile]
+\frametitle{Figure I.2. The capital--income ratio in Europe, 1870--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_0_2} 
 
 }
 
@@ -242,7 +245,7 @@ see http://piketty.pse.ens.fr/capital21c)
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_1} 
 
 }
 
@@ -265,7 +268,7 @@ see http://piketty.pse.ens.fr/capital21c)
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_2} 
 
 }
 
@@ -288,7 +291,7 @@ see http://piketty.pse.ens.fr/capital21c)
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_3} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_3} 
 
 }
 
@@ -311,7 +314,7 @@ see http://piketty.pse.ens.fr/capital21c)
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_4} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_4} 
 
 }
 
@@ -334,7 +337,7 @@ see http://piketty.pse.ens.fr/capital21c)
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_5} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_5} 
 
 }
 
@@ -358,7 +361,7 @@ see http://piketty.pse.ens.fr/capital21c)
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_6} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_6} 
 
 }
 
@@ -381,7 +384,7 @@ see http://piketty.pse.ens.fr/capital21c)
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_7} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_7} 
 
 }
 
@@ -404,7 +407,7 @@ see http://piketty.pse.ens.fr/capital21c)
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_8} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_8} 
 
 }
 
@@ -427,7 +430,7 @@ see http://piketty.pse.ens.fr/capital21c)
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_9} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_9} 
 
 }
 
@@ -450,7 +453,7 @@ see http://piketty.pse.ens.fr/capital21c)
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_10} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_10} 
 
 }
 
@@ -469,13 +472,13 @@ see http://piketty.pse.ens.fr/capital21c)
 \frametitle{This presentation: three points}
 \begin{enumerate}
 \item
-The return of a patrimonial (or wealth-based) society in the Old World (Europe, Japan). Wealth-income ratios seem to be returning to very high levels in low growth countries.
+\textbf{The return of a patrimonial (or wealth-based) society} in the Old World (Europe, Japan). Wealth-income ratios seem to be returning to very high levels in low growth countries.
 \medskip\newline
 Intuition: in a slow-growth society, wealth accumulated in the past can naturally become very important. In the very long run, this can be relevant for the entire world.
 \item 
-The future of wealth concentration: with high r-g during 21c (r = `net-of-tax rate of return', g = `growth rate'), then wealth inequality might reach or surpass 19c oligarchic levels; conversely, suitable institutions can allow to democratize wealth.
+\textbf{The future of wealth concentration}: with high $r-g$ during 21c ($r =$~`net-of-tax rate of return', $g =$~`growth rate'), then wealth inequality might reach or surpass 19c oligarchic levels; conversely, suitable institutions can allow to democratize wealth.
 \item
-Inequality in America (``meritocratic extremism''): is the New World developing a new inequality model that is based upon extreme labor income inequality more than upon wealth inequality? Is it more merit-based, or can it become the worst of all worlds?
+\textbf{Inequality in America} (``meritocratic extremism''): is the New World developing a new inequality model that is based upon extreme labor income inequality more than upon wealth inequality? Is it more merit-based, or can it become the worst of all worlds?
 \end{enumerate}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -486,13 +489,13 @@ Inequality in America (``meritocratic extremism''): is the New World developing 
 \frametitle{Brasil vs Europe--US--Japan}
 \begin{itemize}
 \item
-Top income shares: income inequality is known to be high in Brasil; but it is probably underestimated (problem with household surveys); little access to fiscal data in Brasil
+\textbf{Top income shares}: income inequality is known to be high in Brasil; but it is probably underestimated (problem with household surveys); little access to fiscal data in Brasil.
 \item 
-Wealth-income ratios: probably a strong rise in Brasil (real estate prices), but we do not really know
+\textbf{Wealth-income ratios}: probably a strong rise in Brasil (real estate prices), but we do not really know.
 \item
-Wealth inequality: probably very high, but we do not really know; no access to property tax and inheritance tax statistics
+\textbf{Wealth inequality}: probably very high, but we do not really know; no access to property tax and inheritance tax statistics.
 \item
-Like other countries, Brasil needs more transparency about income and wealth; progressive tax on income, inheritance and wealth would be a powerful way to produce information about how the different income and wealth groups are benefiting from growth
+\textbf{Like other countries, Brasil needs more transparency about income and wealth}; progressive tax on income, inheritance and wealth would be a powerful way to produce information about how the different income and wealth groups are benefiting from growth.
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -543,6 +546,10 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+\againframe[shrink=4]{ThreePoints}
+
+\againframe{Figure_0_2}
+
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_5_1]
 \frametitle{Figure 5.1: Private \& public capital in Europe \& United States, 1870--2010}
@@ -552,7 +559,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_1} 
 
 }
 
@@ -575,7 +582,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_2} 
 
 }
 
@@ -598,7 +605,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_3} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_3} 
 
 }
 
@@ -606,29 +613,6 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 
 \end{knitrout}
 \caption{Private capital is worth between 2 and 3.5 years of national income in rich countries in 1970, and between 4 and 7 years of national income in 2010.}
-\end{minipage}
-\end{figure}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_5_4]
-\frametitle{Figure 5.4: Private capital in rich countries (ratio), 1970--2010}
-\begin{figure}[t]
-\begin{minipage}[b]{\textwidth}
-\centering
-\begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_4} 
-
-}
-
-
-
-\end{knitrout}
-\caption{Expressed in years of household disposable income (about 70--80\% of national income), the capital/income ratio appears to be larger than when it is expressed in years of national income.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -644,7 +628,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_3b} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_3b} 
 
 }
 
@@ -652,6 +636,29 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 
 \end{knitrout}
 \caption{In France, Britain, Germany, and the United States, government deficits exceeded public investment by 2--3\% of national income on average over the period 1970--2010, compared with more than 6\% in Italy.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_4]
+\frametitle{Figure 5.4: Private capital in rich countries (ratio), 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_4} 
+
+}
+
+
+
+\end{knitrout}
+\caption{Expressed in years of household disposable income (about 70--80\% of national income), the capital/income ratio appears to be larger than when it is expressed in years of national income.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -667,7 +674,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth,height=0.75\textheight]{figures/bw/Figure_5_5} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_5} 
 
 }
 
@@ -690,7 +697,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_6} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_6} 
 
 }
 
@@ -713,7 +720,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth,height=0.75\textheight]{figures/bw/Figure_5_7} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_7} 
 
 }
 
@@ -736,7 +743,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_8} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_8} 
 
 }
 
@@ -824,7 +831,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_9_8} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_9_8} 
 
 }
 
@@ -847,7 +854,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_14_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_14_1} 
 
 }
 
@@ -870,7 +877,7 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_14_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_14_2} 
 
 }
 
@@ -889,22 +896,705 @@ Like other countries, Brasil needs more transparency about income and wealth; pr
 \frametitle{Conclusions}
 \begin{itemize}
 \item
-The history of income and wealth inequality is always political, chaotic and unpredictable; it involves national identities and sharp reversals; nobody can predict the reversals of the future
+\textbf{The history of income and wealth inequality is always political, chaotic and unpredictable; it involves national identities and sharp reversals; nobody can predict the reversals of the future.}
 \item
-Marx: with $g=0$, $\beta\rightarrow\infty$, $r\rightarrow 0$ : revolution, war
+Marx: with $g=0$, $\beta \to \infty$, $r \to 0$ : revolution, war
 \item
-My conclusions are less apocalyptic: with $g>0$, at least we have a steady state $\beta=s/g$
+My conclusions are less apocalyptic: with $g>0$, at least we have a steady state $\beta = s/g$.
 \item
-But with $g>0$ \& small, this steady-state can be rather gloomy: it can involve a very large capital-income ratio $\beta$ and capital share $\alpha$, as well as extreme wealth concentration due to high $r-g$
+But with $g>0$ \& small, this steady-state can be rather gloomy: it can involve a very large capital-income ratio $\beta$ and capital share $\alpha$, as well as extreme wealth concentration due to high $r-g$.
 \item
-This has nothing to do with a market imperfection: the more perfect the capital market, the higher $r-g$
+This has nothing to do with a market imperfection: the more perfect the capital market, the higher $r-g$.
 \item
-The ideal solution: progressive wealth tax at the global scale, based upon automatic exchange of bank information
+The ideal solution: progressive wealth tax at the global scale, based upon automatic exchange of bank information.
 \item
-Other solutions involve authoritarian political \& capital controls (China, Russia..), or perpetual population growth (US), or inflation, or some mixture of all
+Other solutions involve authoritarian political \& capital controls (China, Russia..), or perpetual population growth (US), or inflation, or some mixture of all.
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Transition_1]
+\begin{center}
+\begin{huge}
+Supplementary Slides
+\vspace{3\baselineskip}\par
+(long lecture version)
+\end{huge}
+\end{center}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Long Version Starts Here
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=WealthReturn,shrink=8]
+\frametitle{1. The return of a wealth-based society}
+\begin{itemize}
+\item
+Wealth = capital $K$ = everything we own and that can be sold on a market (net of all debts) (excludes human $K$, except in slave societies)
+\item
+In textbooks, wealth-income \& capital-ouput ratios are supposed to be constant. But the so-called ``Kaldor facts'' actually rely on little historical evidence.
+\item
+In fact, we observe in Europe \& Japan a large recovery of $\beta=K/Y$ in recent decades:
+\begin{align*}
+\beta = 200-300\% ~\text{in}~ 1950-1960 \\
+\beta = 500-600\% ~\text{in}~ 2000-2010
+\end{align*}
+\begin{footnotesize}
+(i.e. average wealth $K$ was about 2--3 years of average income $Y$ around 1950--1960; it is about 5--6 years in 2000--2010)
+\linebreak
+(with $\beta \simeq 600\%$, if $Y \simeq \euro 30,000$ per capita, then $K \simeq \euro 180,000$ per capita) (currently, $K \simeq$ half real estate, half financial assets)
+\end{footnotesize}
+\item
+\textbf{Are we heading back to the $\beta = 600-700\%$ observed in the wealth-based societies of 18c-19c? Or even more?}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\againframe{Figure_5_3}
+
+
+\againframe{Figure_5_5}
+
+
+\againframe{Figure_5_7}
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_3_1]
+\frametitle{Figure 3.1: Capital in Britain, 1700--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{National capital is worth about seven years of national income in Britain in 1700 (including four in agricultural land).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_3_2]
+\frametitle{Figure 3.2: Capital in France, 1700--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{National capital is worth almost seven years of national income in France in 1910 (including one invested abroad).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=CapitalIsBack]
+\frametitle{Capital is back}
+\begin{itemize}
+\item
+The simplest way to think about this is the following: 
+\begin{itemize}
+\item
+In the long-run, $\beta = s/g$
+\par\medskip
+with $s$ = (net-of-depreciation) saving rate and $g$ = economy's growth rate (population + productivity).
+\end{itemize}
+\item
+With $s = 10\%$, $g = 3\%$, $\beta \simeq 300\%$; but if $s = 10\%$, $g = 1.5\%$, $\beta \simeq 600\%$.
+\item
+\textbf{In slow-growth societies, the total stock of wealth accumulated in the past can naturally be very important.}
+\item
+$\rightarrow$ \textbf{capital is back because low growth is back.}
+(in particular because population growth $\downarrow 0$)
+\item
+$\rightarrow$ \textbf{in the long run, this can be relevant for the entire planet.}
+\item
+Note: $\beta = s/g$ = pure stock-flow accounting identity; it is true whatever the combination of saving motives.
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_12_5]
+\frametitle{Figure 12.5: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=ElasticityKL,shrink=14]
+\frametitle{The capital--labor elasticity of substitution}
+\begin{itemize}
+\item
+\textbf{Will the rise of capital income-ratio $\beta$ also lead to a rise of the capital share $\alpha$ in national income?}
+\item
+If the capital stock equals $\beta = 6$ years of income and the average return to capital is equal $r = 5\%$ per year, then the share of capital income (rent, dividends, interest, profits, etc.) in national income equals $\alpha = r \times \beta = 30\%$.
+\item
+Technically, whether a rise in $\beta$ also leads to a rise in capital share $\alpha = r \beta$ depends on the elasticity of substitution $\sigma$ between capital $K$ and labor $L$ in the production function $Y = F(K, L)$.
+\item
+Intuition: $\sigma$ measures the extent to which workers can be replaced by machines (e.g. Amazon’s drones).
+\item
+Standard assumption: Cobb-Douglas production function ($\sigma = 1$) = as the stock $\beta \uparrow$, the return $r \downarrow$ exactly in the same proportions, so that $\alpha = r \times \beta$ remains unchanged, like by magic = a stable world where the capital--labor split is entirely set by technology.
+\item
+But if $\sigma > 1$, then the return to capital $r \downarrow$ falls less than the volume of capital $\beta\uparrow$, so that the product $\alpha = r \times \beta \uparrow$.
+\item
+\textbf{Exactly what happened since the 1970s--80s: both the ratio $\beta$ and the capital share $\alpha$ have increased.}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_6_5]
+\frametitle{Figure 6.5: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Robots]
+\frametitle{Towards a world of robots?}
+\begin{itemize}
+\item
+With a large rise in $\beta$, one can get large rise in $\alpha$ with a production function $F(K,L)$ that is just a little bit more substituable than in the standard Cobb-Douglas model (say if $\sigma = 1.5$ instead of $1$).
+\item
+Maybe it is natural to expect $\sigma \uparrow$ over the course of history: more and more diversified uses for capital;
+\textbf{extreme case: pure robot-economy} ($\sigma = $ infinity).
+\item
+Less extreme case: there are many possible uses for capital (machines can replace cashiers, drones can replace Amazon's delivery workers, etc.), so that the capital share $\alpha \uparrow$ continuously; there's no natural corrective mechanism for this.
+\item
+The rise of $\beta$ and $\alpha$ can be a good thing (we could all devote more time to culture, education, health..., rather than to our own subsistance), assuming one can answer the following question: \textbf{who owns the robots?}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=WealthFuture]
+\frametitle{2. The future of wealth concentration}
+\begin{itemize}
+\item
+In all European countries (UK, France, Sweden...), wealth concentration was extremely high in 18c-19c \& until WW1:
+\begin{itemize}
+\item
+about 90\% of aggregate wealth for top 10\% wealth holders
+\item
+about 60\% of aggregate wealth for top 1\% wealth-holders
+\end{itemize}
+\item
+\textbf{= the classic patrimonial (wealth-based) society}: 
+\begin{itemize}
+\item
+a minority lives off its wealth, while the rest of the populaton works (Austen, Balzac)
+\end{itemize}
+\item
+Today wealth concentration is still very high, but less extreme:\hfill
+\begin{itemize}%\vspace{-\baselineskip}% hack
+\item
+about 60--70\% for top 10\%; about 20--30\% for top 1\%
+\item
+the bottom 50\% still owns almost nothing (<5\%)
+\item
+but the middle 40\% now owns 20--30\% of aggregate wealth
+\item
+\textbf{= the rise of a patrimonial middle class}.
+\end{itemize}
+\item
+\textbf{How did it happen, and will it last? Will the patrimonial middle class expend, or will it shrink?}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_1]
+\frametitle{Figure 10.1: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_2]
+\frametitle{Figure 10.2: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_3]
+\frametitle{Figure 10.3: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_4]
+\frametitle{Figure 10.4: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=WealthShocks]
+\frametitle{Wealth shocks}
+\begin{itemize}
+\item
+\textbf{Key finding: there was no decline in wealth concentration prior to World War shocks; was it just due to shocks?}
+\begin{itemize}
+\item
+\textbf{Question}: Apart from shocks, what forces determine the long-run level of wealth concentration?
+\item
+\textbf{Answer}: In any dynamic, multiplicative wealth accumulation model with random individual shocks (tastes, demographics, returns, wages,..), 
+\textbf{the steady-state level of wealth concentration is an increasing function of $r-g$}. 
+\smallskip\par (with $r$ = net-of-tax rate of return and $g$ = growth rate)
+\end{itemize}
+\item
+With growth slowdown and rising tax competition to attract capital, $r-g$ might well rise in the 21c $\rightarrow$ back to 19c levels.
+\item
+Future values of $r$ also depend on technology ($\sigma > 1$?)
+\item 
+Under plausible assumptions, wealth concentration might reach or surpass 19c record levels: see global wealth rankings
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_9]
+\frametitle{Figure 10.9: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_10]
+\frametitle{Figure 10.10: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_1]
+\frametitle{Figure 2.1: The growth of world population, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_1} 
+
+}
+
+
+
+\end{knitrout}
+\caption{World population rose from 600 million inhabitants in 1700 to 7 billion in 2012.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_1_b]
+\frametitle{Figure 2.1: The growth of world population, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_1_b} 
+
+}
+
+
+
+\end{knitrout}
+\caption{World population rose from 600 million inhabitants in 1700 to 7 billion in 2012.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_2a]
+\frametitle{Figure 2.2a: The growth rate of population from Antiquity to 2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_2a} 
+
+}
+
+
+
+\end{knitrout}
+%\caption{}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_2]
+\frametitle{Figure 2.2: The growth rate of world population from Antiquity to 2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_2} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The growth rate of world population was above 1 percent per year from 1950 to 2012 and should return toward 0 percent by the end of the twenty-first century.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_3]
+\frametitle{Figure 2.3: The growth rate of per capita output since the Industrial Revolution}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_3} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The growth rate of per capita output surpassed 4 percent per year in Europe between 1950 and 1970, before returning to American levels.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_4]
+\frametitle{Figure 2.4: The growth rate of world per capita output from Antiquity to 2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_4} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The growth rate of per capita output surpassed 2 percent from 1950 to 2012. If the convergence process goes on, it will surpass 2.5 percent from 2012 to 2050, and then will drop below 1.5 percent.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_5]
+\frametitle{Figure 2.5: The growth rate of world output from Antiquity to 2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_5} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The growth rate of world output surpassed 4 percent from 1950 to 1990. If the convergence process goes on, it will drop below 2 percent by 2050.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_6,fragile]
+\frametitle{Figure 2.6. Inflation since the Industrial Revolution}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_6} 
+
+}
+
+
+
+\end{knitrout}
+\caption{Inflation in the rich countries was zero in the eighteenth and nineteenth centuries, high in the twentieth century, and roughly 2 percent a year since 1990.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_12_1]
+\frametitle{Figure 12.1: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_12_2]
+\frametitle{Figure 12.2: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_12_3]
+\frametitle{Figure 12.3: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\againframe{Table_12_1}
+
+
+\againframe{Table_12_2}
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=InequalityUSA]
+\frametitle{3. Inequality in America}
+\framesubtitle{``meritocratic extremism''}
+\begin{itemize}
+\item
+Inequality in America = a different structure as in Europe: 
+\textbf{more egalitarian in some ways, more inegalitarian in some other dimensions}.
+\item
+The New World in the 19th century: the land of opportunity (capital accumulated in the past mattered much less than in Europe; perpetual demographic growth as a way to reduce the level of inherited wealth and wealth concentration)... and also the land of slavery.
+\item 
+Northern US were in many ways more egalitarian than Old Europe; but Southern US were more inegalitarian.
+\item 
+We still have the same ambiguous relationship of America with inequality today: in some ways more merit-based; in other ways more violent (prisons).
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\againframe{Figure_3_2}
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_6]
+\frametitle{Figure 4.6: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\againframe{Figure_5_2}
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_10]
+\frametitle{Figure 4.10: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_11]
+\frametitle{Figure 4.11: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=USAvEU]
+\frametitle{America Versus Europe}
+\begin{itemize}
+\item
+The US distribution of income has become more unequal than in Europe over the course of the 20th century; it is now as unequal as pre--WW1 Europe.
+\item 
+But the structure of inequality is different: US 2013 has less wealth inequality than Europe 1913, but higher inequality of labor income.
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_6]
+\frametitle{Figure 10.6: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\againframe{Figure_8_5}
+
+
+\againframe{Figure_9_8}
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=MeritVNorms]
+\frametitle{Merit or Social Norms?}
+\begin{itemize}
+\item
+Higher inequality of labor income in the US could reflect higher inequality in education investment; but it also reflects a huge rise of top executive compensation that it very hard to explain with education and productivity reasoning alone.
+\item 
+In the US, this is sometime described as more merit--based: the rise of top labor incomes makes it possible to become rich with no inheritance ($\simeq$~Napoleonic «préfets»)
+\item 
+\textbf{Problem: this can be the worst of all worlds for those who are neither top income earners nor top successors}: they are poor, and they are depicted as dump \& undeserving (by contrast, nobody was trying to depict Ancien Regime inequality as fair!).
+\item 
+It is unclear whether rise of top incomes has a lot to do with merit or productivity: sharp decline in top tax rates \& rise of CEO bargaining power are more convincing explanations; chaotic US history of social norms regarding inequality.
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\againframe{Figure_14_1}
+
+
+\againframe{Figure_14_2}
+
+
+\againframe[shrink=7]{Conclusions_1}
+
+
+
 \end{document}
+
