@@ -1,0 +1,17 @@
+\frametitle{Figure 1.4. Global Inequality, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_1_4}
+
+}
+
+
+
+\end{knitrout}
+\caption{In 2012, 1 euro was worth \$1.30 according to current exchange rate, but \$1.20 in purchasing power parity.}
+\end{minipage}
+\end{figure}

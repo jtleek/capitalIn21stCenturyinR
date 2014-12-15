@@ -1,0 +1,17 @@
+\frametitle{Figure 1.5. Exchange rate and purchasing power parity: euro/yuan}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_1_5}
+
+}
+
+
+
+\end{knitrout}
+\caption{In 2012, 1 euro was worth 8 yuan according to current exchange rate, but 5 yuan in purchasing power parity.}
+\end{minipage}
+\end{figure}

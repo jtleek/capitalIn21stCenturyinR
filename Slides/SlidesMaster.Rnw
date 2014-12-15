@@ -150,11 +150,43 @@ ts0.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
 names(ts0.2) <- c("Year", "Germany", "France", "Britain")
 df0.2 <- melt(ts0.2, id.vars = "Year")
 
+## Figure 1.1 / TS1.1a / world output / 4 continents
+ts1.1a <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.1a", rowIndex = 8:18, colIndex = c(1, 3:6), header = FALSE)
+names(ts1.1a) <- c("Year", "Europe", "America", "Africa", "Asia")
+ts1.1a <- melt(ts1.1a, id.vars = "Year")
+df1.1 <- ts1.1a
+
+## Figure 1.2 / TS1.2 / world population / 4 continents
+ts1.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.2", rowIndex = 8:18, colIndex = c(1, 3:6), header = FALSE)
+names(ts1.2) <- c("Year", "Europe", "America", "Africa", "Asia")
+ts1.2 <- melt(ts1.2, id.vars = "Year")
+df1.2 <- ts1.2
+
+## Figure 1.3 / TS1.3 / world population / 4 continents
+ts1.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.3", rowIndex = 8:18, colIndex = c(1:8), header = FALSE)
+names(ts1.3) <- c("Year", "World", "Europe", "America", "Africa", "Asia", "Europe + America", "Asia + Africa")
+ts1.3 <- melt(ts1.3, id.vars = "Year")
+df1.3 <- subset(ts1.3, variable %in% c("Year", "Europe + America", "Asia + Africa", "World"))
+
+## Figure 1.4 / TS1.7 / exchange rate euro/dollar
+ts1.7 <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.7", rowIndex = 8:30, colIndex = c(1:9, 17:22), header = FALSE)
+names(ts1.7) <- c("Year", "Exchange rate euro/dollar", "Purchasing power parity euro/dollar", "Exchange rate euro/yuan", "Purchasing power parity euro/yuan", "Exchange rate euro/rupee", "Purchasing power parity euro/rupee", "Exchange rate euro/yen", "Purchasing power parity euro/yen", "Exchange rate dollar/yuan", "Purchasing power parity dollar/yuan", "Exchange rate dollar/rupee", "Purchasing power parity dollar/rupee", "Exchange rate dollar/yen", "Purchasing power parity dollar/yen")
+ts1.7 <- melt(ts1.7, id.vars = "Year")
+df1.4 <- subset(ts1.7, variable %in% c("Year", "Exchange rate euro/dollar", "Purchasing power parity euro/dollar"))
+
+## Figure 1.5 / TS1.7 / exchange rate euro/dollar
+df1.5 <- subset(ts1.7, variable %in% c("Year", "Exchange rate euro/yuan", "Purchasing power parity euro/yuan"))
+
 ## Figure 2.1 / TS2.1 / world population / 4 continents
 ts2.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
   sheetName = "TS2.2", rowIndex = 8:17, colIndex = c(25, 27:30), header = FALSE)
 names(ts2.1) <- c("Year", "Europe", "America", "Africa", "Asia")
-df2.1 <- melt(ts2.1, id.vars = "Year")
+ts2.1 <- melt(ts2.1, id.vars = "Year")
+df2.1 <- ts2.1
 
 ## Table TS2.2
 # Table S2.2a
@@ -193,14 +225,16 @@ ts2.4a <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
   sheetName = "TS2.4", rowIndex = 10:16, colIndex = 4:6, header = FALSE)
 ts2.4a[, 4] <- as.numeric(row.names(ts2.4a)) # Create a sequence
 names(ts2.4a) <- c("Period", "Western Europe", "North America", "Seq")
-df2.3 <- melt(ts2.4a, id.vars = c("Period", "Seq"))
+ts2.4a <- melt(ts2.4a, id.vars = c("Period", "Seq"))
+df2.3 <- ts2.4a
 
 ## Figure 2.4 / TS2.4 / World / Per capita output
 ts2.4b <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
   sheetName = "TS2.4",rowIndex = 7:18, colIndex = c(1,3), header = FALSE)
 ts2.4b[, 3] <- as.numeric(row.names(ts2.4b)) # Create a sequence
 names(ts2.4b) <- c("Period", "World", "Seq")
-df2.4 <- melt(ts2.4b, id.vars = c("Period", "Seq"))
+ts2.4b <- melt(ts2.4b, id.vars = c("Period", "Seq"))
+df2.4 <- ts2.4b
 # Create factors Observed / Projected
 df2.4$Type <- as.factor(ifelse(df2.4$Seq < 8, "Observed", "Projected"))
 
@@ -1489,6 +1523,86 @@ Under plausible assumptions, wealth concentration might reach or surpass 19c rec
 #ggplot(data = df10.10, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Marginal tax rate applying to the highest inheritances") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.15, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank())  + guides(shape = guide_legend(ncol = 2)) 
 @
 \caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_1]
+\frametitle{Figure 1.1: The distribution of world output, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.1', out.width='1\\linewidth'>>=
+ggplot(data = df1.1, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .5, show_guide = TRUE) + ylab("Share in world output (% of total)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2012), breaks = seq(1700, 2020, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_fill_brewer(palette = "Blues") + theme(legend.key = element_blank(), legend.position = "bottom", legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{Europe's GDP made 47 percent of world GDP in 1913, down to 25 percent in 2012.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_2]
+\frametitle{Figure 1.2: The distribution of world population, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.2', out.width='1\\linewidth'>>=
+ggplot(data = df1.2, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .5, show_guide = TRUE) + ylab("Share in world population (% of total)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2012), breaks = seq(1700, 2020, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_fill_brewer(palette = "Blues") + theme(legend.key = element_blank(), legend.position = "bottom", legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{Europe's population made 26 percent of world population in 1913, down to 10 percent in 2012.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_3,fragile]
+\frametitle{Figure 1.3. Global Inequality, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.3', out.width='1\\linewidth'>>=
+ggplot(data = df1.3, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Per capital GDP (% of world average)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2012), breaks = seq(1700, 2020, by = 20)) + scale_y_continuous(limits = c(0.25, 2.5), labels = percent, breaks = seq(0.25, 2.5, by = .25)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .5), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Per capita GDP in Asia--Africa went from 37 percent of world average in 1950 to 61 percent in 2012. Divergence then convergence?}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_4,fragile]
+\frametitle{Figure 1.4. Global Inequality, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.4', out.width='1\\linewidth'>>=
+ggplot(data = df1.4, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Exchange rate euro/dollar (in dollars)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1990, 2012, by = 2)) + scale_y_continuous(limits = c(0.85, 1.5), labels = dollar, breaks = seq(0.8, 1.5, by = .1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{In 2012, 1 euro was worth \$1.30 according to current exchange rate, but \$1.20 in purchasing power parity.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_5,fragile]
+\frametitle{Figure 1.5. Exchange rate and purchasing power parity: euro/yuan}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.5', out.width='1\\linewidth'>>=
+ggplot(data = df1.5, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Exchange rate euro/dollar (in dollars)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1990, 2012, by = 2)) + scale_y_continuous(limits = c(2, 11.5), labels = dollar, breaks = seq(0, 12, by = 2)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .1), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{In 2012, 1 euro was worth 8 yuan according to current exchange rate, but 5 yuan in purchasing power parity.}
 \end{minipage}
 \end{figure}
 \end{frame}
