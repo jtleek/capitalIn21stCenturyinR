@@ -1,0 +1,2185 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Author: https://github.com/jtleek/capitalIn21stCenturyinR
+%%% Author: knitr/beamer by Patrick Toche, December 2014
+%%% Author: data/content by Thomas Piketty, 2013-2014
+%%% This replicates a December 2014 presentation at Sao Paulo by Thomas Piketty
+%%% The .Rnw file is the 'master', other files produced by knitr compilation
+%%% To compile in R: library(knitr); knit("slides.Rnw");
+%%% To compile in Rstudio: 'Compile PDF' menu command
+%%% The 'pictures' directory contains images inserted with \includegraphics
+%%% The 'figures' directory contains pdf created and inserted by knitr
+%%% Delete the 'cache' directory to recreate pdf graphics
+%%% The 'SaoPaulo' directory contains pdf of original powerpoint for reference
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% \PassOptionsToPackage loads options for packages loaded by beamer class
+\PassOptionsToPackage{obeyspaces}{url}% url package loaded by hyperref
+\PassOptionsToPackage{usenames,dvipsnames,svgnames}{xcolor}% named colors
+\PassOptionsToPackage{%
+    unicode = {false}%
+    , colorlinks = {true}%
+    , linkcolor = {MidnightBlue}%
+    , filecolor = {MidnightBlue}%
+    , citecolor = {MidnightBlue}%
+    , urlcolor = {MidnightBlue}%
+    , breaklinks = {false}%
+    , plainpages = {true}% page number anchors as plain arabic
+    , bookmarks = {true}%
+    , bookmarksnumbered = {true}%
+    , bookmarksopen = {true}%
+    , backref = {false}%
+    , pdfusetitle = {false}% false required for \includeonlyframeslist hack
+    , pdfpagemode = {UseNone}% UseThumbs, UseOutlines, FullScreen, UseNone
+    , pdfpagetransition = {Wipe /Di -45}%
+    , pdfpagelayout = {SinglePage}%
+    , pdfpagelabels = {false}% fix for beamer bug for some classes
+    , pdfstartpage = {1}%
+    , pdfstartview = {FitV}%
+    , pdffitwindow = {false}%
+    , pdfcenterwindow = {true}%
+    , pdfmenubar = {true}%
+    , pdfdisplaydoctitle = {true}%
+}{hyperref}
+
+%%%%%%%%%% Preamble Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[t]{beamer}
+%%% Select frames to be included in presentation
+% \includeonlyframes{} takes a comma-separated list *without spaces*
+%\input{slidesPikettySaoPaulo2014}% list of frames for inclusion
+%\input{slidesCurrent}% frames being debugged
+
+%%%%%%%%%% Set Document Information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Capital in the 21st Century}
+\author[Thomas Piketty]{Thomas Piketty\inst{1}\inst{2}}
+\institute{$^1$Paris School of Economics \\
+  Sao Paulo, 26 November 2014 \bigskip\bigskip \\
+  $^2$translated to beamer via knitr by Patrick Toche \\
+  \href{mailto:contact@patricktoche.com}{contact@patricktoche.com} \\
+  Based on collaborative effort led by Jeff Leek \\
+  \url{https://github.com/jtleek/capitalIn21stCenturyinR} \\
+  All copyright claims with Professor Piketty
+}
+\date{December 2014}
+
+%%%%%%%%%% Set Beamer Options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usetheme{piketty}
+
+%%%%%%%%%% Load Latex Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[T1]{fontenc}% font encoding, load before inputenc
+\usepackage[utf8]{inputenc}% character inputing, load after fontenc
+\usepackage{lmodern}
+\usepackage{booktabs}% fancy tables
+\usepackage[flushleft]{threeparttable}% fancy tables
+\usepackage{adjustbox}% combine with threeparttable package
+\usepackage{verbatim}% pass text as unprocessed strings / comment out
+
+%%%%%%%%%% Set Miscellani %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{secnumdepth}{3}%
+\setcounter{tocdepth}{3}%
+\setlength{\abovecaptionskip}{0pt}%
+\setlength{\belowcaptionskip}{0pt}%
+\renewcommand{\insertpagenumber}{}% suppress page numbers
+
+%%%%%%%%%% Load knitr Options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<'setup', include=FALSE>>=
+library(knitr)
+
+### Set compilation options
+# option warning = FALSE set locally for easy toggle on/off while debugging
+opts_chunk$set(echo = FALSE, comment = NA, concordance = TRUE, warning = FALSE, cache = TRUE)
+
+# Set smaller font size for chunks (for code display):
+opts_chunk$set(size = 'footnotesize')
+
+# Set figure size and resolution
+opts_chunk$set(dev = c('pdf','png'), fig.path = 'figures/color/', fig.align='center', fig.height = 5, fig.width = 8, dpi = 300)
+
+# evaluate fig.cap after a chunk is evaluated
+opts_knit$set(eval.after = 'fig.cap')
+
+# TeX styles in tex document, CSS styles in HTML document
+opts_knit$set(self.contained = TRUE)
+
+# Rename figures to remove -1 suffix
+local({# works for first element of dev=c('pdf','png')
+  hook_plot = knit_hooks$get('plot')
+  knit_hooks$set(plot = function(x, options) {
+    name = sub('-1([.][a-z]{3,4})$', '\\1', x)
+    if (name != x) file.rename(x, name)
+    hook_plot(name, options)
+  })
+}) 
+
+### Load Libraries:
+# setwd("~/R/capital21c/Github/Slides")# temp for convenience
+library("ggplot2")      # wide range of plotting capabilities
+library("scales")       # labels with %, $ and other units
+library("xlsx")         # load data stored in .xlsx files
+library("reshape2")     # convert data from wide to long form
+library("RColorBrewer") # convenient color palettes
+library("stringr")      # str_wrap() to print labels on 2 lines
+
+### Set Color & Shape Scheme
+# linetype scheme (experimental, needs a tweak or two)
+linePalette <- c("solid", "dotted", "dashed", "dotdash", "longdash", "twodash", "13", "31", "1221")# "33" means 3 units on followed by 3 units off
+# shape scheme (is there a package for this?)
+shapePalette <- c(17, 2, 16, 1, 15, 0, 18, 5, 24)
+# color scheme (with RBrewerColor package)
+colorPalette <- colorRampPalette(brewer.pal(9, "Set1"))(9)# extract palette colors
+# fill scheme (with RBrewerColor package)
+fillPalette <- "Blues"
+# bw scheme (uncomment 3 lines below to activate)
+    #colorPalette <- rep("#000000", 9)# black and white figures in 'Piketty' style
+    #fillPalette <- "Greys"           # black and white figures in 'Piketty' style
+    #opts_chunk$set(fig.path = 'figures/bw/') # save in sub-directory
+@
+
+
+<<'data', include=FALSE>>=
+### Load Data:
+# Piketty denotes TS1.1 the sheets for Chapter 1.1, etc.
+# I denote df1.1 the dataframe for Figure 1.1, etc.
+# I denote df0.1 the dataframe for Figure I.1 (I stands for Introduction but is all too easily confused with 1)
+
+## Figure I.1 / TSI.1 / top decile / USA
+ts0.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
+  sheetName = "TSI.1", rowIndex = 7:107, colIndex = 1:2, header = FALSE)
+names(ts0.1) <- c("Year", "top_10_is")
+df0.1 <- melt(ts0.1, id.vars = "Year")
+
+## Figure I.2 / TSI.2 / private capital / 3 countries
+ts0.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
+  sheetName = "TSI.2", rowIndex = 6:20, colIndex = 1:4, header = FALSE)
+names(ts0.2) <- c("Year", "Germany", "France", "Britain")
+df0.2 <- melt(ts0.2, id.vars = "Year")
+
+## Figure 1.1 / TS1.1a / world output / 4 continents
+ts1.1a <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.1a", rowIndex = 8:18, colIndex = c(1, 3:6), header = FALSE)
+names(ts1.1a) <- c("Year", "Europe", "America", "Africa", "Asia")
+ts1.1a <- melt(ts1.1a, id.vars = "Year")
+df1.1 <- ts1.1a
+
+## Figure 1.2 / TS1.2 / world population / 4 continents
+ts1.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.2", rowIndex = 8:18, colIndex = c(1, 3:6), header = FALSE)
+names(ts1.2) <- c("Year", "Europe", "America", "Africa", "Asia")
+ts1.2 <- melt(ts1.2, id.vars = "Year")
+df1.2 <- ts1.2
+
+## Figure 1.3 / TS1.3 / world population / 4 continents
+ts1.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.3", rowIndex = 8:18, colIndex = c(1:8), header = FALSE)
+names(ts1.3) <- c("Year", "World", "Europe", "America", "Africa", "Asia", "Europe + America", "Asia + Africa")
+ts1.3 <- melt(ts1.3, id.vars = "Year")
+df1.3 <- subset(ts1.3, variable %in% c("Year", "Europe + America", "Asia + Africa", "World"))
+
+## Figure 1.4 / TS1.7 / exchange rate euro/dollar
+ts1.7 <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.7", rowIndex = 8:30, colIndex = c(1:9, 17:22), header = FALSE)
+names(ts1.7) <- c("Year", "Exchange rate euro/dollar", "Purchasing power parity euro/dollar", "Exchange rate euro/yuan", "Purchasing power parity euro/yuan", "Exchange rate euro/rupee", "Purchasing power parity euro/rupee", "Exchange rate euro/yen", "Purchasing power parity euro/yen", "Exchange rate dollar/yuan", "Purchasing power parity dollar/yuan", "Exchange rate dollar/rupee", "Purchasing power parity dollar/rupee", "Exchange rate dollar/yen", "Purchasing power parity dollar/yen")
+ts1.7 <- melt(ts1.7, id.vars = "Year")
+df1.4 <- subset(ts1.7, variable %in% c("Year", "Exchange rate euro/dollar", "Purchasing power parity euro/dollar"))
+
+## Figure 1.5 / TS1.7 / exchange rate euro/dollar
+df1.5 <- subset(ts1.7, variable %in% c("Year", "Exchange rate euro/yuan", "Purchasing power parity euro/yuan"))
+
+## Figure 2.1 / TS2.1 / world population / 4 continents
+ts2.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.2", rowIndex = 8:17, colIndex = c(25, 27:30), header = FALSE)
+names(ts2.1) <- c("Year", "Europe", "America", "Africa", "Asia")
+ts2.1 <- melt(ts2.1, id.vars = "Year")
+df2.1 <- ts2.1
+
+## Table TS2.2
+# Table S2.2a
+ts2.2a <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.2", rowIndex = 8:28, colIndex = 1:6, header = FALSE)
+ts2.2a[, 7] <- c(1:13, 10:13, 10:13) # Create a sequence
+names(ts2.2a) <- c("Period", "World", "Europe", "United States", "Africa", "Asia", "Seq")
+df2.2a <- ts2.2a[1:13,]
+df2.2a <- melt(df2.2a, id.vars = c("Period", "Seq"))
+# Create factors Observed / Projected
+df2.2a$Type <- as.factor(ifelse(df2.2a$Seq < 10, "Observed", "Projected"))
+# Table S2.2b
+ts2.2b <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.2", rowIndex = 8:28, colIndex = 8:23, header = FALSE)
+ts2.2b[, 17] <- c(1:13, 10:13, 10:13) # Create a sequence
+names(ts2.2b) <- c("Period", "World", "Western Europe", "Eastern Europe", "Russia & Ukraine Belarus Moldavia", "North America", "Latin America", "Northern Africa", "Sub-Shaharan Africa", "China", "India", "Japan", "Australia & New Zealand", "Middle East (Including Turkey)", "Central Asia", "Other Asian Countries", "Seq")
+ts2.2b <- melt(ts2.2b, id.vars = "Period")
+# Table S2.2c
+ts2.2c <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.2", rowIndex = 8:29, colIndex = 25:30, header = FALSE)
+ts2.2c[, 7] <- c(1:14, 11:14, 11:14) # Create a sequence
+names(ts2.2c) <- c("Year", "World", "Europe", "United States", "Africa", "Asia", "Seq")
+ts2.2c <- melt(ts2.2c, id.vars = "Year")
+# Table S2.2d
+ts2.2d <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.2", rowIndex = 8:29, colIndex = 32:47, header = FALSE)
+ts2.2d[, 17] <- c(1:14, 11:14, 11:14) # Create a sequence
+names(ts2.2d) <- c("Year", "World", "Western Europe", "Eastern Europe", "Russia & Ukraine Belarus Moldavia", "North America", "Latin America", "Northern Africa", "Sub-Shaharan Africa", "China", "India", "Japan", "Australia & New Zealand", "Middle East (Including Turkey)", "Central Asia", "Other Asian Countries", "Seq")
+ts2.2d <- melt(ts2.2d, id.vars = "Year")
+
+## Figure 2.2 / TS2.2 / World population
+df2.2 <- df2.2a[which(df2.2a$variable == "World"),]
+
+## Figure 2.3 / TS2.4 / Europe + America / Per capita output
+ts2.4a <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.4", rowIndex = 10:16, colIndex = 4:6, header = FALSE)
+ts2.4a[, 4] <- as.numeric(row.names(ts2.4a)) # Create a sequence
+names(ts2.4a) <- c("Period", "Western Europe", "North America", "Seq")
+ts2.4a <- melt(ts2.4a, id.vars = c("Period", "Seq"))
+df2.3 <- ts2.4a
+
+## Figure 2.4 / TS2.4 / World / Per capita output
+ts2.4b <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.4",rowIndex = 7:18, colIndex = c(1,3), header = FALSE)
+ts2.4b[, 3] <- as.numeric(row.names(ts2.4b)) # Create a sequence
+names(ts2.4b) <- c("Period", "World", "Seq")
+ts2.4b <- melt(ts2.4b, id.vars = c("Period", "Seq"))
+df2.4 <- ts2.4b
+# Create factors Observed / Projected
+df2.4$Type <- as.factor(ifelse(df2.4$Seq < 8, "Observed", "Projected"))
+
+## Figure 2.5 / TS2.4 / World / Total output
+ts2.4c <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.4",rowIndex = 7:18, colIndex = c(1,2), header = FALSE)
+ts2.4c[, 3] <- as.numeric(row.names(ts2.4c)) # Create a sequence
+names(ts2.4c) <- c("Period", "World", "Seq")
+df2.5 <- melt(ts2.4c, id.vars = c("Period", "Seq"))
+# Create factors Observed / Projected
+df2.5$Type <- as.factor(ifelse(df2.5$Seq < 8, "Observed", "Projected"))
+
+## Figure 2.6 / TS2.5 / Countries / Inflation
+ts2.5 <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.5", rowIndex = 8:14, colIndex = 1:5, header = FALSE)
+ts2.5[, 6] <- as.numeric(row.names(ts2.5)) # Create a sequence
+names(ts2.5) <- c("Period", "France", "Germany", "United States", "Britain", "Seq")
+df2.6 <- melt(ts2.5, id.vars = c("Period", "Seq"))
+
+## Figure 3.1 / TS3.1 / Britain / Capital
+ts3.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter3TablesFigures.xlsx", 
+  sheetName = "TS3.1", rowIndex = 9:19, colIndex = 1:10, header = FALSE)
+names(ts3.1) <- c("Year", "National capital (private + public)", "Agricultural land", "Housing", "Other domestic capital", "Net foreign capital", "Public capital", "Public assets", "Public debt", "Private capital")
+ts3.1 <- melt(ts3.1, id.vars = "Year")
+df3.1 <- ts3.1[which(ts3.1$variable %in% c("Agricultural land", "Housing", "Other domestic capital", "Net foreign capital")),]
+
+## Figure 3.2 / TS3.2 / France / Capital
+ts3.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter3TablesFigures.xlsx", 
+  sheetName = "TS3.2", rowIndex = 9:21, colIndex = 1:10, header = FALSE)
+names(ts3.2) <- c("Year", "National capital (private + public)", "Agricultural land", "Housing", "Other domestic capital", "Net foreign capital", "Public capital", "Public assets", "Public debt", "Private capital")
+ts3.2 <- melt(ts3.2, id.vars = "Year")
+df3.2 <- ts3.2[which(ts3.2$variable %in% c("Agricultural land", "Housing", "Other domestic capital", "Net foreign capital")),]
+
+## Figure 3.3 / TS3.1 / Britain / Capital
+df3.3 <- ts3.1[which(ts3.1$variable %in% c("Public assets", "Public debt")),]
+
+## Figure 3.4 / TS3.2 / France / Capital
+df3.4 <- ts3.2[which(ts3.2$variable %in% c("Public assets", "Public debt")),]
+
+## Figure 3.5 / TS3.1 / Britain / Capital
+df3.5 <- ts3.1[which(ts3.1$variable %in% c("National capital (private + public)", "Private capital", "Public capital")),]
+
+## Figure 3.6 / TS3.2 / France / Capital
+df3.6 <- ts3.2[which(ts3.2$variable %in% c("National capital (private + public)", "Private capital", "Public capital")),]
+
+
+## Figure 4.6 / TS???
+
+## Figure 4.10 / TS???
+
+## Figure 4.11 / TS???
+
+
+## Figure 5.1 / CTS4.5 / private & public capital / USA & Europe
+# Private capital
+cts4.5a <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS4.5", rowIndex = 6:20, colIndex = c(1:6), header = FALSE)
+names(cts4.5a) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe")
+cts4.5a[, "Type"] <- "Private capital"
+# National capital
+cts4.5b <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS4.5", rowIndex = 6:20, colIndex = c(1,7:11), header = FALSE)
+names(cts4.5b) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe")
+cts4.5b[, "Type"] <- "National capital"
+# Public capital
+cts4.5c <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS4.5", rowIndex = 6:20, colIndex = c(1,12:16), header = FALSE)
+names(cts4.5c) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe")
+cts4.5c[, "Type"] <- "Public capital"
+# Net foreign capital
+cts4.5d <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS4.5", rowIndex = 6:20, colIndex = c(1,21:25), header = FALSE)
+names(cts4.5d) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe")
+cts4.5d[, "Type"] <- "Net foreign capital"
+# Merge data frames
+cts4.5 <- rbind(cts4.5a, cts4.5b, cts4.5c, cts4.5d)
+rm(list = c('cts4.5a', 'cts4.5b', 'cts4.5c', 'cts4.5d'))
+cts4.5[, "Type"] <- factor(cts4.5[, "Type"])
+cts4.5 <- melt(cts4.5, id.vars = c("Year", "Type"))
+df5.1 <- subset(cts4.5, variable %in% c("United States", "Europe") & Type %in% c("Private capital", "Public capital"))
+
+## Figure 5.2 / CTS4.5 / national & foreign capital / USA & Europe
+df5.2 <- subset(cts4.5, variable %in% c("United States", "Europe") & Type %in% c("National capital", "Net foreign capital"))
+
+## Figure 5.3 / TS5.1 / private capital / 9 countries
+ts5.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.1", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(ts5.1) <-  c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+df5.3 <- melt(ts5.1, id.vars = "Year")
+
+## Figure 5.3a / TS5.2 / public capital / 9 countries
+ts5.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.2", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(ts5.2) <-  c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+df5.3a <- melt(ts5.2, id.vars = "Year")
+
+## Figure 5.4 / TS5.12 / private capital ratio / 9 countries
+ts5.12 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.12", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(ts5.12) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+df5.4 <- melt(ts5.12, id.vars = "Year")
+
+## Figure 5.5 / TS5.1 + TS5.2 / public & private capital / 9 countries
+df5.5 <- merge(df5.3, df5.3a, by = c("Year", "variable"))
+names(df5.5) <- c("Year", "variable", "Private", "Public")
+df5.5 <- melt(df5.5, id.vars = c("Year", "variable"))
+names(df5.5) <- c("Year", "variable", "Type", "value")
+
+## Figure 5.6 / TS5.11 / market/book value of corporations  / 7 countries
+ts5.11 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.11", rowIndex = 5:45, colIndex = 1:9, header = FALSE)
+names(ts5.11) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia")
+ts5.11 <- ts5.11[, c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Canada", "Australia")] # Drop Italy as data is empty
+df5.6 <- melt(ts5.11, id.vars = "Year")
+
+## Figure 5.7 / TS5.3 + TS5.5 / public & private capital / 9 countries
+ts5.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.3", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(ts5.3) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+ts5.3 <- melt(ts5.3, id.vars = "Year")
+ts5.5 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.5", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(ts5.5) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+ts5.5 <- melt(ts5.5, id.vars = "Year")
+df5.7 <- merge(ts5.3, ts5.5, by = c("Year", "variable"))
+names(df5.7) <- c("Year", "variable", "National", "Foreign")
+df5.7 <- melt(df5.7, id.vars = c("Year", "variable"))
+names(df5.7) <- c("Year", "variable", "Type", "value")
+
+## Figure 5.8 / CTS12.3 / world capital/income ratio
+cts12.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS12.3", rowIndex = 5:28, colIndex = 1:2, header = FALSE)
+names(cts12.3) <- c("Year", "Capital")
+df5.8 <- melt(cts12.3, id.vars = "Year")
+# Create factors Observed / Projected
+df5.8$Type <- as.factor(ifelse(df5.8$Year < 2011, "Observed", "Projected"))
+
+## Figure 6.5 / TS???
+
+
+
+
+## Figure 8.1 /  TS8.1 / incomes & wages deciles / France
+# remove years < 1910, which have many NAs: start rowIndex at 16
+ts8.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+  sheetName = "TS8.1", rowIndex = 16:116, colIndex = 1:6, header = FALSE)
+names(ts8.1) <- c("Year", "top_10_is", "top_1_is", "top_0.1_is", "top_10_ws", "top_1_ws")
+df8.1 <- ts8.1[, c("Year", "top_10_is", "top_10_ws")]
+names(df8.1) <- c("Year", "Incomes", "Wages")
+df8.1 <- melt(df8.1, id.vars = c("Year"))
+
+## Figure 8.2 /  TS8.1 / incomes & wages percentiles / France
+df8.2 <- ts8.1[, c("Year", "top_1_is", "top_1_ws")]
+names(df8.2) <- c("Year", "Incomes", "Wages")
+df8.2 <- melt(df8.2, id.vars = c("Year"))
+
+## Figure 8.3 /  TS8.3 / income sources / France / 1932
+ts8.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+  sheetName = "TS8.3", rowIndex = c(6:11,15:20,24:29), colIndex = 1:7, header = FALSE)
+names(ts8.3) <- c("Quantile", "Labor Income", "Capital Income", "Mixed Income", "Labor Income", "Capital Income", "Mixed Income")
+ts8.3 <- rbind(ts8.3[,1:4], ts8.3[,c(1,5:7)])
+ts8.3[c(1:6,19:24), "Country"] <- "France"
+ts8.3[c(7:12,13:18,25:30,31:36), "Country"] <- "United States"
+ts8.3[1:6, "Year"] <- "1932"
+ts8.3[c(7:12,13:18), "Year"] <- "1929"
+ts8.3[19:24, "Year"] <- "2005"
+ts8.3[c(25:30,31:36), "Year"] <- "2007"
+ts8.3[c(1:6,13:18,19:24,31:36), "Type"] <- "Excluding capital gains"
+ts8.3[c(7:12,25:30), "Type"] <- "Including capital gains"
+ts8.3[, c("Country","Year","Type")] <- lapply(ts8.3[, c("Country","Year","Type")] , factor)
+df8.3 <- melt(ts8.3, id.vars = c("Quantile", "Country", "Year", "Type"))
+df8.3 <- subset(df8.3, Country == "France" & Year == "1932" & Type == "Excluding capital gains")
+df8.3 <- df8.3[, c("Quantile", "variable", "value")]
+
+## Figure 8.4 /  TS8.3 / income by sources / France / 2005
+df8.4 <- melt(ts8.3, id.vars = c("Quantile", "Country", "Year", "Type"))
+df8.4 <- subset(df8.4, Country == "France" & Year == "2005" & Type == "Excluding capital gains")
+df8.4 <- df8.4[, c("Quantile", "variable", "value")]
+
+## Figure 8.5 /  TS8.2 / top decile w/o capital gains / USA
+# remove years < 1910, which have many NAs: start rowIndex at 16
+ts8.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+  sheetName = "TS8.2", rowIndex = 16:116, colIndex = 1:11, header = FALSE)
+names(ts8.2) <- c("Year",
+  "top_10_is","top_10_5_is", "top_5_1_is","top_1_is", "top_0.1_is",
+  "top_10_is_wok", "top_1_is_wok", "top_0.1_is_wok", 
+  "top_10_ws", "top_1_ws")
+  # is = income share
+  # wok = without kapital gains
+  # ws = wage share
+df8.5 <- ts8.2[, c("Year", "top_10_is", "top_10_is_wok")]
+names(df8.5) <- c("Year", "Including capital gains", "Excluding capital gains")
+df8.5 <- melt(df8.5, id.vars = "Year")
+
+## Figure 8.6 /  TS8.2 / incomes for 3 quantiles / USA
+df8.6 <- ts8.2[, c("Year", "top_1_is", "top_5_1_is", "top_10_5_is")]
+names(df8.6) <- c("Year", "Top 1% (above $352,000)", "Top 5%-1% (between $150,000 and $350,000)", "Top 10%-5% (between $108,000 and $150,000)")
+df8.6 <- melt(df8.6, id.vars = "Year")
+
+## Figure 8.7 /  TS8.2 / incomes & wages deciles / USA
+df8.7 <- ts8.2[, c("Year", "top_10_is", "top_10_is_wok", "top_10_ws")]
+names(df8.7) <- c("Year", "Incomes", "Incomes (Excluding capital gains)", "Wages")
+df8.7 <- melt(df8.7, id.vars = c("Year"))
+
+## Figure 8.8 /  TS8.2 / incomes & wages percentiles / USA
+df8.8 <- ts8.2[, c("Year", "top_1_is", "top_1_is_wok", "top_1_ws")]
+names(df8.8) <- c("Year", "Incomes", "Incomes (Excluding capital gains)", "Wages")
+df8.8 <- melt(df8.8, id.vars = c("Year"))
+
+## Figure 8.9 /  TS8.3 / income by sources / USA / 1929
+df8.9 <- melt(ts8.3, id.vars = c("Quantile", "Country", "Year", "Type"))
+df8.9 <- subset(df8.9, Country == "United States" & Year == "1929" & Type == "Including capital gains")
+df8.9 <- df8.9[, c("Quantile", "variable", "value")]
+
+## Figure 8.10 /  TS8.3 / income by sources / USA / 2007
+df8.10 <- melt(ts8.3, id.vars = c("Quantile", "Country", "Year", "Type"))
+df8.10 <- subset(df8.10, Country == "United States" & Year == "2007" & Type == "Including capital gains")
+df8.10 <- df8.10[, c("Quantile", "variable", "value")]
+
+## Figure 9.8 / TS8.1 + TS9.4 / top deciles / USA & Europe
+# remove years < 1910, which have many NAs: start rowIndex at 16
+# USA
+df8.2b <- ts8.2[, c("Year", "top_10_is")]
+names(df8.2b) <- c("Year", "United States")
+# Europe
+ts9.4 <- read.xlsx("../Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
+  sheetName = "TS9.4", rowIndex = 16:116, colIndex = 1:3, header = FALSE)
+names(ts9.4) <- c("Year", "Including Sweden", "Excluding Sweden")
+df9.4b <- ts9.4[, c("Year", "Including Sweden")]
+names(df9.4b) <- c("Year", "Europe")
+df9.8 <- merge(df8.2b, df9.4b, by = c("Year"))
+df9.8 <- melt(df9.8, id.vars = "Year")
+
+
+## Figure 10.1 / TS???
+
+
+## Figure 10.2 / TS???
+
+## Figure 10.3 / TS???
+
+## Figure 10.4 / TS???
+
+## Figure 10.6 / TS???
+
+## Figure 10.9 / TS???
+
+## Figure 10.10 / TS???
+
+## Figure 12.1 / TS???
+
+## Figure 12.2 / TS???
+
+## Figure 12.3 / TS???
+
+## Figure 12.4 / TS???
+
+## Figure 12.5 / TS???
+
+
+
+## Figure 14.1 / TS14.1 / marginal income tax rates / 4 countries
+ts14.1 = read.xlsx("../Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
+  sheetName = "TS14.1", rowIndex = 5:118, colIndex = c(1:5, 7:16), header = FALSE)
+names(ts14.1) = c("Year", "United States", "United Kingdom", "Germany", "France", "United States (top marginal rate on earned income)", "United States (top effective rate)", "United Kingdom (top marginal rate on earned income)", "France (income tax)", "France (CSG)", "Japan (Saez-Moriguchi Table A0)")
+df14.1 <- ts14.1[, c("Year", "United States", "United Kingdom", "Germany", "France")]
+df14.1 <- melt(df14.1, id.vars = "Year")
+
+## Figure 14.2 / TS14.2 / marginal inheritance tax rates / 4 countries
+ts14.2 = read.xlsx("../Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
+  sheetName = "TS14.2", rowIndex = 5:118, colIndex = c(1:5), header = FALSE)
+names(ts14.2) = c("Year", "United States", "United Kingdom", "Germany", "France")
+df14.2 <- melt(ts14.2, id.vars = "Year")
+
+@
+
+
+%%%%%%%%%% Start of Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=TitlePage_1]
+\maketitle% first slide with title/author information
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_0_1,fragile]
+\frametitle{Figure I.1: Income inequality in the United States, 1910--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.0.1', out.width='1\\linewidth'>>=
+ggplot(data = df0.1, aes(x = Year, y = value)) + geom_line(colour = colorPalette[1]) + geom_point(shape = shapePalette[1], size = 3, colour = colorPalette[1]) + ylab("Share of top decile in national income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.3, .5, by = .05), limits = c(.3, .5))
+@
+\caption{The top decile share in U.S. national income dropped from 45--50\% in the 1910s--1920s to less than 35\% in the 1950s (this is the
+1950 1960 fall documented by Kuznets); it then rose from less than 35\% in the 1970s to 45--50\% in the 2000s--2010s.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_0_2,fragile]
+\frametitle{Figure I.2. The capital--income ratio in Europe, 1870--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.0.2', out.width='1\\linewidth'>>=
+ggplot(data = df0.2, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Market value of private capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = pretty_breaks(n = 8)) + scale_y_continuous(labels = percent, breaks = seq(1, 8, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Aggregate private wealth was worth about 6--7 years of national income in Europe in 1910, between 2 and 3 years in 1950, and between 4 and 6 years in 2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_1]
+\frametitle{Figure 1.1: The distribution of world output, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.1', out.width='1\\linewidth'>>=
+ggplot(data = df1.1, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = FALSE) + ylab("Share in world output (% of total)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2040), breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_fill_brewer(palette = fillPalette) + geom_text(data = subset(df1.1, Year == tail(df1.1$Year, 1)), aes(x = 3+Year, y = cumsum(value), label = variable), vjust = 1, hjust = 0, size = 4)
+@
+\caption{Europe's GDP made 47 percent of world GDP in 1913, down to 25 percent in 2012.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_1]
+\frametitle{Figure 1.1: The distribution of world output, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.1b', out.width='1\\linewidth'>>=
+ggplot(data = df1.1, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("Share in world output (% of total)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2012), breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_fill_brewer(palette = fillPalette) + theme(legend.key = element_blank(), legend.position = "bottom", legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{Europe's GDP made 47 percent of world GDP in 1913, down to 25 percent in 2012.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_2]
+\frametitle{Figure 1.2: The distribution of world population, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.2', out.width='1\\linewidth'>>=
+ggplot(data = df1.2, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = FALSE) + ylab("Share in world population (% of total)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2040), breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_fill_brewer(palette = fillPalette) + geom_text(data = subset(df1.2, Year == tail(df1.2$Year, 1)), aes(x = 3+Year, y = cumsum(value), label = variable), vjust = 1, hjust = 0, size = 4)
+@
+\caption{Europe's population made 26 percent of world population in 1913, down to 10 percent in 2012.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_2b]
+\frametitle{Figure 1.2: The distribution of world population, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.2b', out.width='1\\linewidth'>>=
+ggplot(data = df1.2, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("Share in world population (% of total)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2012), breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_fill_brewer(palette = fillPalette) + theme(legend.key = element_blank(), legend.position = "bottom", legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{Europe's population made 26 percent of world population in 1913, down to 10 percent in 2012.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_3,fragile]
+\frametitle{Figure 1.3. Global Inequality, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.3', out.width='1\\linewidth'>>=
+ggplot(data = df1.3, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Per capital GDP (% of world average)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2012), breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(limits = c(0.25, 2.5), labels = percent, breaks = seq(0.25, 2.5, by = .25)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .5), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Per capita GDP in Asia--Africa went from 37 percent of world average in 1950 to 61 percent in 2012. Divergence then convergence?}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_4,fragile]
+\frametitle{Figure 1.4. Global Inequality, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.4', out.width='1\\linewidth'>>=
+ggplot(data = df1.4, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Exchange rate euro/dollar (in dollars)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1990, 2012, by = 2)) + scale_y_continuous(limits = c(0.85, 1.5), labels = dollar, breaks = seq(0.8, 1.5, by = .1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{In 2012, 1 euro was worth \$1.30 according to current exchange rate, but \$1.20 in purchasing power parity.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_1_5,fragile]
+\frametitle{Figure 1.5. Exchange rate and purchasing power parity: euro/yuan}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.1.5', out.width='1\\linewidth'>>=
+ggplot(data = df1.5, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Exchange rate euro/dollar (in dollars)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1990, 2012, by = 2)) + scale_y_continuous(limits = c(2, 11.5), labels = dollar, breaks = seq(0, 12, by = 2)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .1), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{In 2012, 1 euro was worth 8 yuan according to current exchange rate, but 5 yuan in purchasing power parity.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_1]
+\frametitle{Figure 2.1: The growth of world population, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.2.1', out.width='1\\linewidth'>>=
+ggplot(data = df2.1, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = FALSE) + ylab("World population (millions inhabitants)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2040), breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(labels = comma, breaks = seq(0, 7000, by = 1000)) + scale_fill_brewer(palette = fillPalette) + geom_text(data = subset(df2.1, Year == tail(df2.1$Year, 1)), aes(x = 3+Year, y = cumsum(value), label = variable), vjust = 1, hjust = 0, size = 4)
+@
+\caption{World population rose from 600 million inhabitants in 1700 to 7 billion in 2012.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_1b]
+\frametitle{Figure 2.1: The growth of world population, 1700--2012}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.2.1b', out.width='1\\linewidth'>>=
+ggplot(data = df2.1, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("World population (millions inhabitants)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2012), breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(labels = comma, breaks = seq(0, 7000, by = 1000)) + scale_fill_brewer(palette = fillPalette) + theme(legend.key = element_blank(), legend.position = "right", legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1), fill = guide_legend(reverse = TRUE))
+@
+\caption{World population rose from 600 million inhabitants in 1700 to 7 billion in 2012.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_2a]
+\frametitle{Figure 2.2a: The growth rate of population from Antiquity to 2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.2.2a', out.width='1\\linewidth'>>=
+ggplot(data = df2.2a, aes(x = Period, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Population growth rate") + xlab("") + theme_bw() + scale_x_discrete(labels = function(x)sub("-","-\n", x, fixed = TRUE)) + scale_y_continuous(limits = c(-.005, 0.03), labels = percent, breaks = seq(-0.1, .03, by = .005)) + scale_shape_manual(name = "Continent", values = shapePalette) + scale_colour_manual(name = "Continent", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .8), legend.background = element_rect(colour = 'black'), legend.title = element_blank())
+@
+%\caption{}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_2]
+\frametitle{Figure 2.2: The growth rate of world population from Antiquity to 2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.2.2', out.width='1\\linewidth'>>=
+ggplot(data = df2.2, aes(x = Period, y = value, group = Type, colour = Type, shape = Type)) + geom_line() + geom_point(aes(colour = Type, shape = Type), size = 3) + ylab("World population growth rate") + xlab(NULL) + theme_bw() + scale_x_discrete(labels = function(x)sub("-","-\n", x, fixed = TRUE)) + scale_y_continuous(limits = c(0, 0.02), labels = percent, breaks = seq(0, .02, by = .002)) + scale_shape_manual(name = "Continent", values = shapePalette) + scale_colour_manual(name = "Continent", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .85), legend.background = element_rect(colour = 'black')) + guides(colour = guide_legend(title = NULL), shape = guide_legend(title = NULL))
+@
+\caption{The growth rate of world population was above 1 percent per year from 1950 to 2012 and should return toward 0 percent by the end of the twenty-first century.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_3]
+\frametitle{Figure 2.3: The growth rate of per capita output since the Industrial Revolution}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.2.3', out.width='1\\linewidth'>>=
+ggplot(data = df2.3, aes(x = Period, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Growth rate of per capita GDP") + xlab(NULL) + theme_bw() + scale_y_continuous(limits = c(0, .05), labels = percent, breaks = seq(0, .05, by = .005)) + scale_shape_manual(name = "Continent", values = shapePalette) + scale_colour_manual(name = "Continent", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{The growth rate of per capita output surpassed 4 percent per year in Europe between 1950 and 1970, before returning to American levels.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_4]
+\frametitle{Figure 2.4: The growth rate of world per capita output from Antiquity to 2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.2.4', out.width='1\\linewidth'>>=
+ggplot(data = df2.4, aes(x = Period, y = value, group = Type, colour = Type, shape = Type)) + geom_line() + geom_point(aes(colour = Type, shape = Type), size = 3) + ylab("World population growth rate") + xlab(NULL) + theme_bw() + scale_x_discrete(labels = function(x)sub("-","-\n", x, fixed = TRUE)) + scale_y_continuous(limits = c(-0.001, 0.027), labels = percent, breaks = seq(0, .025, by = .005)) + scale_shape_manual(name = "Continent", values = shapePalette) + scale_colour_manual(name = "Continent", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .85), legend.background = element_rect(colour = 'black')) + guides(colour = guide_legend(title = NULL), shape = guide_legend(title = NULL))
+@
+\caption{The growth rate of per capita output surpassed 2 percent from 1950 to 2012. If the convergence process goes on, it will surpass 2.5 percent from 2012 to 2050, and then will drop below 1.5 percent.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_5]
+\frametitle{Figure 2.5: The growth rate of world output from Antiquity to 2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.2.5', out.width='1\\linewidth'>>=
+ggplot(data = df2.5, aes(x = Period, y = value, group = Type, colour = Type, shape = Type)) + geom_line() + geom_point(aes(colour = Type, shape = Type), size = 3) + ylab("World population growth rate") + xlab(NULL) + theme_bw() + scale_x_discrete(labels = function(x)sub("-","-\n", x, fixed = TRUE)) + scale_y_continuous(limits = c(0, 0.042), labels = percent, breaks = seq(0, .04, by = .005)) + scale_shape_manual(name = "Continent", values = shapePalette) + scale_colour_manual(name = "Continent", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .85), legend.background = element_rect(colour = 'black')) + guides(colour = guide_legend(title = NULL), shape = guide_legend(title = NULL))
+@
+\caption{The growth rate of world output surpassed 4 percent from 1950 to 1990. If the convergence process goes on, it will drop below 2 percent by 2050.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_2_6,fragile]
+\frametitle{Figure 2.6. Inflation since the Industrial Revolution}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.2.6', out.width='1\\linewidth'>>=
+ggplot(data = df2.6, aes(x = Period, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Inflation rate (consumer price index)") + xlab(NULL) + theme_bw() + scale_y_continuous(limits = c(-.02, .18), labels = percent, breaks = seq(-.02, .18, by = .02)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Inflation in the rich countries was zero in the eighteenth and nineteenth centuries, high in the twentieth century, and roughly 2 percent a year since 1990.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_3_1]
+\frametitle{Figure 3.1: Capital in Britain, 1700--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.3.1', out.width='1\\linewidth'>>=
+ggplot(data = df3.1, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("Value of national capital (% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(labels = percent, breaks = seq(0, 8, by = 1)) + scale_fill_brewer(palette = fillPalette) + theme(legend.key = element_blank(), legend.position = "bottom", legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{National capital is worth about seven years of national income in Britain in 1700 (including four in agricultural land).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_3_2]
+\frametitle{Figure 3.2: Capital in France, 1700--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.3.2', out.width='1\\linewidth'>>=
+ggplot(data = df3.2, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("Value of national capital (% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(labels = percent, breaks = seq(0, 8, by = 1)) + scale_fill_brewer(palette = fillPalette) + theme(legend.key = element_blank(), legend.position = "bottom", legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
+@
+\caption{National capital is worth almost seven years of national income in France in 1910 (including one invested abroad).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_3_3]
+\frametitle{Figure 3.3: Public wealth in Britain, 1700--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.3.3', out.width='1\\linewidth'>>=
+ggplot(data = df3.3, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Public assets and debt (% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1700, 2020, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 2.5, by = 0.2)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{Public debt surpassed two years of national income in 1950 (versus one year for public assets).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_3_4]
+\frametitle{Figure 3.4: Public wealth in France, 1700--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.3.4', out.width='1\\linewidth'>>=
+ggplot(data = df3.4, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Public assets and debt (% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1700, 2020, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 1.6, by = 0.2)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{Public debt is about one year of national income in France in 1780 as well as in 1880 and in 2000--2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_3_5]
+\frametitle{Figure 3.5: Private and public capital in Britain, 1700--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.3.5', out.width='1\\linewidth'>>=
+ggplot(data = df3.5, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("National, private and public capital \n(% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1700, 2020, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(-2, 9, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .5), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{In 1810, private capital is worth eight years of national income in Britain (versus seven years for national capital).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_3_6]
+\frametitle{Figure 3.6: Private and public capital in France, 1700--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.3.6', out.width='1\\linewidth'>>=
+ggplot(data = df3.6, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("National, private and public capital \n(% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1700, 2020, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(-2, 9, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .5), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{In 1950, public capital is worth almost one year of national income versus two years for private capital.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_1]
+\frametitle{Figure 4.1: Capital in Germany, 1870--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.1', out.width='1\\linewidth'>>=
+#ggplot(data = df4.1, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("Value of national capital (% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1870, 2010, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 8, by = 1)) + scale_fill_brewer(palette = fillPalette) %+ geom_text(data = subset(df4.1, Year == tail(df4.1$Year, 1)), aes(x = 3+Year, y = cumsum(value), label = variable), vjust = 1, hjust = 0, size = 4)
+@
+\caption{National capital is worth 6.5 years of national income in Germany in 1910 (including about 0.5 year invested abroad).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_2]
+\frametitle{Figure 4.2: Public wealth in Germany, 1870--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.2', out.width='1\\linewidth'>>=
+ggplot(data = df4.2, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Public assets and debt (% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1870, 2020, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 2.5, by = 0.5)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{Public debt is worth almost one year of national income in Germany in 2010 (as much as assets).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_3]
+\frametitle{Figure 4.3: Private and public capital in Germany, 1870--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.3', out.width='1\\linewidth'>>=
+#ggplot(data = df4.3, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("National, private and public capital \n(% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1870, 2020, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(-.1, 8, by = 0.1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1))
+@
+\caption{In 1970, public capital is worth almost one year of national income, versus slightly more than two for private capital.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_4]
+\frametitle{Figure 4.4: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.4', out.width='1\\linewidth'>>=
+#ggplot
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_5]
+\frametitle{Figure 4.5: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.5', out.width='1\\linewidth'>>=
+#ggplot
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_6]
+\frametitle{Figure 4.6: Capital in the United States, 1770--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.6', out.width='1\\linewidth'>>=
+#ggplot(data = df4.6, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("Value of national capital (% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1770, 2010, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 8, by = 1)) + scale_fill_brewer(palette = fillPalette) %+ geom_text(data = subset(df4.6, Year == tail(df4.6$Year, 1)), aes(x = 3+Year, y = cumsum(value), label = variable), vjust = 1, hjust = 0, size = 4)
+@
+\caption{National capital is worth three years of national income in the United States in 1770 (including 1.5 years in agricultural land).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_7]
+\frametitle{Figure 4.7: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.7', out.width='1\\linewidth'>>=
+#ggplot
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_8]
+\frametitle{Figure 4.8: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.8', out.width='1\\linewidth'>>=
+#ggplot
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_9]
+\frametitle{Figure 4.9: Capital in Canada, 1860--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.9', out.width='1\\linewidth'>>=
+#ggplot(data = df4.9, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("Value of national capital (% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1860, 2010, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 8, by = 1)) + scale_fill_brewer(palette = fillPalette) %+ geom_text(data = subset(df4.9, Year == tail(df4.9$Year, 1)), aes(x = 3+Year, y = cumsum(value), label = variable), vjust = 1, hjust = 0, size = 4)
+@
+\caption{In Canada, a substantial part of domestic capital has always been held by the rest of the world, so that national capital has always been less than domestic capital.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_10]
+\frametitle{Figure 4.10: Capital and slavery in the United States}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.10', out.width='1\\linewidth'>>=
+#ggplot(data = df4.10, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("Value of national capital (% of national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1770, 2010, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 8, by = 1)) + scale_fill_brewer(palette = fillPalette) %+ geom_text(data = subset(df4.10, Year == tail(df4.10$Year, 1)), aes(x = 3+Year, y = cumsum(value), label = variable), vjust = 1, hjust = 0, size = 4)
+@
+\caption{The market value of slaves was about 1.5 years of US national income around 1770 (as much as land).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_4_11]
+\frametitle{Figure 4.11: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.4.11', out.width='1\\linewidth'>>=
+#ggplot(data = df4.11, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Marginal tax rate applying to the highest inheritances") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.15, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank())  + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_1]
+\frametitle{Figure 5.1: Private \& public capital in Europe \& United States, 1870--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.5.1', out.width='1\\linewidth'>>=
+ggplot(data = df5.1, aes(x = Year, y = value, group = interaction(variable,Type), shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1870, 2010, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(-1, 8, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{The fluctuations of national capital in the long run correspond mostly to the fluctuations of private capital (both in Europe and in the United States).}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_2]
+\frametitle{Figure 5.2: National capital in Europe \& United States, 1870--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.5.2', out.width='1\\linewidth'>>=
+ggplot(data = df5.2, aes(x = Year, y = value, group = interaction(variable,Type), shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1870, 2010, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(-1, 8, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{National capital (public and private) is worth 6.5 years of national income in Europe in 1910, versus 4.5 years in the United States.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_3]
+\frametitle{Figure 5.3: Private capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.5.3', out.width='1\\linewidth'>>=
+# Spain included, to remove replace df with df[df['variable'] != "Spain",]
+ggplot(data = df5.3, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of private capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(2, 9), labels = percent, breaks = seq(2, 8, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 3)) 
+@
+\caption{Private capital is worth between 2 and 3.5 years of national income in rich countries in 1970, and between 4 and 7 years of national income in 2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_3a]
+\frametitle{Figure 5.3a: Public capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.5.3a', out.width='1\\linewidth'>>=
+ggplot(data = df5.3a, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of public capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-.7, 1.5), labels = percent, breaks = seq(-.8, 1.5, by = .2)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .9), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 3)) 
+@
+\caption{In France, Britain, Germany, and the United States, government deficits exceeded public investment by 2--3\% of national income on average over the period 1970--2010, compared with more than 6\% in Italy.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_4]
+\frametitle{Figure 5.4: Private capital in rich countries (ratio), 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.5.4', out.width='1\\linewidth'>>=
+# Spain included, to remove replace df with df[df['variable'] != "Spain",]
+ggplot(data = df5.4, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Private capital (% disposable household income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(3, 10, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.22, .75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{Expressed in years of household disposable income (about 70--80\% of national income), the capital/income ratio appears to be larger than when it is expressed in years of national income.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_5]
+\frametitle{Figure 5.5: Private and public capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.5.5', out.width='1\\linewidth'>>= ## out.height='0.75\\textheight'
+ggplot(data = df5.5, aes(x = Year, y = value, group = interaction(variable,Type), shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-1, 8.2), labels = percent, breaks = seq(-1, 9, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .82), legend.background = element_rect(colour = 'black'), legend.title = element_blank(), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{In Italy, private capital rose from 240\% to 680\% in national income between 1970 and 2010, while public capital dropped from 20\% to -70\%.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_6]
+\frametitle{Figure 5.6: Market value and book value of corporations, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.5.6', out.width='1\\linewidth'>>=
+ggplot(data = df5.6, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("ratio between market value and book value of corporations") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(0, 1.6, by = .2)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{Tobin's Q (i.e. the ratio between market value and book value of corporations) has risen in rich countries since the 1970s--1980s.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_7]
+\frametitle{Figure 5.7: National capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.5.7', out.width='1\\linewidth'>>=  ##out.height='0.75\\textheight'
+ggplot(data = df5.7, aes(x = Year, y = value, group = interaction(variable,Type), shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Value of capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-1.1, 9), labels = percent, breaks = seq(-1, 9, by = 1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.19, .82), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{Net foreign assets held by Japan and Germany are worth between 6 months and one year of national income in 2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_8]
+\frametitle{Figure 5.8: The world capital/income ratio, 1870--2100}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.5.8', out.width='1\\linewidth'>>=
+ggplot(data = df5.8, aes(x = Year, y = value, colour = Type)) + geom_line() + geom_point(aes(colour = Type, shape = Type), size = 3) + ylab("Value of capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1870, 2100, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(2.5, 7, by = .5)) + scale_linetype_manual(name = "World capital/income ratio", values = linePalette) + scale_shape_manual(name = "World capital/income ratio", values = shapePalette) + scale_colour_manual(name = "World capital/income ratio", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .8), legend.background = element_rect(colour = 'black')) 
+@
+\caption{According to simulations (central scenario), the world capital/income ratio could be close to 700 percent by the end of the twenty-first century.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_6_1]
+\frametitle{Figure 6.1: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.6.1', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_6_2]
+\frametitle{Figure 6.2: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.6.2', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_6_3]
+\frametitle{Figure 6.3: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.6.3', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_6_4]
+\frametitle{Figure 6.4: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.6.4', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_6_5]
+\frametitle{Figure 6.5: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.6.5', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_6_6]
+\frametitle{Figure 6.6: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.6.6', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_6_7]
+\frametitle{Figure 6.7: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.6.7', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_6_8]
+\frametitle{Figure 6.8: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.6.8', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_1,fragile]
+\frametitle{Figure 8.1. Income inequality in France, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.8.1', out.width='1\\linewidth'>>=
+ggplot(data = df8.1, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total (incomes or wages)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.2, .5, by = .05), limits = c(.2, .5)) + scale_shape_manual(name = "Share of top decile in total", values = shapePalette) + scale_colour_manual(name = "Share of top decile in total", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.7, .85), legend.background = element_rect(colour = 'black')) 
+@
+\caption{Inequality of total income (labor and capital) has dropped in France during the twentieth century, while wage inequality has remained the same.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_2,fragile]
+\frametitle{Figure 8.2. The fall of rentiers in France, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.8.2', out.width='1\\linewidth'>>=
+ggplot(data = df8.2, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total (incomes or wages)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, .22, by = .02)) + scale_shape_manual(name = "Share of top percentile in total", values = shapePalette) + scale_colour_manual(name = "Share of top percentile in total", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.7, .85), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The fall in the top percentile share (the top 1 percent highest incomes) in France between 1914 and 1945 is due to the fall of top capital incomes.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_3,fragile]
+\frametitle{Figure 8.3. The composition of top incomes in France in 1932}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.8.3', out.width='1\\linewidth'>>=
+ggplot(data = df8.3, aes(x = Quantile, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share in total income of various fractiles") + xlab(NULL) + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Type of income", values = shapePalette) + scale_colour_manual(name = "Type of income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Labor income becomes less and less important as one goes up within the top decile of total income. Notes: (i)~``P90--95'' includes individuals between percentiles 90 to 95, ``P95--99'' includes the next 4 percent, ``P99--99.5'' the next 0.5 percent, etc.; (ii)~Labor income: wages, bonuses, pensions. Capital income: dividends, interest, rent. Mixed income: self-employment income.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_4,fragile]
+\frametitle{Figure 8.4. The composition of top incomes in France in 2005}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.8.4', out.width='1\\linewidth'>>=
+ggplot(data = df8.4, aes(x = Quantile, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share in total income of various fractiles") + xlab(NULL) + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Type of income", values = shapePalette) + scale_colour_manual(name = "Type of income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Capital income becomes dominant at the level of the top 0.1 percent in France in 2005, as opposed to the top 0.5 percent in 1932.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_5,fragile]
+\frametitle{Figure 8.5. Income inequality in the United States, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.8.5', out.width='1\\linewidth'>>=
+ggplot(data = df8.5, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in national income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.3, .5, by = .05), limits = c(.3, .5)) + scale_shape_manual(name = "Share of top decile in total income", values = shapePalette) + scale_colour_manual(name = "Share of top decile in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .85), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The top decile share in U.S. national income dropped from 45--50\% in the 1910s--1920s to less than 35\% in the 1950s (this is the
+1950 1960 fall documented by Kuznets); it then rose from less than 35\% in the 1970s to 45--50\% in the 2000s--2010s.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_6,fragile]
+\frametitle{Figure 8.6. Decomposition of the top decile, United States, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.8.6', out.width='1\\linewidth'>>=
+ggplot(data = df8.6, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of the different groups in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0.08, .24, by = .02), limits = c(.08, .25)) + scale_shape_manual(name = "Annual incomes in 2010", values = shapePalette) + scale_colour_manual(name = "Annual incomes in 2010", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .85), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The rise of the top decile income share since the 1970s is mostly due to the top percentile.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_7,fragile]
+\frametitle{Figure 8.7. High incomes and high wages in the United States, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering % To Do: add 'excluding capital gains'
+<<'Figure.8.7', out.width='1\\linewidth'>>=
+ggplot(data = df8.7, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total (incomes or wages)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.2, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in total", values = shapePalette) + scale_colour_manual(name = "Share of top decile in total", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .85), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The rise of income inequality since the 1970s is largely due to the rise of wage inequality.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_8,fragile]
+\frametitle{Figure 8.8. The transformation of the top 1 percent in the United States, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering % To Do: add 'excluding capital gains'
+<<'Figure.8.8', out.width='1\\linewidth'>>=
+ggplot(data = df8.8, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in total (incomes or wages)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, .3, by = .02)) + scale_shape_manual(name = "Share of top percentile in total", values = shapePalette) + scale_colour_manual(name = "Share of top percentile in total", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .85), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The rise in the top 1 percent highest incomes since the 1970s is largely due to the rise in the top 1 percent highest wages.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_9,fragile]
+\frametitle{Figure 8.9. The composition of top incomes in the United States in 1929}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.8.9', out.width='1\\linewidth'>>=
+ggplot(data = df8.9, aes(x = Quantile, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share in total income of various fractiles") + xlab(NULL) + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Type of income", values = shapePalette) + scale_colour_manual(name = "Type of income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Labor income becomes less and less important as one moves up within the top income decile.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_8_10,fragile]
+\frametitle{Figure 8.10. The composition of top incomes in the United States in 2007}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.8.10', out.width='1\\linewidth'>>=
+ggplot(data = df8.10, aes(x = Quantile, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share in total income of various fractiles") + xlab(NULL) + theme_bw() + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Type of income", values = shapePalette) + scale_colour_manual(name = "Type of income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{Capital income becomes dominant at the level of top 0.1 percent in 2007, as opposed to the top 1 percent in 1929.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_1]
+\frametitle{Figure 9.1: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.9.1', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_2]
+\frametitle{Figure 9.2: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.9.2', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_3]
+\frametitle{Figure 9.3: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.9.3', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_4]
+\frametitle{Figure 9.4: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.9.4', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_5]
+\frametitle{Figure 9.5: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.9.5', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_6]
+\frametitle{Figure 9.6: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.9.6', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_7]
+\frametitle{Figure 9.7: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.9.7', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_8]
+\frametitle{Figure 9.8: Income inequality: Europe vs. United States, 1900--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.9.8', out.width='1\\linewidth'>>=
+ggplot(data = df9.8, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(group = variable, shape = variable, colour = variable), size = 3) + ylab("Share of top decile in national income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.25, .5, by = .05)) + scale_shape_manual(name = "Share of top decile \n in national income", values = shapePalette[1:2]) + scale_colour_manual(name = "Share of top decile \n in national income", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.6, .85), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The top decile income share was higher in Europe than in the U.S. in 1900--2010. It is much higher in the U.S. in 2000--2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_9]
+\frametitle{Figure 9.9: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.9.9', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_1]
+\frametitle{Figure 10.1: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.1', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_2]
+\frametitle{Figure 10.2: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.2', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_3]
+\frametitle{Figure 10.3: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.3', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_4]
+\frametitle{Figure 10.4: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.4', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_5]
+\frametitle{Figure 10.5: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.5', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_6]
+\frametitle{Figure 10.6: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.6', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_7]
+\frametitle{Figure 10.7: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.7', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_8]
+\frametitle{Figure 10.8: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.8', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_9]
+\frametitle{Figure 10.9: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.9', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_10]
+\frametitle{Figure 10.10: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.10', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_11]
+\frametitle{Figure 10.11: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.10.11', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_1]
+\frametitle{Figure 11.1: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.1', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_2]
+\frametitle{Figure 11.2: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.2', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_3]
+\frametitle{Figure 11.3: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.3', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_4]
+\frametitle{Figure 11.4: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.4', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_5]
+\frametitle{Figure 11.5: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.5', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_6]
+\frametitle{Figure 11.6: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.6', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_7]
+\frametitle{Figure 11.7: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.7', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_8]
+\frametitle{Figure 11.8: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.8', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_9]
+\frametitle{Figure 11.9: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.9', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_10]
+\frametitle{Figure 11.10: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.10', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_11]
+\frametitle{Figure 11.11: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.11', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_11_12]
+\frametitle{Figure 11.12: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.11.12', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_12_1]
+\frametitle{Figure 12.1: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.12.1', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_12_2]
+\frametitle{Figure 12.2: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.12.2', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_12_3]
+\frametitle{Figure 12.3: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.12.3', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_12_4]
+\frametitle{Figure 12.4: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.12.4', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_12_5]
+\frametitle{Figure 12.5: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.12.5', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_12_6]
+\frametitle{Figure 12.6: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.12.6', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_13_1]
+\frametitle{Figure 13.1: }
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.13.1', out.width='1\\linewidth'>>=
+#
+@
+\caption{.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_14_1]
+\frametitle{Figure 14.1: Top income tax rates, 1900--2013}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.14.1', out.width='1\\linewidth'>>=
+ggplot(data = df14.1, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Marginal tax rate applying to the highest incomes") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .15), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{The top marginal tax rate of the income tax (applying to the highest incomes) in the U.S. dropped from 70\% in 1980 to 28\% in 1988.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_14_2]
+\frametitle{Figure 14.2: Top inheritance tax rates, 1900--2013}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure.14.2', out.width='1\\linewidth'>>=
+ggplot(data = df14.2, aes(x = Year, y = value, group = variable, shape = variable, colour = variable)) + geom_line() + geom_point(aes(shape = variable, colour = variable), size = 3) + ylab("Marginal tax rate applying to the highest inheritances") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .1), legend.background = element_rect(colour = 'black'), legend.title = element_blank())  + guides(shape = guide_legend(ncol = 2)) 
+@
+\caption{The top marginal tax rate of the inheritance tax (applying to the highest inheritances) in the U.S. dropped from 70\% in 1980 to 35\% in 2013.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%       HARD CODED AND DANGEROUS UNTIL A BETTER HACK IS FOUND         %%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Rename png files in current directory
+% pdf files are renamed within knitr: 
+% that hack only renames the first element of the vector dev=c('pdf','png')
+% and so 'png' files are renamed here, until a better hack is found
+<<'Rename', echo = FALSE, comment = NA, warning = FALSE, message = FALSE>>=
+x <- list.files(
+    path = file.path("~/R/capital21c/Github/Slides/figures", 
+                     fsep =.Platform$file.sep), 
+    pattern = '*-1.', recursive = TRUE, full.names = TRUE)
+y <- sub(pattern='*-1.', replacement = '.', x)
+file.rename(from = x, to = y)
+@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}
