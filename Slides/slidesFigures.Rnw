@@ -139,8 +139,7 @@ fillPalette <- "Blues"
 
 
 %% Load Data from 'dataFiguresTables.Rnw'
-% knit_child('dataFiguresTables.Rnw')
-<<'data-input', child = 'dataFiguresTables.Rnw'>>=
+<<'data-input', child='dataFiguresTables.Rnw'>>=
 @
 
 

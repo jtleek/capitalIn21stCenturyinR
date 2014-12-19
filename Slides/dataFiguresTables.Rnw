@@ -1,5 +1,5 @@
 
-<<'data', include=FALSE>>=
+<<'data', include=FALSE, cache=FALSE>>=
 ### Load Data:
 # Piketty denotes TS1.1 the sheets for Chapter 1.1, etc.
 # I denote df1.1 the dataframe for Figure 1.1, etc.
