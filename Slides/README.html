@@ -77,7 +77,7 @@ Do not comment the sandwiched part
 <li><p><code>'slidesPikettySaoPaulo2014.tex'</code><br />– a LaTeX/beamer command.<br />– calls <code>\includeonlyframes</code> command with a list of frame labels to be included to reproduce the Sao Paulo 2014 presentation.</p></li>
 <li><p><code>'slidesFiguresRename.Rnw'</code><br />– an ugly hack designed to rename the Figures in a way consistent with the Piketty book. It is called from ‘slidesFigures.Rnw’, at the very end. If omitted, the figures will be named ‘Figure_x_y-1.png’ instead of ‘Figure_x_y.png’.</p></li>
 <li><p><code>'pgfbaseimage.sty'</code><br />– a hack designed to remove a warning when compiling the beamer class.<br />– may be safely omitted.</p></li>
-<li><p><code>'slidesFigures-concordance.tex'</code>, files with <code>'.vrb'</code>, <code>'.nav'</code>, <code>.snm</code>, <code>.synctex.gz</code>, <code>.toc</code><br />– a by-product of compilation.<br />– may or not be present in repository.<br />– may be safely deleted.</p></li>
+<li><p><code>'slidesFigures-concordance.tex'</code>, files with <code>'.vrb'</code>, <code>'.nav'</code>, <code>.snm</code>, <code>.synctex.gz</code>, <code>.toc</code><br />– various files produced by knitr as a by-product of compilation.<br />– may or not be present in repository.<br />– may be safely deleted.</p></li>
 </ol></li>
 <li><p><strong>FOLDERS/DIRECTORIES</strong>:</p>
 <ol style="list-style-type: decimal">
@@ -87,6 +87,7 @@ Do not comment the sandwiched part
 <li><p><code>pictures</code><br />– contains images and figures not directly imported into the beamer documents, e.g. a screenshot of the ‘World Top Incomes Database’ website.</p></li>
 <li><p><code>pikettySlides/original</code><br />– contains copies of a sample of Professor Piketty’s powerpoint presentations.</p></li>
 <li><p><code>pikettySlides/cloned</code><br />– contains ‘cloned’ versions of Professor Piketty’s powerpoint presentations created with knitr/beamer.</p></li>
+<li><p><code>cache</code><br />– contains the ‘cache’ created by knitr as a by-product of compilation.<br />– may or not be present in repository.<br />– may be safely deleted.</p></li>
 </ol></li>
 </ol>
 <hr />

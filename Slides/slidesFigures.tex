@@ -129,16 +129,26 @@
 \setlength{\belowcaptionskip}{0pt}%
 \renewcommand{\insertpagenumber}{}% suppress page numbers
 
+%%%% Load Data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Code for data creation in 'dataFiguresTables.Rnw'
+%%%% To load data this way, comment out each instance of 'load' for each figure
+%    <<'dataInput', child='TestdataFiguresTables.Rnw'>>=
+%    @
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 %%%%%%%%%% Load knitr Options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
+%%%%%%%%%% Define French / US styles %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
 %%%%%%%%%% Start of Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
+
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=TitlePage_1]
@@ -156,15 +166,14 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_0_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_0_1} 
 
 }
 
 
 
 \end{knitrout}
-\caption{The top decile share in U.S. national income dropped from 45--50\% in the 1910s--1920s to less than 35\% in the 1950s (this is the
-1950 1960 fall documented by Kuznets); it then rose from less than 35\% in the 1970s to 45--50\% in the 2000s--2010s.}
+\caption{\scriptsize The top decile share in U.S. national income dropped from 45--50\% in the 1910s--1920s to less than 35\% in the 1950s (this is the 1950--1960 fall documented by Kuznets); it then rose from less than 35\% in the 1970s to 45--50\% in the 2000s--2010s.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -180,7 +189,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_0_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_0_2} 
 
 }
 
@@ -203,7 +212,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_1_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_1} 
 
 }
 
@@ -218,7 +227,7 @@
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_1_1]
+\begin{frame}[label=Figure_1_1b]
 \frametitle{Figure 1.1: The distribution of world output, 1700--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
@@ -226,7 +235,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_1_1b} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_1b} 
 
 }
 
@@ -249,7 +258,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_1_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_2} 
 
 }
 
@@ -272,7 +281,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_1_2b} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_2b} 
 
 }
 
@@ -295,7 +304,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_1_3} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_3} 
 
 }
 
@@ -318,7 +327,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_1_4} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_4} 
 
 }
 
@@ -341,7 +350,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_1_5} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_1_5} 
 
 }
 
@@ -364,7 +373,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_2_1} 
 
 }
 
@@ -387,7 +396,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_1b} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_2_1b} 
 
 }
 
@@ -410,14 +419,14 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_2a} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_2_2a} 
 
 }
 
 
 
 \end{knitrout}
-%\caption{}
+\caption{The growth rate of world population was above 1 percent per year from 1950 to 2012 and should return toward 0 percent by the end of the twenty-first century.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -433,7 +442,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_2_2} 
 
 }
 
@@ -456,7 +465,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_3} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_2_3} 
 
 }
 
@@ -479,7 +488,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_4} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_2_4} 
 
 }
 
@@ -502,7 +511,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_5} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_2_5} 
 
 }
 
@@ -525,7 +534,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_2_6} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_2_6} 
 
 }
 
@@ -548,7 +557,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_3_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_3_1} 
 
 }
 
@@ -571,7 +580,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_3_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_3_2} 
 
 }
 
@@ -594,7 +603,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_3_3} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_3_3} 
 
 }
 
@@ -617,7 +626,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_3_4} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_3_4} 
 
 }
 
@@ -640,7 +649,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_3_5} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_3_5} 
 
 }
 
@@ -663,7 +672,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_3_6} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_3_6} 
 
 }
 
@@ -686,7 +695,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_1} 
 
 }
 
@@ -709,7 +718,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_2} 
 
 }
 
@@ -732,7 +741,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_3} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_3} 
 
 }
 
@@ -755,7 +764,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_4} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_4} 
 
 }
 
@@ -778,7 +787,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_5} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_5} 
 
 }
 
@@ -801,7 +810,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_6} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_6} 
 
 }
 
@@ -824,14 +833,14 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_7} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_7} 
 
 }
 
 
 
 \end{knitrout}
-\caption{.}
+\caption{Public debt is worth one year of national income in the United States in 1950 (almost as much as assets).}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -847,7 +856,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_8} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_8} 
 
 }
 
@@ -870,7 +879,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_9} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_9} 
 
 }
 
@@ -893,7 +902,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_10} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_10} 
 
 }
 
@@ -916,7 +925,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_4_11} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_4_11} 
 
 }
 
@@ -939,7 +948,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_1} 
 
 }
 
@@ -962,7 +971,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_2} 
 
 }
 
@@ -985,7 +994,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_3} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_3} 
 
 }
 
@@ -1000,22 +1009,22 @@
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_5_3a]
-\frametitle{Figure 5.3a: Public capital in rich countries, 1970--2010}
+\begin{frame}[label=Figure_5_3b]
+\frametitle{Figure 5.3b: Private capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_3a} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_3b} 
 
 }
 
 
 
 \end{knitrout}
-\caption{In France, Britain, Germany, and the United States, government deficits exceeded public investment by 2--3\% of national income on average over the period 1970--2010, compared with more than 6\% in Italy.}
+\caption{Private capital is worth between 2 and 3.5 years of national income in rich countries in 1970, and between 4 and 7 years of national income in 2010.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1031,7 +1040,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_4} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_4} 
 
 }
 
@@ -1039,6 +1048,75 @@
 
 \end{knitrout}
 \caption{Expressed in years of household disposable income (about 70--80\% of national income), the capital/income ratio appears to be larger than when it is expressed in years of national income.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_4b]
+\frametitle{Figure 5.4b: Private capital in rich countries (ratio), 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_4b} 
+
+}
+
+
+
+\end{knitrout}
+\caption{Expressed in years of household disposable income (about 70--80\% of national income), the capital/income ratio appears to be larger than when it is expressed in years of national income.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_5S]
+\frametitle{Figure 5.5S: Public capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_5S} 
+
+}
+
+
+
+\end{knitrout}
+\caption{In France, Britain, Germany, and the United States, government deficits exceeded public investment by 2--3\% of national income on average over the period 1970--2010, compared with more than 6\% in Italy.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_5Sb]
+\frametitle{Figure 5.5Sb: Public capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_5Sb} 
+
+}
+
+
+
+\end{knitrout}
+\caption{In France, Britain, Germany, and the United States, government deficits exceeded public investment by 2--3\% of national income on average over the period 1970--2010, compared with more than 6\% in Italy.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1054,7 +1132,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_5} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_5} 
 
 }
 
@@ -1077,7 +1155,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_6} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_6} 
 
 }
 
@@ -1100,7 +1178,30 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_7} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_7} 
+
+}
+
+
+
+\end{knitrout}
+\caption{Net foreign assets held by Japan and Germany are worth between 6 months and one year of national income in 2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_5_7b]
+\frametitle{Figure 5.7b: National capital in rich countries, 1970--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_7b} 
 
 }
 
@@ -1123,7 +1224,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_5_8} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_5_8} 
 
 }
 
@@ -1139,12 +1240,21 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_1]
-\frametitle{Figure 6.1: }
+\frametitle{Figure 6.1: The capital-labor split in Britain, 1770--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-\caption{.}
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_6_1} 
+
+}
+
+
+
+\end{knitrout}
+\caption{During the nineteenth century, capital income (rent, profits, dividends, interest...) absorbed about 40 percent of national income versus 60 percent for labor income (including both wage and non-wage income).}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1153,12 +1263,21 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_2]
-\frametitle{Figure 6.2: }
+\frametitle{Figure 6.2: The capital-labor split in France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-\caption{.}
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_6_2} 
+
+}
+
+
+
+\end{knitrout}
+\caption{In the twenty-first century, capital income (rent, profits, dividends, interest...) absorbs about 30 percent of national income versus 70 percent for labor income (including both wage and non-wage income).}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1167,12 +1286,21 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_3]
-\frametitle{Figure 6.3: }
+\frametitle{Figure 6.3: The pure rate of return on capital in Britain, 1770--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-\caption{.}
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_6_3} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The pure rate of return to capital is roughly stable around 4--5 percent in the long run.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1181,12 +1309,21 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_4]
-\frametitle{Figure 6.4: }
+\frametitle{Figure 6.4: The pure rate of return on capital in France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-\caption{.}
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_6_4} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The observed average rate of return displays larger fluctuations than the pure rate of return during the twentieth century.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1195,12 +1332,21 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_5]
-\frametitle{Figure 6.5: }
+\frametitle{Figure 6.5: The capital share in rich countries, 1975--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-\caption{.}
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_6_5} 
+
+}
+
+
+
+\end{knitrout}
+\caption{Capital income absorbs between 15 percent and 25 percent of national income in rich countries in 1970, and between 25 percent and 30 percent in 2000--2010.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1209,12 +1355,21 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_6]
-\frametitle{Figure 6.6: }
+\frametitle{Figure 6.6: The profit share in the value added of corporations in France, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-\caption{.}
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_6_6} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The share of gross profits in gross value added of corporations rose from 25 percent in 1982 to 33 percent in 2010; the share of net profits in net value added rose from 12 percent to 20 percent.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1223,12 +1378,21 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_7]
-\frametitle{Figure 6.7: }
+\frametitle{Figure 6.7: The share of housing rent in national income in France, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-\caption{.}
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_6_7} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The share of housing rent (rental value of dwellings) rose from 2 percent of national income in 1948 to 10 percent in 2010.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1237,12 +1401,44 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_8]
-\frametitle{Figure 6.8: }
+\frametitle{Figure 6.8: The capital share in national income in France, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-\caption{.}
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_6_8} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The share of capital income (net profits and rents) rose from 15 percent of national income in 1982 to 27 percent in 2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_6_8b]
+\frametitle{Figure 6.8b: The capital share in national income in France, 1900--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_6_8b} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The share of capital income (net profits and rents) rose from 15 percent of national income in 1982 to 27 percent in 2010.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1258,7 +1454,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_1} 
 
 }
 
@@ -1281,7 +1477,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_2} 
 
 }
 
@@ -1304,7 +1500,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_3} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_3} 
 
 }
 
@@ -1327,7 +1523,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_4} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_4} 
 
 }
 
@@ -1350,7 +1546,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_5} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_5} 
 
 }
 
@@ -1374,7 +1570,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_6} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_6} 
 
 }
 
@@ -1393,11 +1589,11 @@
 \frametitle{Figure 8.7. High incomes and high wages in the United States, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
-\centering % To Do: add 'excluding capital gains'
+\centering
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_7} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_7} 
 
 }
 
@@ -1416,11 +1612,11 @@
 \frametitle{Figure 8.8. The transformation of the top 1 percent in the United States, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
-\centering % To Do: add 'excluding capital gains'
+\centering 
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_8} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_8} 
 
 }
 
@@ -1443,7 +1639,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_9} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_9} 
 
 }
 
@@ -1466,7 +1662,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_8_10} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_8_10} 
 
 }
 
@@ -1482,12 +1678,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_1]
-\frametitle{Figure 9.1: }
+\frametitle{Figure 9.1: Minimum wage in France and the United States, 1950--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Expressed in 2013 purchasing power, the hourly minimum wage rose from \$3.80 to \$7.30 between 1950 and 2013 in the United States, and from \euro 2.10 to \euro 9.40 in France.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1496,12 +1692,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_2]
-\frametitle{Figure 9.2: }
+\frametitle{Figure 9.2: Income inequality in Anglo-Saxon countries, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The share of top percentile in total income rose since the 1970s in all Anglo-Saxon countries, but with different magnitudes.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1510,12 +1706,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_3]
-\frametitle{Figure 9.3: }
+\frametitle{Figure 9.3: Income inequality in Continental Europe and Japan, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{As compared to Anglo-Saxon countries, the share of top percentile barely increased since the 1970s in Continental Europe and Japan.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1524,12 +1720,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_4]
-\frametitle{Figure 9.4: }
+\frametitle{Figure 9.4: Income inequality in Northern and Southern Europe, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{As compared to Anglo-Saxon countries, the top percentile income share barely increased in Northern and Southern Europe since the 1970s.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1538,12 +1734,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_5]
-\frametitle{Figure 9.5: }
+\frametitle{Figure 9.5: The top decile income share in Anglo-Saxon countries, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The share of the top 0.1 percent highest incomes in total income rose sharply since the 1970s in all Anglo-Saxon countries, but with varying magnitudes.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1552,12 +1748,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_6]
-\frametitle{Figure 9.6: }
+\frametitle{Figure 9.6: The top decile income share in Continental Europe and Japan, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{As compared to Anglo-Saxon countries, the top 0.1 percent income share barely increased in Continental Europe and Japan.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1566,12 +1762,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_7]
-\frametitle{Figure 9.7: }
+\frametitle{Figure 9.7: The top decile income share in Europe and the United States, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{In the 1950s--1970s, the top decile income share was about 30--35 percent of total income in Europe as in the United States.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1587,7 +1783,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_9_8} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_9_8} 
 
 }
 
@@ -1603,12 +1799,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_9]
-\frametitle{Figure 9.9: }
+\frametitle{Figure 9.9: Income inequality in emerging countries, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Measured by the top percentile income share, income inequality rose in emerging countries since the 1980s, but ranks below the US level in 2000--2010.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1617,12 +1813,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_1]
-\frametitle{Figure 10.1: }
+\frametitle{Figure 10.1: Wealth inequality in France, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The top decile (the top 10 percent highest wealth holders) owns 80--90 percent of total wealth in 1810--1910, and 60--65 percent today.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1631,12 +1827,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_2]
-\frametitle{Figure 10.2: }
+\frametitle{Figure 10.2: Wealth inequality in Paris versus France, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The top percentile (the top 1 percent wealth holders) owns 70 percent of aggregate wealth in Paris on the eve of World War I.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1645,12 +1841,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_3]
-\frametitle{Figure 10.3: }
+\frametitle{Figure 10.3: Wealth inequality in Britain, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The top decile owns 80--90 percent of total wealth in 1810--1910, and 70 percent today.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1659,12 +1855,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_4]
-\frametitle{Figure 10.4: }
+\frametitle{Figure 10.4: Wealth inequality in Sweden, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The top 10 percent holds 80--90 percent of total wealth in 1810--1910 and 55--60 percent today.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1673,12 +1869,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_5]
-\frametitle{Figure 10.5: }
+\frametitle{Figure 10.5: Wealth inequality in the United States, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The top 10 percent wealth holders own about 80 percent of total wealth in 1910 and 75 percent today.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1687,12 +1883,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_6]
-\frametitle{Figure 10.6: }
+\frametitle{Figure 10.6: Wealth inequality in Europe versus the United States, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Until the mid-twentieth century, wealth inequality was higher in Europe than in the United States.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1701,12 +1897,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_7]
-\frametitle{Figure 10.7: }
+\frametitle{Figure 10.7: Return to capital and growth: France, 1820--1913}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The rate of return on capital is a lot higher than the growth rate in France between 1820 and 1913.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1715,12 +1911,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_8]
-\frametitle{Figure 10.8: }
+\frametitle{Figure 10.8: Capital share and saving rate: France, 1820--1913}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The share of capital income in national income is much larger than the saving rate in France between 1820 and 1913.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1729,12 +1925,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_9]
-\frametitle{Figure 10.9: }
+\frametitle{Figure 10.9: Rate of return versus growth rate at the world level, from Antiquity until 2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The rate of return to capital (pretax) has always been higher than the world growth rate, but the gap was reduced during the twentieth century, and might widen again in the twenty-first century.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1743,12 +1939,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_10]
-\frametitle{Figure 10.10: }
+\frametitle{Figure 10.10: After tax rate of return versus growth rate at the world level, from Antiquity until 2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The rate of return to capital (after tax and capital losses) fell below the growth rate during the twentieth century, and may again surpass it in the twenty-first century.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1757,12 +1953,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_11]
-\frametitle{Figure 10.11: }
+\frametitle{Figure 10.11: After tax rate of return versus growth rate at the world level, from Antiquity until 2200}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The rate of return to capital (after tax and capital losses) fell below the growth rate during the twentieth century, and might again surpass it in the twenty-first century.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1771,12 +1967,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_1]
-\frametitle{Figure 11.1: }
+\frametitle{Figure 11.1: The annual inheritance flow as a fraction of national income, France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The annual inheritance flow was about 20–25 percent of national income during the nineteenth century and until 1914; it then fell to less than 5 percent in the 1950s, and returned to about 15 percent in 2010.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1785,12 +1981,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_2]
-\frametitle{Figure 11.2: }
+\frametitle{Figure 11.2: The mortality rate in France, 1820--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The mortality rate fell in France during the twentieth century (rise of life expectancy), and should increase somewhat during the twenty-first century (baby-boom effect).}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1799,12 +1995,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_3]
-\frametitle{Figure 11.3: }
+\frametitle{Figure 11.3: Average age of decedents and inheritors: France, 1820--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The average of (adult) decedents rose from less than 60 years to almost 80 years during the twentieth century, and the average age at the time of inheritance rose from 30 years to 50 years.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1813,12 +2009,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_4]
-\frametitle{Figure 11.4: }
+\frametitle{Figure 11.4: Inheritance flow versus mortality rate: France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The annual flow of inheritance (bequests and gifts) is equal to about 2.5 percent of aggregate wealth in 2000--2010 versus 1.2 percent for the mortality rate.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1827,12 +2023,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_5]
-\frametitle{Figure 11.5: }
+\frametitle{Figure 11.5: The ratio between average wealth at death and average wealth of the living: France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{In 2000--2010, the average wealth at death is 20 percent higher than that of the living if one omits the gifts that were made before death, but more than twice as large if one re-integrates gifts.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1841,12 +2037,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_6]
-\frametitle{Figure 11.6: }
+\frametitle{Figure 11.6: Observed and simulated inheritance flow: France, 1820--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Simulations based upon the theoretical model indicate that the level of the inheritance flow in the twenty-first century will depend upon the growth rate and the net rate of return to capital.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1855,12 +2051,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_7]
-\frametitle{Figure 11.7: }
+\frametitle{Figure 11.7: The share of inherited wealth in total wealth: France, 1850--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Inherited wealth represents 80--90 percent of total wealth in France in the nineteenth century; this share fell to 40--50 percent during the twentieth century, and might re- turn to 80--90 percent during the twenty-first century.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1869,12 +2065,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_8]
-\frametitle{Figure 11.8: }
+\frametitle{Figure 11.8: The annual inheritance flow as a fraction of household disposable income: France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Expressed as a fraction of household disposable income (rather than national income), the annual inheritance flow is about 20 percent in 2010, in other words, close to its nineteenth-century level.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1883,12 +2079,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_9]
-\frametitle{Figure 11.9: }
+\frametitle{Figure 11.9: The share of inheritance in the total resources (inheritance and work) of cohorts born in 1790--2030}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Inheritance made about 25 percent of the resources of nineteenth-century cohorts, down to less than 10 percent for cohorts born in 1910--1920 (who should have inherited in 1950--1960).}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1897,12 +2093,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_10]
-\frametitle{Figure 11.10: }
+\frametitle{Figure 11.10: The dilemma of Rastignac for cohorts born in 1790--2030}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{In the nineteenth century, the living standards that could be attained by the top 1 percent inheritors were a lot higher than those that could be attained by the top 1 percent labor earners.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1911,12 +2107,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_11]
-\frametitle{Figure 11.11: }
+\frametitle{Figure 11.11: Which fraction of a cohort receives in inheritance the equivalent of a lifetime labor income?}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Within the cohorts born around 1970--1980, 12--14 percent of individuals receive in inheritance the equivalent of the lifetime labor income received by the bottom 50 percent less well paid workers.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1925,12 +2121,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_12]
-\frametitle{Figure 11.12: }
+\frametitle{Figure 11.12: The inheritance flow in Europe, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{The inheritance flow follows a U-shape in curve in France as well as in the United Kingdom and Germany. It is possible that gifts are underestimated in the United Kingdom at the end of the period.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1939,12 +2135,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_1]
-\frametitle{Figure 12.1: }
+\frametitle{Figure 12.1: The world's billionaires according to Forbes, 1987--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Between 1987 and 2013, according to Forbes, the number of \$ billionaires rose from 140 to 1,400, and their total wealth rose from 300 to 5,400 billion dollars.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1953,12 +2149,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_2]
-\frametitle{Figure 12.2: }
+\frametitle{Figure 12.2: Billionaires as a fraction of global population and wealth, 1987--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Between 1987 and 2013, the number of billionaires per 100 million adults rose from five to thirty, and their share in aggregate private wealth rose from 0.4 percent to 1.5 percent.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1967,12 +2163,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_3]
-\frametitle{Figure 12.3: }
+\frametitle{Figure 12.3: The share of top wealth fractiles in world wealth, 1987--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Between 1987 and 2013, the share of the top 1/20 million fractile rose from 0.3 percent to 0.9 percent of world wealth, and the share of the top 1/100 million fractile rose from 0.1 percent to 0.4 percent.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1981,12 +2177,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_4]
-\frametitle{Figure 12.4: }
+\frametitle{Figure 12.4: The world capital/income ratio, 1870--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{According to the simulations (central scenario), the world capital/income ratio might be near to 700 percent by the end of the twenty-first century.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1995,12 +2191,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_5]
-\frametitle{Figure 12.5: }
+\frametitle{Figure 12.5: The distribution of world capital, 1870--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{According to the central scenario, Asian countries should own about half of world capital by the end of the twenty-first century.} % typo in book
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -2009,12 +2205,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_6]
-\frametitle{Figure 12.6: }
+\frametitle{Figure 12.6: The net foreign asset position of rich countries}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Unregistered financial assets held in tax havens are higher than the official net foreign debt of rich countries.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -2023,12 +2219,12 @@
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_13_1]
-\frametitle{Figure 13.1: }
+\frametitle{Figure 13.1: Tax revenues in rich countries, 1870--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 
-\caption{.}
+\caption{Total tax revenues were less than 10 percent of national income in rich countries until 1900--1910; they represent between 30 percent and 55 percent of national income in 2000--2010.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -2044,7 +2240,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_14_1} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_14_1} 
 
 }
 
@@ -2067,7 +2263,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=1\linewidth]{figures/color/Figure_14_2} 
+{\centering \includegraphics[width=1\linewidth]{figures/bw/Figure_14_2} 
 
 }
 
@@ -2082,26 +2278,25 @@
 
 
 
+%\begin{comment}
+%\end{comment}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%       HARD CODED AND DANGEROUS UNTIL A BETTER HACK IS FOUND         %%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{comment}
+% Remove '-1' extension in Figure names - DANGEROUS HACK
+% Code inserted from 'slidesFiguresRename.Rnw'
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% HARD CODED AND DANGEROUS - UNTIL A BETTER HACK IS FOUND %%       
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Rename png files in current directory
 % pdf files are renamed within knitr: 
 % that hack only renames the first element of the vector dev=c('pdf','png')
 % and so 'png' files are renamed here, until a better hack is found
-\begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
- [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-[15] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-[29] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-[43] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{comment}
 
 
 
