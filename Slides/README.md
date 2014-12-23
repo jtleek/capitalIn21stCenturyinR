@@ -61,7 +61,7 @@ I) **FILES/SCRIPTS**:
     -- may be safely omitted.  
     
     8) ``'slidesFigures-concordance.tex'``, files with  ``'.vrb'``, ``'.nav'``, ``.snm``, ``.synctex.gz``, ``.toc``  
-    -- a by-product of compilation.  
+    -- various files produced by knitr as a by-product of compilation.  
     -- may or not be present in repository.  
     -- may be safely deleted.  
 
@@ -87,7 +87,12 @@ II) **FOLDERS/DIRECTORIES**:
     -- contains copies of a sample of Professor Piketty's powerpoint presentations.
 
     6) ``pikettySlides/cloned``  
-    -- contains 'cloned' versions of Professor Piketty's powerpoint presentations created with knitr/beamer.
+    -- contains 'cloned' versions of Professor Piketty's powerpoint presentations created with knitr/beamer.  
+    
+    7) ``cache``  
+    -- contains the 'cache' created by knitr as a by-product of compilation.  
+    -- may or not be present in repository.  
+    -- may be safely deleted.  
 
 
 ------
