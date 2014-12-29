@@ -100,7 +100,8 @@ opts_chunk$set(echo = FALSE, comment = NA, concordance = TRUE, warning = FALSE, 
 opts_chunk$set(size = 'footnotesize')
 
 # Set figure size and resolution
-opts_chunk$set(dev = c('pdf','png'), fig.path = 'figures/color/', fig.align='center', fig.height = 5, fig.width = 8, dpi = 300)
+opts_chunk$set(dev = c('pdf','png'), fig.path = 'figures/color/', fig.align='center', fig.height = 5, fig.width = 8, dpi = 300, pdf.options(encoding = "ISOLatin9.enc")) 
+# list of encodings: list.files(system.file("enc", package = "grDevices")) 
 
 # evaluate fig.cap after a chunk is evaluated
 opts_knit$set(eval.after = 'fig.cap')
@@ -125,7 +126,7 @@ library("scales")       # labels with %, $ and other units
 library("RColorBrewer") # convenient color palettes
 
 ### Set Color & Shape Scheme
-# linetype scheme (experimental, needs a tweak or two)
+# linetype scheme (not extensively tested)
 linePalette <- c("solid", "dotted", "dashed", "dotdash", "longdash", "twodash", "13", "31", "1221")# "33" means 3 units on followed by 3 units off
 # shape scheme (is there a package for this?)
 shapePalette <- c(17, 21, 15, 25, 19, 23, 18, 2, 16, 0, 8)
@@ -144,7 +145,7 @@ fillPalette <- "Blues"
 
 
 %%%%%%%%%% Define French / US styles %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-<<'Formats', include=FALSE>>=
+<<'Formats', echo = FALSE, results = 'hide', comment = NA, warning = FALSE, message = FALSE>>=
 # Create euro currency symbol for plot labels
 euro <- function(x) {
   paste0("€", format(x, big.mark = ",", decimal.mark = ".", trim = TRUE,
@@ -183,6 +184,73 @@ yuanFrench <- yenFrench
 @
 
 
+%%%%%%%%%% Define ggplot_dual_axis() function %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<'ggplot_dual_axis', include=FALSE>>=
+##' function named ggplot_dual_axis()
+##' Takes 2 ggplot plots and makes a dual y-axis plot
+##' function takes 2 compulsory arguments and 1 optional argument
+##' arg lhs is the ggplot whose y-axis is to be displayed on the left
+##' arg rhs is the ggplot whose y-axis is to be displayed on the right
+##' arg 'axis.title.y.rhs' takes value "rotate" to rotate right y-axis label
+##' The function does as little as possible, namely:
+##'  # display the lhs plot without minor grid lines and with a
+##'  transparent background to allow grid lines to show
+##'  # display the rhs plot without minor grid lines and with a
+##'  secondary y axis, a rotated axis label, without minor grid lines
+##'  # justify the y-axis label by setting 'hjust = 0' in 'axis.text.y'
+##'  # rotate the right plot 'axis.title.y' by 270 degrees, for symmetry
+##'  # rotation can be turned off with 'axis.title.y.rhs' option
+##'  
+ggplot_dual_axis <- function(lhs, rhs, axis.title.y.rhs = "rotate") {
+  # 1.  Fix the right y-axis label justification
+    rhs <- suppressMessages(rhs + theme(axis.text.y = element_text(hjust = 0)))
+  # 2.  Rotate the right y-axis label by 270 degrees by default
+  if (missing(axis.title.y.rhs) | 
+	    axis.title.y.rhs %in% c("rotate", "rotated")) {
+        rhs <- suppressMessages(rhs + theme(axis.title.y = element_text(angle = 270))) 
+    }
+  # 3.  Remove the right plot x-axis labels to prevent over-printing
+    rhs <- suppressMessages(rhs + scale_x_continuous(NULL))
+  # 4.  Remove the right plot title to prevent over-printing
+    rhs <- suppressMessages(rhs + ggtitle(NULL))
+  # 5a. Use only major grid lines for the left axis
+    lhs <- suppressMessages(lhs + theme(panel.grid.minor = element_blank()))
+  # 5b. Use only major grid lines for the right axis
+  #     force transparency of the backgrounds to allow grid lines to show
+    rhs <- suppressMessages(rhs + theme(panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank(), # prevent overplotting
+        panel.background = element_rect(fill = "transparent", colour = NA), 
+        plot.background = element_rect(fill = "transparent", colour = NA)))
+  # Process gtable objects
+  # 6.  Extract gtable
+	library("gtable") # loads the grid package
+	g1 <- ggplot_gtable(ggplot_build(lhs))
+	g2 <- ggplot_gtable(ggplot_build(rhs))
+  # 7.  Overlap the panel of the rhs plot on that of the lhs plot
+	pp <- c(subset(g1$layout, name == "panel", se = t:r))
+	g <- gtable_add_grob(g1, 
+	    g2$grobs[[which(g2$layout$name == "panel")]], pp$t, pp$l, pp$b, pp$l)
+  # 8.  Tweak axis position, ticks and labels
+  ia <- which(g2$layout$name == "axis-l")
+	ax <- g2$grobs[[ia]]$children[["axis"]]  # g2$grobs[[ia]]$children[[2]]
+	ax$widths <- rev(ax$widths)
+	ax$grobs <- rev(ax$grobs)
+	# insert space on the right of the plot to fit the second axis
+	g <- gtable_add_cols(g, g2$widths[g2$layout[ia, ]$l], length(g$widths)-1)
+	# overlay the second axis to the right of the plot
+	g <- gtable_add_grob(g, ax, pp$t, length(g$widths)-1, pp$b)
+	# overlay the second label to the right of the plot
+	g <- gtable_add_grob(g, g2$grobs[[7]], pp$t, length(g$widths), pp$b)
+	# adjust ticks alignment along the right axis
+	ax$grobs[[1]]$x <- ax$grobs[[1]]$x - unit(1, "npc") + unit(0.15, "cm")
+  # 9.   by-pass class check in ggsave to print a gtable with ggsave 
+    ggsave <- ggplot2::ggsave; body(ggsave) <- body(ggplot2::ggsave)[-2]
+  # 10.  return the gtable with grid.draw
+    grid.newpage()
+    return(grid.draw(g))
+}
+@ 
+
 %%%%%%%%%% Start of Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
@@ -196,7 +264,7 @@ yuanFrench <- yenFrench
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_0_1,fragile]
-\frametitle{Figure I.1: Income inequality in the United States, 1910--2012}
+\frametitle{Figure I.1. Income inequality in the United States, 1910--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -230,7 +298,7 @@ ggplot(data = df_0_2, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_1_1]
-\frametitle{Figure 1.1: The distribution of world output, 1700--2012}
+\frametitle{Figure 1.1. The distribution of world output, 1700--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -247,7 +315,7 @@ ggplot(data = df_1_1, aes(x = Year, y = value, group = variable, fill = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_1_1b]
-\frametitle{Figure 1.1: The distribution of world output, 1700--2012}
+\frametitle{Figure 1.1. The distribution of world output, 1700--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -264,13 +332,13 @@ ggplot(data = df_1_1, aes(x = Year, y = value, group = variable, fill = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_1_2]
-\frametitle{Figure 1.2: The distribution of world population, 1700--2012}
+\frametitle{Figure 1.2. The distribution of world population, 1700--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_1_2', out.width='1\\linewidth'>>=
 load("data/df_1_2.Rda")  # load data from /data subdirectory
-ggplot(data = df_1_2, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = FALSE) + ylab("Share in world population (% of total)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2040), breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_fill_brewer(palette = fillPalette) + geom_text(data = subset(df_1_2, Year == tail(df_1_2$Year, 1)), aes(x = 3+Year, y = cumsum(value), label = variable), vjust = 1, hjust = 0, size = 4)
+ggplot(data = df_1_2, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = FALSE) + ylab("Share in world population (% of total)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2040), breaks = seq(1700, 2000, by = 50)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_fill_brewer(palette = fillPalette) + geom_text(data = subset(df_1_2, Year == tail(df_1_2$Year, 1)), aes(x = 3+Year, y = cumsum(value), label = variable), vjust = 1, hjust = 0, size = 6)
 @
 \caption{Europe's population made 26 percent of world population in 1913, down to 10 percent in 2012.}
 \end{minipage}
@@ -281,13 +349,13 @@ ggplot(data = df_1_2, aes(x = Year, y = value, group = variable, fill = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_1_2b]
-\frametitle{Figure 1.2: The distribution of world population, 1700--2012}
+\frametitle{Figure 1.2. The distribution of world population, 1700--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_1_2b', out.width='1\\linewidth'>>=
 load("data/df_1_2.Rda")  # load data from /data subdirectory
-ggplot(data = df_1_2, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("Share in world population (% of total)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2012), breaks = seq(1700, 2020, by = 50)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_fill_brewer(palette = fillPalette) + theme(legend.key = element_blank(), legend.position = c(0.25, 0.75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1), fill = guide_legend(reverse = TRUE))
+ggplot(data = df_1_2, aes(x = Year, y = value, group = variable, fill = variable)) + geom_area(position = 'stack', colour = gray, alpha = .4, show_guide = TRUE) + ylab("Share in world population (% of total)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1700, 2012), breaks = seq(1700, 2010, by = 50)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_fill_brewer(palette = fillPalette) + theme(legend.key = element_blank(), legend.position = c(0.25, 0.75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1), fill = guide_legend(reverse = TRUE))
 @
 \caption{Europe's population made 26 percent of world population in 1913, down to 10 percent in 2012.}
 \end{minipage}
@@ -349,7 +417,7 @@ ggplot(data = df_1_5, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_2_1]
-\frametitle{Figure 2.1: The growth of world population, 1700--2012}
+\frametitle{Figure 2.1. The growth of world population, 1700--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -366,7 +434,7 @@ ggplot(data = df_2_1, aes(x = Year, y = value, group = variable, fill = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_2_1b]
-\frametitle{Figure 2.1: The growth of world population, 1700--2012}
+\frametitle{Figure 2.1. The growth of world population, 1700--2012}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -382,14 +450,14 @@ ggplot(data = df_2_1, aes(x = Year, y = value, group = variable, fill = variable
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_2_2a]
-\frametitle{Figure 2.2a: The growth rate of population from Antiquity to 2100}
+\begin{frame}[label=Figure_2_2S]
+\frametitle{Figure 2.2S. The growth rate of population from Antiquity to 2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<'Figure_2_2a', out.width='1\\linewidth'>>=
-load("data/df_2_2a.Rda")  # load data from /data subdirectory
-ggplot(data = df_2_2a, aes(x = Period, y = value, group = variable, colour = variable, shape = variable)) + geom_rect(aes(xmin = "2012-2030", xmax = Inf, ymin = -Inf, ymax = Inf), fill = "White Smoke", color = "NA", alpha = 1) + geom_line() + geom_point(size = 3) + ylab("Population growth rate") + xlab("") + theme_bw() + scale_x_discrete(labels = function(x)sub("-","-\n", x, fixed = TRUE)) + scale_y_continuous(limits = c(-.005, 0.035), labels = percent, breaks = seq(-0.1, .03, by = .005)) + scale_shape_manual(name = "Population growth", values = shapePalette) + scale_colour_manual(name = "Population growth", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .75), legend.background = element_rect(colour = 'black')) + annotate("text", label = "Observed growth rates \n before 2012", x = "1970-1990", y = 0.03) + annotate("text", label = "UN projections \n after 2012 \n(central scenario)", x = "2050-2070", y = 0.03, vjust = .7)
+<<'Figure_2_2S', out.width='1\\linewidth'>>=
+load("data/df_2_2S.Rda")  # load data from /data subdirectory
+ggplot(data = df_2_2S, aes(x = Period, y = value, group = variable, colour = variable, shape = variable)) + geom_rect(aes(xmin = "2012-2030", xmax = Inf, ymin = -Inf, ymax = Inf), fill = "blue", color = "NA", alpha = .003) + geom_line() + geom_point(size = 3) + ylab("Population growth rate") + xlab("") + theme_bw() + scale_x_discrete(labels = function(x)sub("-","-\n", x, fixed = TRUE)) + scale_y_continuous(limits = c(-.005, 0.04), labels = percent, breaks = seq(-0.1, .05, by = .005)) + scale_shape_manual(name = "Population growth", values = shapePalette) + scale_colour_manual(name = "Population growth", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .75), legend.background = element_rect(colour = 'black')) + annotate("text", label = "Observed growth rates \n before 2012", x = "1970-1990", y = 0.035) + annotate("text", label = "UN projections \n after 2012 \n(central scenario)", x = "2050-2070", y = 0.035, vjust = .7)
 @
 \caption{The growth rate of world population was above 1 percent per year from 1950 to 2012 and should return toward 0 percent by the end of the twenty-first century.}
 \end{minipage}
@@ -400,7 +468,7 @@ ggplot(data = df_2_2a, aes(x = Period, y = value, group = variable, colour = var
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_2_2]
-\frametitle{Figure 2.2: The growth rate of world population from Antiquity to 2100}
+\frametitle{Figure 2.2. The growth rate of world population from Antiquity to 2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -417,7 +485,7 @@ ggplot(data = df_2_2, aes(x = Period, y = value)) + geom_line(aes(group = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_2_3]
-\frametitle{Figure 2.3: The growth rate of per capita output since the Industrial Revolution}
+\frametitle{Figure 2.3. The growth rate of per capita output since the Industrial Revolution}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -434,7 +502,7 @@ ggplot(data = df_2_3, aes(x = Period, y = value, group = variable, colour = vari
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_2_4]
-\frametitle{Figure 2.4: The growth rate of world per capita output from Antiquity to 2100}
+\frametitle{Figure 2.4. The growth rate of world per capita output from Antiquity to 2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -451,7 +519,7 @@ ggplot(data = df_2_4, aes(x = Period, y = value)) + geom_line(aes(group = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_2_5]
-\frametitle{Figure 2.5: The growth rate of world output from Antiquity to 2100}
+\frametitle{Figure 2.5. The growth rate of world output from Antiquity to 2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -485,7 +553,7 @@ ggplot(data = df_2_6, aes(x = Period, y = value, group = variable, colour = vari
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_3_1]
-\frametitle{Figure 3.1: Capital in Britain, 1700--2010}
+\frametitle{Figure 3.1. Capital in Britain, 1700--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -502,7 +570,7 @@ ggplot(data = df_3_1, aes(x = Year, y = value, group = variable, fill = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_3_2]
-\frametitle{Figure 3.2: Capital in France, 1700--2010}
+\frametitle{Figure 3.2. Capital in France, 1700--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -519,7 +587,7 @@ ggplot(data = df_3_2, aes(x = Year, y = value, group = variable, fill = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_3_3]
-\frametitle{Figure 3.3: Public wealth in Britain, 1700--2010}
+\frametitle{Figure 3.3. Public wealth in Britain, 1700--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -536,7 +604,7 @@ ggplot(data = df_3_3, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_3_4]
-\frametitle{Figure 3.4: Public wealth in France, 1700--2010}
+\frametitle{Figure 3.4. Public wealth in France, 1700--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -553,7 +621,7 @@ ggplot(data = df_3_4, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_3_5]
-\frametitle{Figure 3.5: Private and public capital in Britain, 1700--2010}
+\frametitle{Figure 3.5. Private and public capital in Britain, 1700--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -570,7 +638,7 @@ ggplot(data = df_3_5, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_3_6]
-\frametitle{Figure 3.6: Private and public capital in France, 1700--2010}
+\frametitle{Figure 3.6. Private and public capital in France, 1700--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -587,7 +655,7 @@ ggplot(data = df_3_6, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_1]
-\frametitle{Figure 4.1: Capital in Germany, 1870--2010}
+\frametitle{Figure 4.1. Capital in Germany, 1870--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -604,13 +672,13 @@ ggplot(data = df_4_1, aes(x = Year, y = value, group = variable, fill = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_2]
-\frametitle{Figure 4.2: Public wealth in Germany, 1870--2010}
+\frametitle{Figure 4.2. Public wealth in Germany, 1870--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_4_2', out.width='1\\linewidth'>>=
 load("data/df_4_2.Rda")  # load data from /data subdirectory
-ggplot(data = df_4_2, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Public assets and debt (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1870, 2020, by = 20)) + scale_y_continuous(limits = c(0, 1.1), labels = percent, breaks = seq(0, 2.5, by = 0.25)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .9), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
+ggplot(data = df_4_2, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Public assets and debt (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1870, 2020, by = 20)) + scale_y_continuous(limits = c(0, 1.1), labels = percent, breaks = seq(0, 2.5, by = 0.25)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.18, .9), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
 @
 \caption{Public debt is worth almost one year of national income in Germany in 2010 (as much as assets).}
 \end{minipage}
@@ -621,7 +689,7 @@ ggplot(data = df_4_2, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_3]
-\frametitle{Figure 4.3: Private and public capital in Germany, 1870--2010}
+\frametitle{Figure 4.3. Private and public capital in Germany, 1870--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -638,7 +706,7 @@ ggplot(data = df_4_3, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_4]
-\frametitle{Figure 4.4: Private and public capital in Europe, 1870--2010}
+\frametitle{Figure 4.4. Private and public capital in Europe, 1870--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -655,7 +723,7 @@ ggplot(data = df_4_4, aes(x = Year, y = value, group = interaction(variable,Cate
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_5]
-\frametitle{Figure 4.5: National capital in Europe, 1870--2010}
+\frametitle{Figure 4.5. National capital in Europe, 1870--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -672,7 +740,7 @@ ggplot(data = df_4_5, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_6]
-\frametitle{Figure 4.6: Capital in the United States, 1770--2010}
+\frametitle{Figure 4.6. Capital in the United States, 1770--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -689,7 +757,7 @@ ggplot(data = df_4_6, aes(x = Year, y = value, group = variable, fill = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_7]
-\frametitle{Figure 4.7: Public wealth in the United States, 1770--2010}
+\frametitle{Figure 4.7. Public wealth in the United States, 1770--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -706,7 +774,7 @@ ggplot(data = df_4_7, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_8]
-\frametitle{Figure 4.8: Private and public capital in the United States, 1770--2010}
+\frametitle{Figure 4.8. Private and public capital in the United States, 1770--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -723,7 +791,7 @@ ggplot(data = df_4_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_9]
-\frametitle{Figure 4.9: Capital in Canada, 1860--2010}
+\frametitle{Figure 4.9. Capital in Canada, 1860--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -740,7 +808,7 @@ ggplot(data = df_4_9, aes(x = Year, y = value, group = variable, fill = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_10]
-\frametitle{Figure 4.10: Capital and slavery in the United States}
+\frametitle{Figure 4.10. Capital and slavery in the United States}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -757,7 +825,7 @@ ggplot(data = df_4_10, aes(x = Year, y = value, group = variable, fill = variabl
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_4_11]
-\frametitle{Figure 4.11: Capital around 1770--1810: Old and New World}
+\frametitle{Figure 4.11. Capital around 1770--1810: Old and New World}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -774,7 +842,7 @@ ggplot(data = df_4_11, aes(x = Country, y = value, group = variable, fill = vari
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_5_1]
-\frametitle{Figure 5.1: Private \& public capital in Europe \& United States, 1870--2010}
+\frametitle{Figure 5.1. Private \& public capital in Europe \& United States, 1870--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -791,7 +859,7 @@ ggplot(data = df_5_1, aes(x = Year, y = value, group = interaction(variable,Cate
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_5_2]
-\frametitle{Figure 5.2: National capital in Europe \& United States, 1870--2010}
+\frametitle{Figure 5.2. National capital in Europe \& United States, 1870--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -808,13 +876,13 @@ ggplot(data = df_5_2, aes(x = Year, y = value, group = interaction(variable,Cate
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_5_3]
-\frametitle{Figure 5.3: Private capital in rich countries, 1970--2010}
+\frametitle{Figure 5.3. Private capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_5_3', out.width='1\\linewidth'>>=
 load("data/df_5_3.Rda")  # load data from /data subdirectory
-ggplot(data = df_5_3, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Value of private capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(2, 8), labels = percent, breaks = seq(2, 9, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .7), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
+ggplot(data = df_5_3, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Value of private capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(2, 8), labels = percent, breaks = seq(2, 9, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.17, .7), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
 @
 \caption{Private capital is worth between 2 and 3.5 years of national income in rich countries in 1970, and between 4 and 7 years of national income in 2010.}
 \end{minipage}
@@ -824,15 +892,15 @@ ggplot(data = df_5_3, aes(x = Year, y = value, group = variable, colour = variab
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_5_3b]
-\frametitle{Figure 5.3b: Private capital in rich countries, 1970--2010}
+\begin{frame}[label=Figure_5_3S]
+\frametitle{Figure 5.3S. Private capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<'Figure_5_3b', out.width='1\\linewidth'>>=
-load("data/df_5_3b.Rda")  # load data from /data subdirectory
-# df_5_3b.Rda includes Spain
-ggplot(data = df_5_3, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Value of private capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(2, 8), labels = percent, breaks = seq(2, 9, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .7), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
+<<'Figure_5_3S', out.width='1\\linewidth'>>=
+load("data/df_5_3S.Rda")  # load data from /data subdirectory
+# df_5_3S.Rda includes Spain
+ggplot(data = df_5_3S, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Value of private capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(2, 8), labels = percent, breaks = seq(2, 9, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.17, .7), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
 @
 \caption{Private capital is worth between 2 and 3.5 years of national income in rich countries in 1970, and between 4 and 7 years of national income in 2010.}
 \end{minipage}
@@ -843,13 +911,13 @@ ggplot(data = df_5_3, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_5_4]
-\frametitle{Figure 5.4: Private capital in rich countries (ratio), 1970--2010}
+\frametitle{Figure 5.4. Private capital measured in years of disposable income, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_5_4', out.width='1\\linewidth'>>=
 load("data/df_5_4.Rda")  # load data from /data subdirectory
-ggplot(data = df_5_4, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Private capital (% disposable household income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(3, 10, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .7), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
+ggplot(data = df_5_4, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Private capital (% disposable household income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(3, 10, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.17, .7), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
 @
 \caption{Expressed in years of household disposable income (about 70--80\% of national income), the capital/income ratio appears to be larger than when it is expressed in years of national income.}
 \end{minipage}
@@ -859,15 +927,15 @@ ggplot(data = df_5_4, aes(x = Year, y = value, group = variable, colour = variab
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_5_4b]
-\frametitle{Figure 5.4b: Private capital in rich countries (ratio), 1970--2010}
+\begin{frame}[label=Figure_5_4S]
+\frametitle{Figure 5.4S. Private capital measured in years of disposable income, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<'Figure_5_4b', out.width='1\\linewidth'>>=
-load("data/df_5_4b.Rda")  # load data from /data subdirectory
-# df_5_4b.Rda includes Spain
-ggplot(data = df_5_4, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Private capital (% disposable household income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(3, 10, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.2, .7), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
+<<'Figure_5_4S', out.width='1\\linewidth'>>=
+load("data/df_5_4S.Rda")  # load data from /data subdirectory
+# df_5_4S.Rda includes Spain
+ggplot(data = df_5_4S, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Private capital (% disposable household income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(labels = percent, breaks = seq(3, 10, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.17, .7), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 1)) 
 @
 \caption{Expressed in years of household disposable income (about 70--80\% of national income), the capital/income ratio appears to be larger than when it is expressed in years of national income.}
 \end{minipage}
@@ -877,14 +945,14 @@ ggplot(data = df_5_4, aes(x = Year, y = value, group = variable, colour = variab
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_5_5S]
-\frametitle{Figure 5.5S: Public capital in rich countries, 1970--2010}
+\begin{frame}[label=Figure_5_5X]
+\frametitle{Figure 5.5X. Public capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<'Figure_5_5S', out.width='1\\linewidth'>>=
-load("data/df_5_5S.Rda")  # load data from /data subdirectory
-ggplot(data = df_5_5S, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Value of public capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-.7, 1.55), labels = percent, breaks = seq(-.8, 1.6, by = .2)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .9), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 4)) 
+<<'Figure_5_5X', out.width='1\\linewidth'>>=
+load("data/df_5_5X.Rda")  # load data from /data subdirectory
+ggplot(data = df_5_5X, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Value of public capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-.7, 1.55), labels = percent, breaks = seq(-.8, 1.6, by = .2)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.65, .9), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 4)) 
 @
 \caption{In France, Britain, Germany, and the United States, government deficits exceeded public investment by 2--3\% of national income on average over the period 1970--2010, compared with more than 6\% in Italy.}
 \end{minipage}
@@ -894,15 +962,15 @@ ggplot(data = df_5_5S, aes(x = Year, y = value, group = variable, colour = varia
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_5_5Sb]
-\frametitle{Figure 5.5Sb: Public capital in rich countries, 1970--2010}
+\begin{frame}[label=Figure_5_5XS]
+\frametitle{Figure 5.5XS. Public capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<'Figure_5_5Sb', out.width='1\\linewidth'>>=
-load("data/df_5_5Sb.Rda")  # load data from /data subdirectory
-# df_5_5Sb.Rda includes Spain
-ggplot(data = df_5_5Sb, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Value of public capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-.7, 1.55), labels = percent, breaks = seq(-.8, 1.6, by = .2)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .9), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 4)) 
+<<'Figure_5_5XS', out.width='1\\linewidth'>>=
+load("data/df_5_5XS.Rda")  # load data from /data subdirectory
+# df_5_5XS.Rda includes Spain
+ggplot(data = df_5_5XS, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Value of public capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-.7, 1.55), labels = percent, breaks = seq(-.8, 1.6, by = .2)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.65, .9), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 4)) 
 @
 \caption{In France, Britain, Germany, and the United States, government deficits exceeded public investment by 2--3\% of national income on average over the period 1970--2010, compared with more than 6\% in Italy.}
 \end{minipage}
@@ -913,13 +981,13 @@ ggplot(data = df_5_5Sb, aes(x = Year, y = value, group = variable, colour = vari
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_5_5]
-\frametitle{Figure 5.5: Private and public capital in rich countries, 1970--2010}
+\frametitle{Figure 5.5. Private and public capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_5_5', out.width='1\\linewidth'>>= ## out.height='0.75\\textheight'
 load("data/df_5_5.Rda")  # load data from /data subdirectory
-ggplot(data = df_5_5, aes(x = Year, y = value, group = interaction(variable,Category), colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Value of capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-1, 9), labels = percent, breaks = seq(-1, 9, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank(), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
+ggplot(data = df_5_5, aes(x = Year, y = value, group = interaction(variable,Category), colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Value of capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-1, 9), labels = percent, breaks = seq(-1, 9, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.22, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank(), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
 @
 \caption{In Italy, private capital rose from 240\% to 680\% in national income between 1970 and 2010, while public capital dropped from 20\% to -70\%.}
 \end{minipage}
@@ -930,7 +998,7 @@ ggplot(data = df_5_5, aes(x = Year, y = value, group = interaction(variable,Cate
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_5_6]
-\frametitle{Figure 5.6: Market value and book value of corporations, 1970--2010}
+\frametitle{Figure 5.6. Market value and book value of corporations, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -947,7 +1015,7 @@ ggplot(data = df_5_6, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_5_7]
-\frametitle{Figure 5.7: National capital in rich countries, 1970--2010}
+\frametitle{Figure 5.7. National capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -963,14 +1031,14 @@ ggplot(data = df_5_7, aes(x = Year, y = value, group = interaction(variable,Cate
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_5_7b]
-\frametitle{Figure 5.7b: National capital in rich countries, 1970--2010}
+\begin{frame}[label=Figure_5_7S]
+\frametitle{Figure 5.7S. National capital in rich countries, 1970--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<'Figure_5_7b', out.width='1\\linewidth'>>=  ##out.height='0.75\\textheight'
-load("data/df_5_7b.Rda")  # load data from /data subdirectory
-ggplot(data = df_5_7b, aes(x = Year, y = value, group = interaction(variable,Category), colour = variable, shape = variable)) + geom_line() + geom_point(aes(colour = variable, shape = variable), size = 3) + ylab("Value of capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-1, 9), labels = percent, breaks = seq(-1, 10, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.22, .83), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
+<<'Figure_5_7S', out.width='1\\linewidth'>>=  ##out.height='0.75\\textheight'
+load("data/df_5_7S.Rda")  # load data from /data subdirectory
+ggplot(data = df_5_7S, aes(x = Year, y = value, group = interaction(variable,Category), colour = variable, shape = variable)) + geom_line() + geom_point(aes(colour = variable, shape = variable), size = 3) + ylab("Value of capital (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(-1, 9), labels = percent, breaks = seq(-1, 10, by = 1)) + scale_shape_manual(name = "Country", values = shapePalettePaired) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.22, .83), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
 @
 \caption{Net foreign assets held by Japan and Germany are worth between 6 months and one year of national income in 2010.}
 \end{minipage}
@@ -981,7 +1049,7 @@ ggplot(data = df_5_7b, aes(x = Year, y = value, group = interaction(variable,Cat
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_5_8]
-\frametitle{Figure 5.8: The world capital/income ratio, 1870--2100}
+\frametitle{Figure 5.8. The world capital/income ratio, 1870--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -998,7 +1066,7 @@ ggplot(data = df_5_8, aes(x = Year, y = value)) + geom_line(aes(group = variable
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_1]
-\frametitle{Figure 6.1: The capital-labor split in Britain, 1770--2010}
+\frametitle{Figure 6.1. The capital-labor split in Britain, 1770--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1015,7 +1083,7 @@ ggplot(data = df_6_1, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_2]
-\frametitle{Figure 6.2: The capital-labor split in France, 1820--2010}
+\frametitle{Figure 6.2. The capital-labor split in France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1032,7 +1100,7 @@ ggplot(data = df_6_2, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_3]
-\frametitle{Figure 6.3: The pure rate of return on capital in Britain, 1770--2010}
+\frametitle{Figure 6.3. The pure rate of return on capital in Britain, 1770--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1049,7 +1117,7 @@ ggplot(data = df_6_3, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_4]
-\frametitle{Figure 6.4: The pure rate of return on capital in France, 1820--2010}
+\frametitle{Figure 6.4. The pure rate of return on capital in France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1066,7 +1134,7 @@ ggplot(data = df_6_4, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_5]
-\frametitle{Figure 6.5: The capital share in rich countries, 1975--2010}
+\frametitle{Figure 6.5. The capital share in rich countries, 1975--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1083,7 +1151,7 @@ ggplot(data = df_6_5, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_6]
-\frametitle{Figure 6.6: The profit share in the value added of corporations in France, 1900--2010}
+\frametitle{Figure 6.6. The profit share in the value added of corporations in France, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1100,7 +1168,7 @@ ggplot(data = df_6_6, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_7]
-\frametitle{Figure 6.7: The share of housing rent in national income in France, 1900--2010}
+\frametitle{Figure 6.7. The share of housing rent in national income in France, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1117,7 +1185,7 @@ ggplot(data = df_6_7, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_6_8]
-\frametitle{Figure 6.8: The capital share in national income in France, 1900--2010}
+\frametitle{Figure 6.8. The capital share in national income in France, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1133,14 +1201,32 @@ ggplot(data = df_6_8, aes(x = Year, y = value, group = variable, colour = variab
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[label=Figure_6_8b]
-\frametitle{Figure 6.8b: The capital share in national income in France, 1900--2010}
+\begin{frame}[label=Figure_6_8S]
+\frametitle{Figure 6.8S. The capital share in national income in France, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
-<<'Figure_6_8b', out.width='1\\linewidth'>>=
-load("data/df_6_8b.Rda")  # load data from /data subdirectory
-ggplot(data = df_6_8b, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Capital share in national income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(limits = c(0, .5), labels = percent, breaks = seq(0, .5, by = .1)) + scale_shape_manual(name = "France", values = shapePalette) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.65, .85), legend.background = element_rect(colour = 'black')) 
+<<'Figure_6_8S', out.width='1\\linewidth'>>=
+load("data/df_6_8S.Rda")  # load data from /data subdirectory
+ggplot(data = df_6_8S, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Capital share in national income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(limits = c(0, .5), labels = percent, breaks = seq(0, .5, by = .1)) + scale_shape_manual(name = "France", values = shapePalette) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.65, .85), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The share of capital income (net profits and rents) rose from 15 percent of national income in 1982 to 27 percent in 2010.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_7_1X]
+\frametitle{Figure 7.1X. Examples of Gini-Lorenz curves}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure_7_1X', out.width='1\\linewidth'>>=
+load("data/df_7_1X.Rda")  # load data from /data subdirectory
+# Figure from sheet FS7.1 but not in book
+ggplot(data = df_7_1X, aes(x = x, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 2) + ylab("Total income owned by the poorest x%") + geom_line(aes(x = x, y = x), colour = "black") + xlab(NULL) + theme_bw() + scale_x_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Examples of distribution", values = shapePalette) + scale_colour_manual(name = "Examples of distribution", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.35, .85), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The share of capital income (net profits and rents) rose from 15 percent of national income in 1982 to 27 percent in 2010.}
 \end{minipage}
@@ -1243,7 +1329,7 @@ ggplot(data = df_8_5, aes(x = Year, y = value, group = variable, colour = variab
 \centering
 <<'Figure_8_6', out.width='1\\linewidth'>>=
 load("data/df_8_6.Rda")  # load data from /data subdirectory
-ggplot(data = df_8_6, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of the different groups in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0.08, .24, by = .02), limits = c(.08, .25)) + scale_shape_manual(name = "Annual incomes in 2010", values = shapePalettePaired) + scale_colour_manual(name = "Annual incomes in 2010", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .85), legend.background = element_rect(colour = 'black')) 
+ggplot(data = df_8_6, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of the different groups in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(0.08, .24, by = .02), limits = c(.08, .25)) + scale_shape_manual(name = "Annual incomes in 2010", values = shapePalettePaired) + scale_colour_manual(name = "Annual incomes in 2010", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .85), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The rise of the top decile income share since the 1970s is mostly due to the top percentile.}
 \end{minipage}
@@ -1260,7 +1346,7 @@ ggplot(data = df_8_6, aes(x = Year, y = value, group = variable, colour = variab
 \centering
 <<'Figure_8_7', out.width='1\\linewidth'>>=
 load("data/df_8_7.Rda")  # load data from /data subdirectory
-ggplot(data = df_8_7, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile in total (incomes or wages)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.2, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in total", values = shapePalettePaired) + scale_colour_manual(name = "Share of top decile in total", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .85), legend.background = element_rect(colour = 'black')) 
+ggplot(data = df_8_7, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile in total (incomes or wages)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.2, .5, by = .05)) + scale_shape_manual(name = "Share of top decile in total", values = shapePalettePaired) + scale_colour_manual(name = "Share of top decile in total", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .85), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The rise of income inequality since the 1970s is largely due to the rise of wage inequality.}
 \end{minipage}
@@ -1320,32 +1406,39 @@ ggplot(data = df_8_10, aes(x = Quantile, y = value, group = variable, colour = v
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+% FIX THIS
+\begin{comment}
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_1]
-\frametitle{Figure 9.1: Minimum wage in France and the United States, 1950--2013}
+\frametitle{Figure 9.1. Minimum wage in France and the United States, 1950--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_9_1', out.width='1\\linewidth'>>=
-#load("data/df_9_1.Rda")  # load data from /data subdirectory
-#ggplot(data = df_9_1, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Hourly minimum wage \n[TO DO: CHANGE DOLLAR SIGN TO EURO] \n MAKE DOUBLE Y-SCALE") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1950, 2015, by = 5)) + scale_y_continuous(limits = c(0, 10), labels = dollar, breaks = seq(0, 10, by = 1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .25), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_9_1.Rda")  # load data from /data subdirectory
+lhs <- ggplot(data = subset(df_9_1, variable %in% c("Year", "United States (2013 euros)", "France (2013 euros)")), aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + xlab(NULL) + ylab("Hourly minimum wage (2013 euros)") + theme_bw() + theme(panel.grid.major = element_line(size = 0.4, colour = "grey80")) + scale_x_continuous(breaks = seq(1950, 2015, by = 5)) + scale_y_continuous(limits = c(1, 10), labels = euro, breaks = seq(0, 10, by = 1)) + scale_shape_manual(name = "Hourly Minimum Wage", values = shapePalette) + scale_colour_manual(name = "Hourly Minimum Wage", values = colorPalette) + theme(legend.key = element_blank(), legend.position = "top", legend.background = element_rect(colour = 'black', fill = 'white')) + guides(shape = guide_legend(ncol = 1))
+rhs <- ggplot(data = subset(df_9_1, variable %in% c("Year", "United States (2013 dollars)")), aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line(size = 0, color = 'white', show_guide = FALSE) + xlab(NULL) + ylab("\n Hourly minimum wage (2013 dollars)") + theme_bw() + theme(panel.grid.major = element_line(size = 0.4, linetype = "solid", colour = "White Smoke"), panel.grid.minor = element_blank()) + scale_x_continuous(breaks = NULL) + scale_y_continuous(limits = 1.2*c(1, 10), labels = dollar, breaks = seq(0, 12, by = 1))  # the rhs grid lines overwrite the legend: Tweaked by stopping grid lines before the top.
+p <- ggplot_dual_axis(lhs = lhs, rhs = rhs)
+p
+#  This figure makes use of custom function ggplot_dual_axis() ... hackish!
 @
 \caption{Expressed in 2013 purchasing power, the hourly minimum wage rose from \$3.80 to \$7.30 between 1950 and 2013 in the United States, and from \euro 2.10 to \euro 9.40 in France.}
 \end{minipage}
 \end{figure}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{comment}
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_2]
-\frametitle{Figure 9.2: Income inequality in Anglo-Saxon countries, 1910--2010}
+\frametitle{Figure 9.2. Income inequality in Anglo-Saxon countries, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_9_2', out.width='1\\linewidth'>>=
-#load("data/df_9_2.Rda")  # load data from /data subdirectory
-#ggplot(data = df_9_2, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top percentile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(0, .25), labels = percent, breaks = seq(0, .25, by = .02)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_9_2.Rda")  # load data from /data subdirectory
+ggplot(data = df_9_2, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top percentile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(.04, .25), labels = percent, breaks = seq(0, .25, by = .02)) + scale_shape_manual(name = "Share of top 1% in total income", values = shapePalette) + scale_colour_manual(name = "Share of top 1% in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .8), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The share of top percentile in total income rose since the 1970s in all Anglo-Saxon countries, but with different magnitudes.}
 \end{minipage}
@@ -1356,13 +1449,13 @@ ggplot(data = df_8_10, aes(x = Quantile, y = value, group = variable, colour = v
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_3]
-\frametitle{Figure 9.3: Income inequality in Continental Europe and Japan, 1910--2010}
+\frametitle{Figure 9.3. Income inequality in Continental Europe and Japan, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_9_3', out.width='1\\linewidth'>>=
-#load("data/df_9_3.Rda")  # load data from /data subdirectory
-#ggplot(data = df_9_3, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top percentile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(0, .25), labels = percent, breaks = seq(0, .25, by = .02)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_9_3.Rda")  # load data from /data subdirectory
+ggplot(data = df_9_3, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top percentile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(.03, .25), labels = percent, breaks = seq(0, .25, by = .02)) + scale_shape_manual(name = "Share of top 1% in total income", values = shapePalette) + scale_colour_manual(name = "Share of top 1% in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .8), legend.background = element_rect(colour = 'black'))
 @
 \caption{As compared to Anglo-Saxon countries, the share of top percentile barely increased since the 1970s in Continental Europe and Japan.}
 \end{minipage}
@@ -1373,13 +1466,13 @@ ggplot(data = df_8_10, aes(x = Quantile, y = value, group = variable, colour = v
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_4]
-\frametitle{Figure 9.4: Income inequality in Northern and Southern Europe, 1910--2010}
+\frametitle{Figure 9.4. Income inequality in Northern and Southern Europe, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_9_4', out.width='1\\linewidth'>>=
-#load("data/df_9_4.Rda")  # load data from /data subdirectory
-#ggplot(data = df_9_4, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top percentile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(0, .24), labels = percent, breaks = seq(0, .25, by = .02)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_9_4.Rda")  # load data from /data subdirectory
+ggplot(data = df_9_4, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top percentile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(.04, .24), labels = percent, breaks = seq(0, .25, by = .02)) + scale_shape_manual(name = "Share of top 1% in total income", values = shapePalette) + scale_colour_manual(name = "Share of top 1% in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .8), legend.background = element_rect(colour = 'black')) 
 @
 \caption{As compared to Anglo-Saxon countries, the top percentile income share barely increased in Northern and Southern Europe since the 1970s.}
 \end{minipage}
@@ -1390,13 +1483,14 @@ ggplot(data = df_8_10, aes(x = Quantile, y = value, group = variable, colour = v
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_5]
-\frametitle{Figure 9.5: The top decile income share in Anglo-Saxon countries, 1910--2010}
+\frametitle{Figure 9.5. The top 0.1\% income share in Anglo-Saxon countries, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_9_5', out.width='1\\linewidth'>>=
-#load("data/df_9_5.Rda")  # load data from /data subdirectory
-#ggplot(data = df_9_5, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top 0.1% in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(0, .12), labels = percent, breaks = seq(0, .12, by = .01)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+# Figure title incorrect in book, "Top decile" should read "Top thousandile"!
+load("data/df_9_5.Rda")  # load data from /data subdirectory
+ggplot(data = df_9_5, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top 0.1% in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(0, .12), labels = percent, breaks = seq(0, .12, by = .01)) + scale_shape_manual(name = "Share of top 0.1% in total income", values = shapePalette) + scale_colour_manual(name = "Share of top 0.1% in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .8), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The share of the top 0.1 percent highest incomes in total income rose sharply since the 1970s in all Anglo-Saxon countries, but with varying magnitudes.}
 \end{minipage}
@@ -1406,14 +1500,32 @@ ggplot(data = df_8_10, aes(x = Quantile, y = value, group = variable, colour = v
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_5X]
+\frametitle{Figure 9.5X. The top decile income share in Anglo-Saxon countries, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure_9_5X', out.width='1\\linewidth'>>=
+load("data/df_9_5X.Rda")  # load data from /data subdirectory
+ggplot(data = df_9_5X, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(.25, .5), labels = percent, breaks = seq(0, .6, by = .05)) + scale_shape_manual(name = "Share of top 10% in total income", values = shapePalette) + scale_colour_manual(name = "Share of top 10% in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .8), legend.background = element_rect(colour = 'black'))
+@
+\caption{The share of the top decile of highest incomes rose sharply in the 1980s and 1990s in all Anglo-Saxon countries, and in particular in the United States and United Kingdom.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_6]
-\frametitle{Figure 9.6: The top decile income share in Continental Europe and Japan, 1910--2010}
+\frametitle{Figure 9.6. The top 0.1\% income share in Continental Europe and Japan, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_9_6', out.width='1\\linewidth'>>=
-#load("data/df_9_6.Rda")  # load data from /data subdirectory
-#ggplot(data = df_9_6, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top 0.1% in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(0, .12), labels = percent, breaks = seq(0, .12, by = .01)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+# Figure title incorrect in book, "Top decile" should read "Top thousandile"!
+load("data/df_9_6.Rda")  # load data from /data subdirectory
+ggplot(data = df_9_6, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top 0.1% in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(0, .12), labels = percent, breaks = seq(0, .12, by = .01)) + scale_shape_manual(name = "Share of top 0.1% in total income", values = shapePalette) + scale_colour_manual(name = "Share of top 0.1% in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .8), legend.background = element_rect(colour = 'black')) 
 @
 \caption{As compared to Anglo-Saxon countries, the top 0.1 percent income share barely increased in Continental Europe and Japan.}
 \end{minipage}
@@ -1423,16 +1535,50 @@ ggplot(data = df_8_10, aes(x = Quantile, y = value, group = variable, colour = v
 
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_6X]
+\frametitle{Figure 9.6X. The top decile income share in Continental Europe and Japan, 1910--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure_9_6X', out.width='1\\linewidth'>>=
+load("data/df_9_6X.Rda")  # load data from /data subdirectory
+ggplot(data = df_9_6X, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(.2, .5), labels = percent, breaks = seq(0, .6, by = .05)) + scale_shape_manual(name = "Share of top 10% in total income", values = shapePalette) + scale_colour_manual(name = "Share of top 10% in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .8), legend.background = element_rect(colour = 'black')) 
+@
+\caption{As compared to Anglo-Saxon countries, the top 10 percent income share has barely increased in Continental Europe.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_7]
-\frametitle{Figure 9.7: The top decile income share in Europe and the United States, 1900--2010}
+\frametitle{Figure 9.7. The top decile income share in Europe and the United States, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_9_7', out.width='1\\linewidth'>>=
-#load("data/df_9_7.Rda")  # load data from /data subdirectory
-#ggplot(data = df_9_7, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(limits = c(.2, .5), labels = percent, breaks = seq(.2, .5, by = .025)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_9_7.Rda")  # load data from /data subdirectory
+ggplot(data = df_9_7, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(limits = c(.2, .58), labels = percent, breaks = seq(0, .6, by = .05)) + scale_shape_manual(name = "Share of top 10% in total income", values = shapePalette) + scale_colour_manual(name = "Share of top 10% in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .8), legend.background = element_rect(colour = 'black'))
 @
 \caption{In the 1950s--1970s, the top decile income share was about 30--35 percent of total income in Europe as in the United States.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_9_7X]
+\frametitle{Figure 9.7X. The top 0.1\% income share in Europe and the United States, 1900--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure_9_7X', out.width='1\\linewidth'>>=
+load("data/df_9_7X.Rda")  # load data from /data subdirectory
+ggplot(data = df_9_7X, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top 0.1% in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(limits = c(0, .13), labels = percent, breaks = seq(0, .15, by = .02)) + scale_shape_manual(name = "Share of top 0.1% in total income", values = shapePalette) + scale_colour_manual(name = "Share of top 0.1% in total income", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.6, .8), legend.background = element_rect(colour = 'black')) 
+@
+\caption{In the 1950s the top 0.1\% income share was about 2--4\% percent of total income in Europe and in the United States.}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1447,7 +1593,7 @@ ggplot(data = df_8_10, aes(x = Quantile, y = value, group = variable, colour = v
 \centering
 <<'Figure_9_8', out.width='1\\linewidth'>>=
 load("data/df_9_8.Rda")  # load data from /data subdirectory
-ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile in national income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(labels = percent, breaks = seq(.25, .5, by = .05)) + scale_shape_manual(name = "Share of top decile \n in national income", values = shapePalettePaired[1:2]) + scale_colour_manual(name = "Share of top decile \n in national income", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.55, .85), legend.background = element_rect(colour = 'black')) 
+ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1900, 2010, by = 10)) + scale_y_continuous(limits = c(.25, .55), labels = percent, breaks = seq(.25, .6, by = .05)) + scale_shape_manual(name = "Share of top 10% in total income", values = shapePalettePaired[1:2]) + scale_colour_manual(name = "Share of top 10% in total income", values = colorPalette[1:2]) + theme(legend.key = element_blank(), legend.position = c(.6, .85), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The top decile income share was higher in Europe than in the U.S. in 1900--2010. It is much higher in the U.S. in 2000--2010.}
 \end{minipage}
@@ -1458,13 +1604,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_9_9]
-\frametitle{Figure 9.9: Income inequality in emerging countries, 1910--2010}
+\frametitle{Figure 9.9. Income inequality in emerging countries, 1910--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_9_9', out.width='1\\linewidth'>>=
-#load("data/df_9_9.Rda")  # load data from /data subdirectory
-#ggplot(data = df_9_9, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top percentile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(0, .28), labels = percent, breaks = seq(0, .28, by = .02)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_9_9.Rda")  # load data from /data subdirectory
+ggplot(data = df_9_9, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top percentile in total income") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1910, 2010), breaks = seq(1910, 2010, by = 10)) + scale_y_continuous(limits = c(.035, .26), labels = percent, breaks = seq(0, .28, by = .02)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .15), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2))
 @
 \caption{Measured by the top percentile income share, income inequality rose in emerging countries since the 1980s, but ranks below the US level in 2000--2010.}
 \end{minipage}
@@ -1475,13 +1621,30 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_1]
-\frametitle{Figure 10.1: Wealth inequality in France, 1810--2010}
+\frametitle{Figure 10.1. Wealth inequality in France, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_1', out.width='1\\linewidth'>>=
-#load("data/df_10_1.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_1, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .25), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_1.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_1, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "France", values = shapePalette) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .25), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The top decile (the top 10 percent highest wealth holders) owns 80--90 percent of total wealth in 1810--1910, and 60--65 percent today.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_1S]
+\frametitle{Figure 10.1S. Wealth inequality in France, 1810--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure_10_1S', out.width='1\\linewidth'>>=
+load("data/df_10_1S.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_1S, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top quantiles in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "France", values = shapePalette) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.85, .9), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The top decile (the top 10 percent highest wealth holders) owns 80--90 percent of total wealth in 1810--1910, and 60--65 percent today.}
 \end{minipage}
@@ -1492,13 +1655,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_2]
-\frametitle{Figure 10.2: Wealth inequality in Paris versus France, 1810--2010}
+\frametitle{Figure 10.2. Wealth inequality in Paris versus France, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_2', out.width='1\\linewidth'>>=
-#load("data/df_10_2.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_2, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, .8), labels = percent, breaks = seq(0, .8, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .25), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_2.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_2, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, .71), labels = percent, breaks = seq(0, .8, by = .1)) + scale_shape_manual(name = "Paris vs France", values = shapePalette) + scale_colour_manual(name = "Paris vs France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .25), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The top percentile (the top 1 percent wealth holders) owns 70 percent of aggregate wealth in Paris on the eve of World War I.}
 \end{minipage}
@@ -1509,13 +1672,30 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_3]
-\frametitle{Figure 10.3: Wealth inequality in Britain, 1810--2010}
+\frametitle{Figure 10.3. Wealth inequality in Britain, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_3', out.width='1\\linewidth'>>=
-#load("data/df_10_3.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_3, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .25), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_3.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_3, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or of top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "United Kingdom", values = shapePalette) + scale_colour_manual(name = "United Kingdom", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .25), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The top decile owns 80--90 percent of total wealth in 1810--1910, and 70 percent today.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_3S]
+\frametitle{Figure 10.3S. Wealth inequality in the United Kingdom, 1810--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure_10_3S', out.width='1\\linewidth'>>=
+load("data/df_10_3S.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_3S, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or of top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "United Kingdom", values = shapePalette) + scale_colour_manual(name = "United Kingdom", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .25), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The top decile owns 80--90 percent of total wealth in 1810--1910, and 70 percent today.}
 \end{minipage}
@@ -1526,13 +1706,30 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_4]
-\frametitle{Figure 10.4: Wealth inequality in Sweden, 1810--2010}
+\frametitle{Figure 10.4. Wealth inequality in Sweden, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_4', out.width='1\\linewidth'>>=
-#load("data/df_10_4.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_4, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .25), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_4.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_4, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or of top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Sweden", values = shapePalette) + scale_colour_manual(name = "Sweden", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .25), legend.background = element_rect(colour = 'black')) 
+@
+\caption{The top 10 percent holds 80--90 percent of total wealth in 1810--1910 and 55--60 percent today.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_4S]
+\frametitle{Figure 10.4S. Wealth inequality in Sweden, 1810--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure_10_4S', out.width='1\\linewidth'>>=
+load("data/df_10_4S.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_4S, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or of top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Sweden", values = shapePalette) + scale_colour_manual(name = "Sweden", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .25), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The top 10 percent holds 80--90 percent of total wealth in 1810--1910 and 55--60 percent today.}
 \end{minipage}
@@ -1543,13 +1740,30 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_5]
-\frametitle{Figure 10.5: Wealth inequality in the United States, 1810--2010}
+\frametitle{Figure 10.5. Wealth inequality in the United States, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_5', out.width='1\\linewidth'>>=
-#load("data/df_10_5.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_5, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.55, .25), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_5.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_5, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or of top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.85, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+@
+\caption{The top 10 percent wealth holders own about 80 percent of total wealth in 1910 and 75 percent today.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_5S]
+\frametitle{Figure 10.5S. Wealth inequality in the United States, 1810--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure_10_5S', out.width='1\\linewidth'>>=
+load("data/df_10_5S.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_5S, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or of top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.85, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
 @
 \caption{The top 10 percent wealth holders own about 80 percent of total wealth in 1910 and 75 percent today.}
 \end{minipage}
@@ -1560,13 +1774,30 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_6]
-\frametitle{Figure 10.6: Wealth inequality in Europe versus the United States, 1810--2010}
+\frametitle{Figure 10.6. Wealth inequality in Europe versus the United States, 1810--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_6', out.width='1\\linewidth'>>=
-#load("data/df_10_6.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_6, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .25), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_6.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_6, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or of top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Category", values = shapePalettePaired) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .1), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2))
+@
+\caption{Until the mid-twentieth century, wealth inequality was higher in Europe than in the United States.}
+\end{minipage}
+\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[label=Figure_10_6S]
+\frametitle{Figure 10.6S. Wealth inequality in Europe versus the United States, 1810--2010}
+\begin{figure}[t]
+\begin{minipage}[b]{\textwidth}
+\centering
+<<'Figure_10_6S', out.width='1\\linewidth'>>=
+load("data/df_10_6S.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_6S, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of top decile or of top percentile in total wealth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1810, 2010, by = 20)) + scale_y_continuous(limits = c(0, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = "bottom", legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2))
 @
 \caption{Until the mid-twentieth century, wealth inequality was higher in Europe than in the United States.}
 \end{minipage}
@@ -1577,13 +1808,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_7]
-\frametitle{Figure 10.7: Return to capital and growth: France, 1820--1913}
+\frametitle{Figure 10.7. Return to capital and growth: France, 1820--1913}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_7', out.width='1\\linewidth'>>=
-#load("data/df_10_7.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_7, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual rate of return or rate of growth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1820, 1913, by = 10)) + scale_y_continuous(limits = c(0, .7), labels = percent, breaks = seq(0, .7, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .5), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_7.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_7, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual rate of return or rate of growth") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1820, 1913, by = 10)) + scale_y_continuous(limits = c(0, .07), labels = percent, breaks = seq(0, .1, by = .01)) + scale_shape_manual(name = "France", values = shapePalette) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .45), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The rate of return on capital is a lot higher than the growth rate in France between 1820 and 1913.}
 \end{minipage}
@@ -1594,13 +1825,17 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_8]
-\frametitle{Figure 10.8: Capital share and saving rate: France, 1820--1913}
+\frametitle{Figure 10.8. Capital share and saving rate: France, 1820--1913}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_8', out.width='1\\linewidth'>>=
-#load("data/df_10_8.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_8, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Capital share or saving rate (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1820, 1913, by = 10)) + scale_y_continuous(limits = c(0, .5), labels = percent, breaks = seq(0, .5, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .25), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_8.Rda")  # load data from /data subdirectory
+# manually fix legend labels to display symbols
+labels_fixed <- as.list(expression(
+    paste("National saving rate (s)"),
+    paste("Capital income share (", alpha, ")"))) 
+ggplot(data = df_10_8, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Capital share or saving rate (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1820, 1913, by = 10)) + scale_y_continuous(limits = c(0, .45), labels = percent, breaks = seq(0, .5, by = .05)) + scale_shape_manual(name = "France", values = shapePalette, labels = labels_fixed) + scale_colour_manual(name = "France", values = colorPalette, labels = labels_fixed) + theme(legend.key = element_blank(), legend.position = c(.25, .45), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The share of capital income in national income is much larger than the saving rate in France between 1820 and 1913.}
 \end{minipage}
@@ -1611,13 +1846,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_9]
-\frametitle{Figure 10.9: Rate of return versus growth rate at the world level, from Antiquity until 2100}
+\frametitle{Figure 10.9. Rate of return versus growth rate at the world level, from Antiquity until 2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_9', out.width='1\\linewidth'>>=
-#load("data/df_10_9.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_9, aes(x = Period, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual rate of return or rate of growth") + xlab(NULL) + theme_bw() + scale_y_continuous(limits = c(0, .6), labels = percent, breaks = seq(0, .6, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .5), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_9.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_9, aes(x = Period, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual rate of return or rate of growth") + xlab(NULL) + theme_bw() + scale_y_continuous(limits = c(0, .06), labels = percent, breaks = seq(0, .1, by = .01)) + scale_shape_manual(name = "World", values = shapePalette) + scale_colour_manual(name = "World", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .45), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The rate of return to capital (pretax) has always been higher than the world growth rate, but the gap was reduced during the twentieth century, and might widen again in the twenty-first century.}
 \end{minipage}
@@ -1628,13 +1863,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_10]
-\frametitle{Figure 10.10: After tax rate of return versus growth rate at the world level, from Antiquity until 2100}
+\frametitle{Figure 10.10. After tax rate of return versus growth rate at the world level, from Antiquity until 2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_10', out.width='1\\linewidth'>>=
-#load("data/df_10_10.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_10, aes(x = Period, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual rate of return or rate of growth") + xlab(NULL) + theme_bw() + scale_y_continuous(limits = c(0, .6), labels = percent, breaks = seq(0, .6, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .5), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_10.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_10, aes(x = Period, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual rate of return or rate of growth") + xlab(NULL) + theme_bw() + scale_y_continuous(limits = c(0, .06), labels = percent, breaks = seq(0, .1, by = .01)) + scale_shape_manual(name = "World", values = shapePalette) + scale_colour_manual(name = "World", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .45), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The rate of return to capital (after tax and capital losses) fell below the growth rate during the twentieth century, and may again surpass it in the twenty-first century.}
 \end{minipage}
@@ -1645,13 +1880,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_10_11]
-\frametitle{Figure 10.11: After tax rate of return versus growth rate at the world level, from Antiquity until 2200}
+\frametitle{Figure 10.11. After tax rate of return versus growth rate at the world level, from Antiquity until 2200}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_10_11', out.width='1\\linewidth'>>=
-#load("data/df_10_11.Rda")  # load data from /data subdirectory
-#ggplot(data = df_10_11, aes(x = Period, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual rate of return or rate of growth") + xlab(NULL) + theme_bw() + scale_y_continuous(limits = c(0, .6), labels = percent, breaks = seq(0, .6, by = .1)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .5), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_10_11.Rda")  # load data from /data subdirectory
+ggplot(data = df_10_11, aes(x = Period, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual rate of return or rate of growth") + xlab(NULL) + theme_bw() + scale_y_continuous(limits = c(0, .06), labels = percent, breaks = seq(0, .1, by = .01)) + scale_shape_manual(name = "World", values = shapePalette) + scale_colour_manual(name = "World", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .45), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The rate of return to capital (after tax and capital losses) fell below the growth rate during the twentieth century, and might again surpass it in the twenty-first century.}
 \end{minipage}
@@ -1662,13 +1897,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_1]
-\frametitle{Figure 11.1: The annual inheritance flow as a fraction of national income, France, 1820--2010}
+\frametitle{Figure 11.1. The annual inheritance flow as a fraction of national income, France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_11_1', out.width='1\\linewidth'>>=
-#load("data/df_11_1.Rda")  # load data from /data subdirectory
-#ggplot(data = df_11_1, aes(x = Period, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual value of inheritance and gifts \n(% national income)") + xlab(NULL) + theme_bw() + scale_y_continuous(limits = c(0, .4), labels = percent, breaks = seq(0, .4, by = .04)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .75), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
+load("data/df_11_1.Rda")  # load data from /data subdirectory
+ggplot(data = df_11_1, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual value of inheritance and gifts \n(% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1820, 2010), breaks = seq(1820, 2020, by = 20)) + scale_y_continuous(limits = c(0, .26), labels = percent, breaks = seq(0, .4, by = .04)) + scale_shape_manual(name = "label", values = shapePalette) + scale_colour_manual(name = "label", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.35, .08), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
 @
 \caption{The annual inheritance flow was about 20–25 percent of national income during the nineteenth century and until 1914; it then fell to less than 5 percent in the 1950s, and returned to about 15 percent in 2010.}
 \end{minipage}
@@ -1679,13 +1914,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_2]
-\frametitle{Figure 11.2: The mortality rate in France, 1820--2100}
+\frametitle{Figure 11.2. The mortality rate in France, 1820--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_11_2', out.width='1\\linewidth'>>=
-#load("data/df_11_2.Rda")  # load data from /data subdirectory
-#ggplot(data = df_11_2, aes(x = Year, y = value, colour = Category)) + geom_line() + geom_point(aes(colour = Category, shape = Category), size = 3) + ylab("Adult mortality rate (%)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1820, 2100, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(.01, .03, by = .005)) + scale_linetype_manual(name = "Adult mortality rate (%)", values = linePalette) + scale_shape_manual(name = "Adult mortality rate", values = shapePalette) + scale_colour_manual(name = "Adult mortality rate", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .75), legend.background = element_rect(colour = 'black')) 
+load("data/df_11_2.Rda")  # load data from /data subdirectory
+ggplot(data = df_11_2, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Adult mortality rate (%)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1820, 2010), breaks = seq(1820, 2020, by = 20)) + scale_y_continuous(limits = c(.01, .025), labels = percent, breaks = seq(0, .05, by = .0025)) + scale_shape_manual(name = "France", values = shapePalette) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .85), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The mortality rate fell in France during the twentieth century (rise of life expectancy), and should increase somewhat during the twenty-first century (baby-boom effect).}
 \end{minipage}
@@ -1696,14 +1931,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_3]
-\frametitle{Figure 11.3: Average age of decedents and inheritors: France, 1820--2100}
+\frametitle{Figure 11.3. Average age of decedents and inheritors: France, 1820--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_11_3', out.width='1\\linewidth'>>=
-#load("data/df_11_3.Rda")  # load data from /data subdirectory
-#ggplot(data = df_11_3, aes(x = Year, y = value, colour = Category)) + geom_line() + geom_point(aes(colour = Category, shape = Category), size = 3) + ylab("Average age in years") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1820, 2100, by = 20)) + scale_y_continuous(breaks = seq(20, 100, by = 10)) + scale_linetype_manual(name = "Average age", values = linePalette) + scale_shape_manual(name = "Average age", values = shapePalettePaired) + scale_colour_manual(name = "Adult mortality rate", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .75), legend.background = element_rect(colour = 'black')) 
-
+load("data/df_11_3.Rda")  # load data from /data subdirectory
+ggplot(data = df_11_3, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Average age in years") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1820, 2100), breaks = seq(1820, 2100, by = 20)) + scale_y_continuous(limits = c(20, 90), breaks = seq(0, 100, by = 10)) + scale_shape_manual(name = "France", values = shapePalette) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.3, .85), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The average of (adult) decedents rose from less than 60 years to almost 80 years during the twentieth century, and the average age at the time of inheritance rose from 30 years to 50 years.}
 \end{minipage}
@@ -1714,13 +1948,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_4]
-\frametitle{Figure 11.4: Inheritance flow versus mortality rate: France, 1820--2010}
+\frametitle{Figure 11.4. Inheritance flow versus mortality rate: France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_11_4', out.width='1\\linewidth'>>=
-#load("data/df_11_4.Rda")  # load data from /data subdirectory
-#ggplot(data = df_11_4, aes(x = Year, y = value, colour = Category)) + geom_line() + geom_point(aes(colour = Category, shape = Category), size = 3) + ylab("Annual rate of transmission or mortality (%)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1820, 2010, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(.01, .045, by = .005)) + scale_shape_manual(name = "Annual flows", values = shapePalettePaired) + scale_colour_manual(name = "Annual flows", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .75), legend.background = element_rect(colour = 'black')) 
+load("data/df_11_4.Rda")  # load data from /data subdirectory
+ggplot(data = df_11_4, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3)  + ylab("Annual rate of transmission or mortality (%)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1820, 2010), breaks = seq(1820, 2010, by = 20)) + scale_y_continuous(limits = c(.01, .04), labels = percent, breaks = seq(0, .05, by = .005)) + scale_shape_manual(name = "France", values = shapePalette) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.4, .1), legend.background = element_rect(colour = 'black')) 
 @
 \caption{The annual flow of inheritance (bequests and gifts) is equal to about 2.5 percent of aggregate wealth in 2000--2010 versus 1.2 percent for the mortality rate.}
 \end{minipage}
@@ -1731,13 +1965,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_5]
-\frametitle{Figure 11.5: The ratio between average wealth at death and average wealth of the living: France, 1820--2010}
+\frametitle{Figure 11.5. The ratio between average wealth at death and average wealth of the living: France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_11_5', out.width='1\\linewidth'>>=
-#load("data/df_11_5.Rda")  # load data from /data subdirectory
-#ggplot(data = df_11_5, aes(x = Year, y = value, colour = Category)) + geom_line() + geom_point(aes(colour = Category, shape = Category), size = 3) + ylab("Ratio between the average wealth of \n decedents and the living") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1820, 2010, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(.6, 2.6, by = .2)) + scale_shape_manual(name = "Ratio", values = shapePalettePaired) + scale_colour_manual(name = "Ratio", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .75), legend.background = element_rect(colour = 'black')) 
+load("data/df_11_5.Rda")  # load data from /data subdirectory
+ggplot(data = df_11_5, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Ratio between the average wealth of \n decedents and the living") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1820, 2010), breaks = seq(1820, 2010, by = 20)) + scale_y_continuous(limits = c(.8, 2.3), labels = percent, breaks = seq(0, 3, by = .2)) + scale_shape_manual(name = "France", values = shapePalette) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.35, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
 @
 \caption{In 2000--2010, the average wealth at death is 20 percent higher than that of the living if one omits the gifts that were made before death, but more than twice as large if one re-integrates gifts.}
 \end{minipage}
@@ -1748,13 +1982,18 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_6]
-\frametitle{Figure 11.6: Observed and simulated inheritance flow: France, 1820--2100}
+\frametitle{Figure 11.6. Observed and simulated inheritance flow: France, 1820--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_11_6', out.width='1\\linewidth'>>=
-#load("data/df_11_6.Rda")  # load data from /data subdirectory
-#ggplot(data = df_11_6, aes(x = Year, y = value, colour = Category)) + geom_line() + geom_point(aes(colour = Category, shape = Category), size = 3) + ylab("Annual value of bequests and gifts \n(% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1820, 2100, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, .4, by = .005)) + scale_linetype_manual(name = "Bequests", values = linePalette) + scale_shape_manual(name = "Bequests", values = shapePalettePaired) + scale_colour_manual(name = "Bequests", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .75), legend.background = element_rect(colour = 'black')) 
+load("data/df_11_6.Rda")  # load data from /data subdirectory
+# manually fix legend labels to display symbols
+labels_fixed <- as.list(expression(
+    paste("Observed series"),
+    paste("Simulated series ", "(", "2010-2100: g = 1.7% and r = 3.0%", ")"),
+    paste("Simulated series ", "(", "2010-2100: g = 1.0% and r = 5.0%", ")"))) 
+ggplot(data = df_11_6, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual value of bequests and gifts \n(% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1820, 2100), breaks = seq(1820, 2100, by = 20)) + scale_y_continuous(limits = c(0, .25), labels = percent, breaks = seq(0, .3, by = .02)) + scale_shape_manual(name = "France", labels = labels_fixed, values = shapePalettePaired[2:4]) + scale_colour_manual(name = "France", labels = labels_fixed, values = colorPalette) + theme(legend.key = element_blank(), legend.position = "bottom", legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 3))
 @
 \caption{Simulations based upon the theoretical model indicate that the level of the inheritance flow in the twenty-first century will depend upon the growth rate and the net rate of return to capital.}
 \end{minipage}
@@ -1765,13 +2004,17 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_7]
-\frametitle{Figure 11.7: The share of inherited wealth in total wealth: France, 1850--2100}
+\frametitle{Figure 11.7. The share of inherited wealth in total wealth: France, 1850--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_11_7', out.width='1\\linewidth'>>=
-#load("data/df_11_7.Rda")  # load data from /data subdirectory
-#ggplot(data = df_11_7, aes(x = Year, y = value, colour = Category)) + geom_line() + geom_point(aes(colour = Category, shape = Category), size = 3) + ylab("Cumulated value of inherited wealth \n(% total wealth of the living)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1850, 2100, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_linetype_manual(name = "Share", values = linePalette) + scale_shape_manual(name = "Share", values = shapePalettePaired) + scale_colour_manual(name = "Share", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .75), legend.background = element_rect(colour = 'black')) 
+load("data/df_11_7.Rda")  # load data from /data subdirectory
+# manually fix legend labels to display symbols
+labels_fixed <- as.list(expression(
+    paste("Share of inherited wealth ", "(", "2010-2100: g = 1.7% and r = 3.0%", ")"),
+    paste("Share of inherited wealth ", "(", "2010-2100: g = 1.0% and r = 5.0%", ")"))) 
+ggplot(data = df_11_7, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Cumulated value of inherited wealth \n(% total wealth of the living)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1850, 2100), breaks = seq(1850, 2100, by = 20)) + scale_y_continuous(limits = c(.4, 1), labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "France", labels = labels_fixed, values = shapePalettePaired) + scale_colour_manual(name = "France", labels = labels_fixed, values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .9), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
 @
 \caption{Inherited wealth represents 80--90 percent of total wealth in France in the nineteenth century; this share fell to 40--50 percent during the twentieth century, and might re- turn to 80--90 percent during the twenty-first century.}
 \end{minipage}
@@ -1782,13 +2025,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_8]
-\frametitle{Figure 11.8: The annual inheritance flow as a fraction of household disposable income: France, 1820--2010}
+\frametitle{Figure 11.8. The annual inheritance flow as a fraction of household disposable income: France, 1820--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_11_8', out.width='1\\linewidth'>>=
-#load("data/df_11_8.Rda")  # load data from /data subdirectory
-#ggplot(data = df_11_8, aes(x = Year, y = value, colour = Category)) + geom_line() + geom_point(aes(colour = Category, shape = Category), size = 3) + ylab("Annual value of inheritance and gifts \n(% household disposable income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1820, 2010, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, .4, by = .005)) + scale_shape_manual(name = "Flow", values = shapePalettePaired) + scale_colour_manual(name = "Flow", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .75), legend.background = element_rect(colour = 'black')) 
+load("data/df_11_8.Rda")  # load data from /data subdirectory
+ggplot(data = df_11_8, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Annual value of inheritance and gifts \n(% household disposable income)") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1820, 2010), breaks = seq(1820, 2010, by = 20)) + scale_y_continuous(limits = c(.01, .27), labels = percent, breaks = seq(0, .4, by = .02)) + scale_shape_manual(name = "France", values = shapePalettePaired) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.key = element_blank(), legend.position = "bottom", legend.background = element_rect(colour = 'black'), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2))
 @
 \caption{Expressed as a fraction of household disposable income (rather than national income), the annual inheritance flow is about 20 percent in 2010, in other words, close to its nineteenth-century level.}
 \end{minipage}
@@ -1799,13 +2042,20 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_9]
-\frametitle{Figure 11.9: The share of inheritance in the total resources (inheritance and work) of cohorts born in 1790--2030}
+\frametitle{Figure 11.9. The share of inheritance in the total resources (inheritance and work) of cohorts born in 1790--2030}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_11_9', out.width='1\\linewidth'>>=
-#load("data/df_11_9.Rda")  # load data from /data subdirectory
-#ggplot(data = df_11_9, aes(x = Year, y = value, colour = Category)) + geom_line() + geom_point(aes(colour = Category, shape = Category), size = 3) + ylab("Share of inheritance of total resources of each cohort") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1790, 2030, by = 20)) + scale_y_continuous(limits = c(.08, .3), labels = percent, breaks = seq(.08, .28, by = .005)) + scale_linetype_manual(name = "Share", values = linePalette) + scale_shape_manual(name = "Share", values = shapePalette) + scale_colour_manual(name = "Share", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.5, .75), legend.background = element_rect(colour = 'black')) 
+load("data/df_11_9.Rda")  # load data from /data subdirectory
+# manually fix legend labels to display symbols
+labels_fixed <- as.list(expression(paste(
+    "Share of inheritance in  total average resources", " ",
+    "as a function of year of birth ", "(", "bequests, gifts,", " ",
+    "labor income flows capitalized at age 50", ")", " ",
+    "(", "2010-2100: g = 1.7% and r = 3.0%", ")"))) 
+# To Do: Insert line breaks!!
+ggplot(data = df_11_9, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share of inheritance of total resources of each cohort") + xlab(NULL) + theme_bw() + scale_x_continuous(limits = c(1790, 2030), breaks = seq(1790, 2030, by = 20)) + scale_y_continuous(limits = c(.08, .26), labels = percent, breaks = seq(0, .3, by = .02)) + scale_shape_manual(name = "France", labels = labels_fixed, values = shapePalettePaired) + scale_colour_manual(name = "France", labels = labels_fixed, values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.4, .9), legend.background = element_rect(colour = 'black'), legend.title = element_blank()) 
 @
 \caption{Inheritance made about 25 percent of the resources of nineteenth-century cohorts, down to less than 10 percent for cohorts born in 1910--1920 (who should have inherited in 1950--1960).}
 \end{minipage}
@@ -1816,12 +2066,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_10]
-\frametitle{Figure 11.10: The dilemma of Rastignac for cohorts born in 1790--2030}
+\frametitle{Figure 11.10. The dilemma of Rastignac for cohorts born in 1790--2030}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_11_10', out.width='1\\linewidth'>>=
 #load("data/df_11_10.Rda")  # load data from /data subdirectory
+#STOPPED HERE
 #ggplot(data = df_11_10, aes(x = Year, y = value, colour = Category)) + geom_line() + geom_point(aes(colour = Category, shape = Category), size = 3) + ylab("Multiples of average income attained by  \n bottom 50% of wage earners") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1790, 2030, by = 20)) + scale_y_continuous(labels = percent, breaks = seq(0, 30, by = 5)) + scale_linetype_manual(name = "Living Standards", values = linePalette) + scale_shape_manual(name = "Living Standards", values = shapePalettePaired) + scale_colour_manual(name = "Living Standards", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.75, .75), legend.background = element_rect(colour = 'black')) 
 @
 \caption{In the nineteenth century, the living standards that could be attained by the top 1 percent inheritors were a lot higher than those that could be attained by the top 1 percent labor earners.}
@@ -1833,7 +2084,7 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_11]
-\frametitle{Figure 11.11: Which fraction of a cohort receives in inheritance the equivalent of a lifetime labor income?}
+\frametitle{Figure 11.11. Which fraction of a cohort receives in inheritance the equivalent of a lifetime labor income?}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1850,7 +2101,7 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_11_12]
-\frametitle{Figure 11.12: The inheritance flow in Europe, 1900--2010}
+\frametitle{Figure 11.12. The inheritance flow in Europe, 1900--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1867,7 +2118,7 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_1]
-\frametitle{Figure 12.1: The world's billionaires according to Forbes, 1987--2013}
+\frametitle{Figure 12.1. The world's billionaires according to Forbes, 1987--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1885,7 +2136,7 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_2]
-\frametitle{Figure 12.2: Billionaires as a fraction of global population and wealth, 1987--2013}
+\frametitle{Figure 12.2. Billionaires as a fraction of global population and wealth, 1987--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1902,7 +2153,7 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_3]
-\frametitle{Figure 12.3: The share of top wealth fractiles in world wealth, 1987--2013}
+\frametitle{Figure 12.3. The share of top wealth fractiles in world wealth, 1987--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1919,7 +2170,7 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_4]
-\frametitle{Figure 12.4: The world capital/income ratio, 1870--2100}
+\frametitle{Figure 12.4. The world capital/income ratio, 1870--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1936,7 +2187,7 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_5]
-\frametitle{Figure 12.5: The distribution of world capital, 1870--2100}
+\frametitle{Figure 12.5. The distribution of world capital, 1870--2100}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1953,7 +2204,7 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_12_6]
-\frametitle{Figure 12.6: The net foreign asset position of rich countries}
+\frametitle{Figure 12.6. The net foreign asset position of rich countries}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -1970,13 +2221,13 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_13_1]
-\frametitle{Figure 13.1: Tax revenues in rich countries, 1870--2010}
+\frametitle{Figure 13.1. Tax revenues in rich countries, 1870--2010}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
 <<'Figure_13_1', out.width='1\\linewidth'>>=
-#load("data/df_13_1.Rda")  # load data from /data subdirectory
-#
+load("data/df_13_1.Rda")  # load data from /data subdirectory
+ggplot(data = df_13_1, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Tax revenue (% national income)") + xlab(NULL) + theme_bw() + scale_x_continuous(breaks = seq(1870, 2010, by = 20)) + scale_y_continuous(limits = c(0, .55), labels = percent, breaks = seq(0, .6, by = .05)) + scale_shape_manual(name = "Country", values = shapePalette) + scale_colour_manual(name = "Country", values = colorPalette) + theme(legend.key = element_blank(), legend.position = c(.25, .85), legend.background = element_rect(colour = 'black'), legend.title = element_blank())
 @
 \caption{Total tax revenues were less than 10 percent of national income in rich countries until 1900--1910; they represent between 30 percent and 55 percent of national income in 2000--2010.}
 \end{minipage}
@@ -1987,7 +2238,7 @@ ggplot(data = df_9_8, aes(x = Year, y = value, group = variable, colour = variab
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_14_1]
-\frametitle{Figure 14.1: Top income tax rates, 1900--2013}
+\frametitle{Figure 14.1. Top income tax rates, 1900--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -2004,7 +2255,7 @@ ggplot(data = df_14_1, aes(x = Year, y = value, group = variable, colour = varia
 
 %%%%%%%%%%%%%%%%%%%% Frame Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[label=Figure_14_2]
-\frametitle{Figure 14.2: Top inheritance tax rates, 1900--2013}
+\frametitle{Figure 14.2. Top inheritance tax rates, 1900--2013}
 \begin{figure}[t]
 \begin{minipage}[b]{\textwidth}
 \centering
@@ -2020,19 +2271,18 @@ ggplot(data = df_14_2, aes(x = Year, y = value, group = variable, colour = varia
 
 
 
-%\begin{comment}
-%\end{comment}
 
-
-
-
-\begin{comment}
-% Remove '-1' extension in Figure names - DANGEROUS HACK
-% Code inserted from 'slidesFiguresRename.Rnw'
+%%%%%%%%%%%%%%%%%%%% Post Processing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Remove '-1' extension in Figure names - DANGEROUS HACK
+%%% Code inserted from 'slidesFiguresRename.Rnw'
 <<'renameFigures', child='slidesFiguresRename.Rnw'>>=
 @
-\end{comment}
 
+%%% Embed fonts into all PDFs
+%%% Code inserted from 'slidesFiguresEmbedFonts.Rnw'
+<<'embedFonts', child='slidesFiguresEmbedFonts.Rnw'>>=
+@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \end{document}
