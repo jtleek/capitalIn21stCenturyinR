@@ -1521,6 +1521,7 @@ save(df_11_1, file = "data/df_11_1.Rda")
 # Figure 11.2 / TS11.1a / mortality rate / France
 load("data/TS11.1a.Rda")
 df_11_2 <- TS11.1a[, c("Year", "Adult mortality rate (adults aged 20 and over)")]
+names(df_11_2) <- c("Year", "Adult mortality rate \n(adults aged 20 and over)")
 df_11_2 <- melt(df_11_2, id.vars = "Year")
 save(df_11_2, file = "data/df_11_2.Rda")
 
@@ -1540,6 +1541,7 @@ save(df_11_4, file = "data/df_11_4.Rda")
 # Figure 11.5 / TS11.1a / wealth at death + wealth of living / France
 load("data/TS11.1a.Rda")
 df_11_5 <- TS11.1a[, c("Year", "Ratio of average wealth at death to average wealth of the decedents and the living, (not including bequest gifts made before death)", "Ratio of average wealth at death to average wealth of the decedents and the living, (including bequest gifts made before death)")]
+names(df_11_5) <- c("Year", "Ratio of average wealth at death to average wealth of the decedents and the living, \n(not including bequest gifts made before death)\n", "Ratio of average wealth at death to average wealth of the decedents and the living, \n(including bequest gifts made before death)\n")
 df_11_5 <- melt(df_11_5, id.vars = "Year")
 save(df_11_5, file = "data/df_11_5.Rda")
 
@@ -1560,7 +1562,7 @@ save(df_11_7, file = "data/df_11_7.Rda")
 # Figure 11.8 / TS11.1a / inheritance flow/disposable income / France
 load("data/TS11.1a.Rda")
 df_11_8 <- TS11.1a[, c("Year", "Annual inheritance flow (% disposable income) (economic flows)", "Annual inheritance flow (% disposable income) (fiscal flows)")]
-names(df_11_8) <- c("Year", "Economic flows \n(annual inheritance flow % disposable income, \ncomputed from national wealth estimates, mortality tables, and age-wealth profiles)\n", "Fiscal flows: \n(annual inheritance flow % disposable income, \ncomputed from bequest and gift tax data, including tax-exempt assets)\n")
+names(df_11_8) <- c("Year", "Economic flows \n(annual inheritance flow % of disposable income, \ncomputed from national wealth estimates, \nmortality tables, and age-wealth profiles)\n", "Fiscal flows: \n(annual inheritance flow % of disposable income, \ncomputed from bequest and gift tax data, \nincluding tax-exempt assets)\n")
 df_11_8 <- melt(df_11_8, id.vars = "Year")
 save(df_11_8, file = "data/df_11_8.Rda")
 
@@ -1640,7 +1642,7 @@ save(TS12.4f, file = "data/TS12.4f.Rda")
 # Table S12.5 / TS12.5
 TS12.5 <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
   sheetName = "TS12.5", rowIndex = 5:28, colIndex = 1:6, header = FALSE)
-names(TS12.5) <- c("Year", "Europe", "United States", "Japan", "Rich countries (Europe, Japan, United States)", "Unregistered financial assets registered in tax havens (lower estimate)")
+names(TS12.5) <- c("Year", "Europe", "United States", "Japan", "Rich countries (Europe, Japan, United States)", "Financial assets registered in tax havens (lower estimate)")
 save(TS12.5, file = "data/TS12.5.Rda")
 
 # Figure 12.1 / TS12.3
@@ -1652,13 +1654,14 @@ save(df_12_1, file = "data/df_12_1.Rda")
 # Figure 12.2 / TS12.3
 load("data/TS12.3.Rda")
 df_12_2 <- TS12.3[, c("Year", "Total wealth of billionaires as a fraction of aggregate private wealth", "Number of billionaires per 100 million adults")]
+names(df_12_2) <- c("Year", "Total wealth of billionaires \nas a fraction of aggregate private wealth", "Number of billionaires per 100 million adults")
 df_12_2 <- melt(df_12_2, id.vars = "Year")
 save(df_12_2, file = "data/df_12_2.Rda")
 
 # Figure 12.3 / TS12.3
 load("data/TS12.3.Rda")
 df_12_3 <- TS12.3[, c("Year", "Share of the top 1/20 million highest wealth holders in gobal private wealth", "Share of top 1/100 million highest wealth holders in gobal private wealth")]
-names(df_12_3) <- c("Year", "Share of the top 1/20 million highest wealth holders \nin gobal private wealth", "Share of top 1/100 million highest wealth holders \nin gobal private wealth")
+names(df_12_3) <- c("Year", "Share of the top 1/20 million highest wealth holders \nin gobal private wealth\n", "Share of top 1/100 million highest wealth holders \nin gobal private wealth\n")
 df_12_3 <- melt(df_12_3, id.vars = "Year")
 save(df_12_3, file = "data/df_12_3.Rda")
 
@@ -1679,6 +1682,7 @@ save(df_12_5, file = "data/df_12_5.Rda")
 # Figure 12.6 / TS12.5
 load("data/TS12.5.Rda")
 df_12_6 <- TS12.5
+names(df_12_6)[6] <- "Financial assets registered in tax havens \n(lower estimate)"
 df_12_6 <- melt(df_12_6, id.vars = "Year")
 save(df_12_6, file = "data/df_12_6.Rda")
 
