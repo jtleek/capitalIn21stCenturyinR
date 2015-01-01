@@ -1,5 +1,14 @@
 % This file to be named beamerthemepiketty.sty and stored on the LaTeX+R path
 
+%---------- spaces -----------------------------------------------------------%
+% hack to reduce space created around figures during the knitr compilation
+\let\myfigure\figure
+\let\endmyfigure\endfigure
+\renewenvironment{figure}
+  {\vspace{-4ex}\myfigure}
+  {\endmyfigure\vspace{-4ex}}
+
+
 %---------- fonts ------------------------------------------------------------%
 \renewcommand\sfdefault{phv}
 \renewcommand\familydefault{\sfdefault}

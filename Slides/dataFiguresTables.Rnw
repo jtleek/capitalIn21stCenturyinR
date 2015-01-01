@@ -1541,7 +1541,7 @@ save(df_11_4, file = "data/df_11_4.Rda")
 # Figure 11.5 / TS11.1a / wealth at death + wealth of living / France
 load("data/TS11.1a.Rda")
 df_11_5 <- TS11.1a[, c("Year", "Ratio of average wealth at death to average wealth of the decedents and the living, (not including bequest gifts made before death)", "Ratio of average wealth at death to average wealth of the decedents and the living, (including bequest gifts made before death)")]
-names(df_11_5) <- c("Year", "Ratio of average wealth at death to average wealth of the decedents and the living, \n(not including bequest gifts made before death)\n", "Ratio of average wealth at death to average wealth of the decedents and the living, \n(including bequest gifts made before death)\n")
+names(df_11_5) <- c("Year", "Ratio of average wealth at death \nto average wealth of the decedents and the living, \n(not including bequest gifts made before death)\n", "Ratio of average wealth at death \nto average wealth of the decedents and the living, \n(including bequest gifts made before death)\n")
 df_11_5 <- melt(df_11_5, id.vars = "Year")
 save(df_11_5, file = "data/df_11_5.Rda")
 
@@ -1604,7 +1604,7 @@ save(df_11_12, file = "data/df_11_12.Rda")
 # Table TS12.3 / TS12.3
 TS12.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
   sheetName = "TS12.3", rowIndex = 7:33, colIndex = 1:7, header = FALSE)
-names(TS12.3) <- c("Year", "Number of bilionaires in dollars", "Total wealth in billions of dollars", "Total wealth of billionaires as a fraction of aggregate private wealth", "Number of billionaires per 100 million adults", "Share of the top 1/20 million highest wealth holders in gobal private wealth", "Share of top 1/100 million highest wealth holders in gobal private wealth")
+names(TS12.3) <- c("Year", "Number of $ billionaires", "Total wealth in billions of dollars", "Total wealth of billionaires as a fraction of aggregate private wealth", "Number of billionaires per 100 million adults", "Share of the top 1/20 million highest wealth holders in gobal private wealth", "Share of top 1/100 million highest wealth holders in gobal private wealth")
 save(TS12.3, file = "data/TS12.3.Rda")
 
 # Spreadsheet TS12.4
@@ -1647,14 +1647,14 @@ save(TS12.5, file = "data/TS12.5.Rda")
 
 # Figure 12.1 / TS12.3
 load("data/TS12.3.Rda")
-df_12_1 <- TS12.3[, c("Year", "Number of bilionaires in dollars", "Total wealth in billions of dollars")]
+df_12_1 <- TS12.3[, c("Year", "Number of $ billionaires", "Total wealth in billions of dollars")]
 df_12_1 <- melt(df_12_1, id.vars = "Year")
 save(df_12_1, file = "data/df_12_1.Rda")
 
 # Figure 12.2 / TS12.3
 load("data/TS12.3.Rda")
 df_12_2 <- TS12.3[, c("Year", "Total wealth of billionaires as a fraction of aggregate private wealth", "Number of billionaires per 100 million adults")]
-names(df_12_2) <- c("Year", "Total wealth of billionaires \nas a fraction of aggregate private wealth", "Number of billionaires per 100 million adults")
+names(df_12_2) <- c("Year", "Total wealth of billionaires, as a fraction of \naggregate private wealth", "Number of billionaires per 100 million adults")
 df_12_2 <- melt(df_12_2, id.vars = "Year")
 save(df_12_2, file = "data/df_12_2.Rda")
 

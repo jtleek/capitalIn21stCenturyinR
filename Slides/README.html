@@ -71,17 +71,20 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <ol style="list-style-type: upper-roman">
 <li><p><strong>FILES/SCRIPTS</strong>:</p>
 <ol style="list-style-type: decimal">
-<li><p><code>'slidesFigures.Rnw'</code><br />– a knitr/beamer document.<br />– it may be run from the R console or in Rstudio by pressing the ‘Compile PDF’ button.<br />– produces beamer slides for all of the book’s figures.<br />– produces standalone <code>.pdf</code> and <code>.png</code> figures stored in <code>data</code> subdirectory.</p></li>
 <li><p><code>'dataFiguresTables.Rnw'</code><br />– a knitr code chunk.<br />– pulls the data from the Piketty spreadsheets and puts it in ready form for printing.<br />– it may be run from the R console by omitting the first and last lines, i.e. by commenting out as follows:</p>
 <pre class="r"><code># &lt;&lt;'data', include=FALSE, cache=FALSE&gt;&gt;=
-Do not comment the sandwiched part
+Whatever comes here is the 'chunk' of R code
 # @</code></pre>
-<p>– … or it may be called from ‘slidesFigures.Rnw’ as a code chunk, in which case comment out every call to <code>load()</code> that appears inside each figure, as follows:</p>
+<p>– … if you wish to recreate the data as you create the figures and slides, call it from <code>slidesFigures.Rnw</code> as a code chunk, in which case comment out every call to <code>load()</code> that appears inside each figure, e.g.:</p>
 <pre class="r"><code># load(&quot;data/df_1_!.Rda&quot;) </code></pre></li>
-<li><p><code>'slidesPikettyAll.tex'</code><br />– a LaTeX/beamer document.<br />– contains beamer slides cloned from some of Professor Piketty’s powerpoint presentations.</p></li>
+<li><p><code>'slidesFigures.Rnw'</code><br />– a knitr/beamer document.<br />– it may be run from the R console or in Rstudio by pressing the ‘Compile PDF’ button.<br />– produces beamer slides for all of the book’s figures.<br />– produces standalone <code>.pdf</code> and <code>.png</code> figures stored in <code>data</code> subdirectory.</p></li>
+<li><p><code>'slidesTextPikettyPowerpoint.tex'</code><br />– a LaTeX/beamer document.<br />– contains beamer slides cloned from some of Professor Piketty’s powerpoint presentations.</p></li>
 <li><p><code>'beamerthemepiketty.sty'</code><br />– a LaTeX/beamer theme style file.<br />– contains a series of customization to obtain a standard, neutral theme.<br />– for instance, frame titles are in a small-ish font to accommodate the sometimes long titles in Piketty’s presentations. A hack makes the euro symbol available to LaTeX and searchable in the PDF (wow!).</p></li>
 <li><p><code>'slidesPikettySaoPaulo2014.tex'</code><br />– a LaTeX/beamer command.<br />– calls <code>\includeonlyframes</code> command with a list of frame labels to be included to reproduce the Sao Paulo 2014 presentation.</p></li>
-<li><p><code>'slidesFiguresRename.Rnw'</code><br />– an ugly hack designed to rename the Figures in a way consistent with the Piketty book. It is called from ‘slidesFigures.Rnw’, at the very end. If omitted, the figures will be named ‘Figure_x_y-1.png’ instead of ‘Figure_x_y.png’.</p></li>
+<li><p><code>'slidesFiguresRename.Rnw'</code><br />– an ugly hack designed to rename the Figures in a way consistent with the Piketty book. It is called from ‘slidesFigures.Rnw’, at the very end. If omitted, the figures will be named e.g. ‘Figure_x_y-1.png’ instead of ‘Figure_x_y.png’.</p></li>
+<li><p><code>'slidesFigures-bw.pdf'</code> and <code>'slidesFigures-color.pdf'</code><br />– the pdf beamer containing all the book figures (plus a few extra).</p></li>
+<li><p><code>'slidesFigures.tex'</code> – a LaTeX file produced by knitr.<br />– may be compiled with <code>pdflatex</code>, which is what knitr calls.<br />– can be useful for debugging.</p></li>
+<li><p><code>'bookFiguresTitles.R'</code> – a list of all the figure titles.<br />– figure titles are currently empty with same titles inside ‘’</p></li>
 <li><p><code>'pgfbaseimage.sty'</code><br />– a hack designed to remove a warning when compiling the beamer class.<br />– may be safely omitted.</p></li>
 <li><p><code>'slidesFigures-concordance.tex'</code>, files with <code>'.vrb'</code>, <code>'.nav'</code>, <code>.snm</code>, <code>.synctex.gz</code>, <code>.toc</code><br />– various files produced by knitr as a by-product of compilation.<br />– may or not be present in repository.<br />– may be safely deleted.</p></li>
 </ol></li>
@@ -95,9 +98,21 @@ Do not comment the sandwiched part
 <li><p><code>pikettySlides/cloned</code><br />– contains ‘cloned’ versions of Professor Piketty’s powerpoint presentations created with knitr/beamer.</p></li>
 <li><p><code>cache</code><br />– contains the ‘cache’ created by knitr as a by-product of compilation.<br />– may or not be present in repository.<br />– may be safely deleted.</p></li>
 </ol></li>
+<li><p><strong>KNOWN ISSUES</strong>:</p>
+<ol style="list-style-type: decimal">
+<li>See <code>'slidesFigures.Rnw'</code> for inline comments about limitations.<br /></li>
+<li>I have tried to make the code reasonably ‘transferrable’ by copy-paste, but there are 4 main exceptions to this principle:
+<ol style="list-style-type: decimal">
+<li>The beamer theme named <code>'piketty'</code> defined in <code>'beamerthemepiketty.sty'</code>.<br /></li>
+<li>The ggplot theme named <code>'theme_piketty()'</code> defined in the preamble of <code>'slidesFigures.Rnw'</code>.<br /></li>
+<li>The <code>linePalette</code>, <code>colorPalette</code>, <code>shapePalette</code> and <code>fillPalette</code> defined in the preamble of <code>'slidesFigures.Rnw'</code>.<br /></li>
+<li>The <code>ggplot_dual_axis()</code> function used to produce dual-axis graphs and defined in <code>'beamerthemepiketty.sty'</code>.</li>
+</ol></li>
+<li>Figures 9.9, 12.1, and 12.2 are dual-axis graphs produced by function <code>ggplot_dual_axis()</code>. This custom function extends ggplot functionalities to dual axis plots. This function is currently buggy and in need of a major overhaul. This function has one major problem: the rhs axis grid overwrites the data and legend. I do know how to fix it, just need an hour or two…</li>
+</ol></li>
 </ol>
 <hr />
-<p>Patrick Toche, December 2014.</p>
+<p>Patrick Toche, 31 December 2014.</p>
 </div>
 </div>
 </div>
