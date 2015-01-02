@@ -22,3 +22,4 @@ request, please add yourself to the list of contributors below.
 * [Mauricio Vargas](http://github.com/pachamaltese)
 * [Franz Mohr](http://econometricswithr.wordpress.com/)
 * [Zach Stednick](http://zachstednick.com)
+* [Patrick Toche](http://patricktoche.com)

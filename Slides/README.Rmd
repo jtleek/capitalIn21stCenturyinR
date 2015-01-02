@@ -1,0 +1,133 @@
+Capital in the 21st Century: Figures, Tables & Slides 
+========================================================
+  
+  
+### with LaTeX / Beamer / KnitR / R / ggplot2 / scales / reshape2  
+  
+  
+#### This fork maintained by Patrick Toche, December 2014.
+  
+  
+---------
+  
+[click here to go to my fork at the github repository](https://github.com/ptoche/capitalIn21stCenturyinR/)  
+  
+[click here to go to the main branch of the github repository](https://github.com/jtleek/capitalIn21stCenturyinR)  
+  
+---------
+
+Software License: [GPL-3](http://www.gnu.org/licenses/gpl.html)  
+
+Replicate Figures & Tables from [Thomas Piketty, Capital in the 21st Century, Harvard University Press, 2013](http://en.wikipedia.org/wiki/Capital_in_the_Twenty-First_Century).  
+
+Based on Professor Piketty's [technical appendices](http://piketty.pse.ens.fr/en/capital21c2).  
+
+---------
+
+This repository, named **Slides**, contains the following:
+
+
+I) **FILES/SCRIPTS**:  
+
+    1) ``'dataFiguresTables.Rnw'``  
+    -- a knitr code chunk.  
+    -- pulls the data from the Piketty spreadsheets and puts it in ready form for printing.  
+    -- it may be run from the R console by omitting the first and last lines, i.e. by commenting out as follows:  
+
+        ```r
+        # <<'data', include=FALSE, cache=FALSE>>=
+        Whatever comes here is the 'chunk' of R code
+        # @
+        ```
+    -- ... if you wish to recreate the data as you create the figures and slides, call it from ``slidesFigures.Rnw`` as a code chunk, in which case comment out every call to ``load()`` that appears inside each figure, e.g.: 
+
+        ```r
+        # load("data/df_1_!.Rda") 
+        ```     
+
+    2) ``'slidesFigures.Rnw'``  
+    -- a knitr/beamer document.  
+    -- it may be run from the R console or in Rstudio by pressing the 'Compile PDF' button.  
+    -- produces beamer slides for all of the book's figures.  
+    -- produces standalone ``.pdf`` and ``.png`` figures stored in ``data`` subdirectory.  
+
+    3) ``'slidesTextPikettyPowerpoint.tex'``  
+    -- a LaTeX/beamer document.  
+    -- contains beamer slides cloned from some of Professor Piketty's powerpoint presentations.  
+    
+    4) ``'beamerthemepiketty.sty'``  
+    -- a LaTeX/beamer theme style file.  
+    -- contains a series of customization to obtain a standard, neutral theme.  
+    -- for instance, frame titles are in a small-ish font to accommodate the sometimes long titles in Piketty's presentations. A hack makes the euro symbol available to LaTeX and searchable in the PDF (wow!).  
+    
+    5) ``'slidesPikettySaoPaulo2014.tex'``  
+    -- a LaTeX/beamer command.  
+    -- calls ``\includeonlyframes`` command with a list of frame labels to be included to reproduce the Sao Paulo 2014 presentation.  
+    
+    6) ``'slidesFiguresRename.Rnw'``  
+    -- an ugly hack designed to rename the Figures in a way consistent with the Piketty book. It is called from 'slidesFigures.Rnw', at the very end. If omitted, the figures will be named e.g. 'Figure_x_y-1.png' instead of 'Figure_x_y.png'.  
+
+    7) ``'slidesFigures-bw.pdf'`` and ``'slidesFigures-color.pdf'``  
+    -- the pdf beamer containing all the book figures (plus a few extra).  
+
+    8) ``'slidesFigures.tex'`` 
+    -- a LaTeX file produced by knitr.  
+    -- may be compiled with ``pdflatex``, which is what knitr calls.  
+    -- can be useful for debugging.  
+
+    9) ``'bookFiguresTitles.R'``
+    -- a list of all the figure titles.  
+    -- figure titles are currently empty with same titles inside '\beamertitle'  
+
+    10) ``'pgfbaseimage.sty'``  
+    -- a hack designed to remove a warning when compiling the beamer class.   
+    -- may be safely omitted.  
+    
+    11) ``'slidesFigures-concordance.tex'``, files with  ``'.vrb'``, ``'.nav'``, ``.snm``, ``.synctex.gz``, ``.toc``  
+    -- various files produced by knitr as a by-product of compilation.  
+    -- may or not be present in repository.  
+    -- may be safely deleted.  
+
+
+II) **FOLDERS/DIRECTORIES**:
+
+    1) ``data``  
+    -- contains data created with ``dataFiguresTables.Rnw``  
+    -- data stored as dataframes in format ``.Rda``  
+    -- files named ``TSx_y.Rda`` contain data from Piketty's worksheet labeled ``TSx.y`` occasional worksheet named ``cTSx.y``  
+    -- files named ``df_x_y.Rda``  contain dataframes used to recreate figure ``x.y``, i.e. figure ``y`` from Chapter ``x``
+    
+    2) ``figures/bw``  
+    -- contains black & white versions of the figures in ``.pdf`` and ``.png`` formats.
+    
+    3) ``figures/color``  
+    -- contains color versions of the figures. in ``.pdf`` and ``.png`` formats.
+    
+    4) ``pictures``  
+    -- contains images and figures not directly imported into the beamer documents, e.g. a screenshot of the 'World Top Incomes Database' website.
+    
+    5) ``pikettySlides/original``  
+    -- contains copies of a sample of Professor Piketty's powerpoint presentations.
+
+    6) ``pikettySlides/cloned``  
+    -- contains 'cloned' versions of Professor Piketty's powerpoint presentations created with knitr/beamer.  
+    
+    7) ``cache``  
+    -- contains the 'cache' created by knitr as a by-product of compilation.  
+    -- may or not be present in repository.  
+    -- may be safely deleted.  
+
+
+III) **KNOWN ISSUES**:  
+
+    1) See ``'slidesFigures.Rnw'`` for inline comments about limitations.  
+    2) I have tried to make the code reasonably 'transferrable' by copy-paste, but there are 4 main exceptions to this principle:  
+        1) The beamer theme named ``'piketty'`` defined in ``'beamerthemepiketty.sty'``.  
+        2) The ggplot theme named ``'theme_piketty()'`` defined in the preamble of ``'slidesFigures.Rnw'``.  
+        3) The ``linePalette``, ``colorPalette``, ``shapePalette`` and ``fillPalette`` defined in the preamble of ``'slidesFigures.Rnw'``.  
+        4) The ``ggplot_dual_axis()`` function used to produce dual-axis graphs and defined in ``'beamerthemepiketty.sty'``.  
+        
+    3) Figures 9.9, 12.1, and 12.2 are dual-axis graphs produced by function ``ggplot_dual_axis()``. This custom function extends ggplot functionalities to dual axis plots. This function is currently buggy and in need of a major overhaul. This function has one major problem: the rhs axis grid overwrites the data and legend. I do know how to fix it, just need an hour or two...   
+
+------
+Patrick Toche, 31 December 2014.

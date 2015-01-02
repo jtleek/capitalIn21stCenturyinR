@@ -1,0 +1,15 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% HARD CODED AND DANGEROUS - UNTIL A BETTER HACK IS FOUND %%       
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Rename png files in current directory
+% pdf files are renamed within knitr: 
+% that hack only renames the first element of the vector dev=c('pdf','png')
+% and so 'png' files are renamed here, until a better hack is found
+<<'Rename', echo = FALSE, results = 'hide', comment = NA, warning = FALSE, message = FALSE>>=
+x <- list.files(
+    path = file.path("~/R/capital21c/Github/Slides/figures",  # adapt to path
+                     fsep =.Platform$file.sep), 
+    pattern = '*-1.', recursive = TRUE, full.names = TRUE)
+y <- sub(pattern='*-1.', replacement = '.', x)
+file.rename(from = x, to = y)
+@

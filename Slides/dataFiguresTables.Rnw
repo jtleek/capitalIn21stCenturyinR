@@ -1,0 +1,1751 @@
+<<'data', include=FALSE, cache=FALSE>>=
+
+### Create R dataframes from Piketty's xlsx worksheets
+## Piketty denotes TS1.1 the sheets for Chapter 1.1, etc.
+## I denote df1.1 the dataframe for Figure 1.1, etc.
+## I denote df0.1 the dataframe for Figure I.1 (I stands for Introduction but is all too easily confused with 1)
+
+## Set Directory:
+#if(.Platform$OS.type == "windows"){
+#  setwd("c:/R/capital21c/Github/Slides/")
+#} else { 
+#  setwd("~/R/capital21c/Github/Slides/") 
+#}
+
+
+## Load Library:
+library("xlsx")         # read data stored in .xlsx files
+library("reshape2")     # convert data from wide to long form
+
+## Chapter 0 - Introduction
+
+# Spreadsheet TSI.1
+TSI.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
+  sheetName = "TSI.1", rowIndex = 7:107, colIndex = 1:2, header = FALSE)
+names(TSI.1) <- c("Year", "usa_top_10_is")
+save(TSI.1, file = "data/TSI.1.Rda")
+
+# Spreadsheet TSI.2
+TSI.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter0TablesFigures.xlsx",
+  sheetName = "TSI.2", rowIndex = 6:20, colIndex = 1:4, header = FALSE)
+names(TSI.2) <- c("Year", "Germany", "France", "Britain")
+save(TSI.2, file = "data/TSI.2.Rda")
+
+# Figure 0.1 = Figure I.1 / TSI.1 / top decile / USA
+load("data/TSI.1.Rda")
+df_0_1 <- melt(TSI.1, id.vars = "Year")
+row.names(df_0_1) <- NULL
+save(df_0_1, file = "data/df_0_1.Rda")
+
+# Figure 0.2 = Figure I.2 / TSI.2 / private capital / 3 countries
+load("data/TSI.2.Rda")
+df_0_2 <- melt(TSI.2, id.vars = "Year")
+row.names(df_0_2) <- NULL
+save(df_0_2, file = "data/df_0_2.Rda")
+
+## Chapter 1 - Income and Output
+
+# Spreadsheet TS1.1a
+TS1.1a <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.1a", rowIndex = 8:18, colIndex = c(1, 3:6), header = FALSE)
+names(TS1.1a) <- c("Year", "Europe", "America", "Africa", "Asia")
+TS1.1a <- melt(TS1.1a, id.vars = "Year")
+save(TS1.1a, file = "data/TS1.1a.Rda")
+
+# Spreadsheet TS1.2
+TS1.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.2", rowIndex = 8:18, colIndex = c(1, 3:6), header = FALSE)
+names(TS1.2) <- c("Year", "Europe", "America", "Africa", "Asia")
+TS1.2 <- melt(TS1.2, id.vars = "Year")
+save(TS1.2, file = "data/TS1.2.Rda")
+
+# Spreadsheet TS1.3
+TS1.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.3", rowIndex = 8:18, colIndex = c(1:8), header = FALSE)
+names(TS1.3) <- c("Year", "World", "Europe", "America", "Africa", "Asia", "Europe + America", "Asia + Africa")
+TS1.3 <- melt(TS1.3, id.vars = "Year")
+save(TS1.3, file = "data/TS1.3.Rda")
+
+# Spreadsheet TS1.7
+TS1.7 <- read.xlsx("../Piketty2014FiguresTables/Chapter1TablesFigures.xlsx",
+  sheetName = "TS1.7", rowIndex = 8:30, colIndex = c(1:9, 17:22), header = FALSE)
+names(TS1.7) <- c("Year", "Euro/Dollar exchange rate", "Euro/Dollar purchasing power parity rate", "Euro/Yuan exchange rate", "Euro/Yuan purchasing power parity rate", "Euro/Rupee exchange rate", "Euro/Rupee purchasing power parity rate", "Euro/Yen exchange rate", "Euro/Yen purchasing power parity rate", "Dollar/Yuan exchange rate", "Dollar/Yuan purchasing power parity rate", "Dollar/Rupee exchange rate", "Dollar/Rupee purchasing power parity rate", "Dollar/Yen exchange rate", "Dollar/Yen  purchasing power parity rate")
+TS1.7 <- melt(TS1.7, id.vars = "Year")
+save(TS1.7, file = "data/TS1.7.Rda")
+
+# Figure 1.1 / TS1.1a / world output / 4 continents
+load("data/TS1.1a.Rda")
+df_1_1 <- TS1.1a
+row.names(df_1_1) <- NULL
+save(df_1_1, file = "data/df_1_1.Rda")
+
+# Figure 1.2 / TS1.2 / world population / 4 continents
+load("data/TS1.2.Rda")
+df_1_2 <- TS1.2
+row.names(df_1_2) <- NULL
+save(df_1_2, file = "data/df_1_2.Rda")
+
+# Figure 1.3 / TS1.3 / world population / 4 continents
+load("data/TS1.3.Rda")
+df_1_3 <- subset(TS1.3, variable %in% c("Year", "Europe + America", "Asia + Africa", "World"))
+row.names(df_1_3) <- NULL
+save(df_1_3, file = "data/df_1_3.Rda")
+
+# Figure 1.4 / TS1.7 / exchange rate euro/dollar
+load("data/TS1.7.Rda")
+df_1_4 <- subset(TS1.7, variable %in% c("Year", "Euro/Dollar exchange rate", "Euro/Dollar purchasing power parity rate"))
+row.names(df_1_4) <- NULL
+save(df_1_4, file = "data/df_1_4.Rda")
+
+# Figure 1.5 / TS1.7 / exchange rate euro/dollar
+load("data/TS1.7.Rda")
+df_1_5 <- subset(TS1.7, variable %in% c("Year", "Euro/Yuan exchange rate", "Euro/Yuan purchasing power parity rate"))
+row.names(df_1_5) <- NULL
+save(df_1_5, file = "data/df_1_5.Rda")
+
+
+## Chapter 2 - Growth: Illusions and Reality
+
+# Spreadsheet TS2.2
+
+# Table S2.2a / TS2.2
+TS2.2a <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.2", rowIndex = 8:28, colIndex = 1:6, header = FALSE)
+TS2.2a[, 7] <- c(1:13, 10:13, 10:13) # Create a sequence
+names(TS2.2a) <- c("Period", "World", "Europe", "United States", "Africa", "Asia", "Seq")
+TS2.2a <- TS2.2a[1:13, ] # Select a type of prediction
+save(TS2.2a, file = "data/TS2.2a.Rda")
+
+# Table S2.2b  / TS2.2
+TS2.2b <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.2", rowIndex = 8:28, colIndex = 8:23, header = FALSE)
+TS2.2b[, 17] <- c(1:13, 10:13, 10:13) # Create a sequence
+names(TS2.2b) <- c("Period", "World", "Western Europe", "Eastern Europe", "Russia & Ukraine Belarus Moldavia", "North America", "Latin America", "Northern Africa", "Sub-Shaharan Africa", "China", "India", "Japan", "Australia & New Zealand", "Middle East (Including Turkey)", "Central Asia", "Other Asian Countries", "Seq")
+TS2.2b <- TS2.2b[1:13, ] # Select a type of prediction
+save(TS2.2b, file = "data/TS2.2b.Rda")
+
+# Table S2.2c / TS2.2
+TS2.2c <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.2", rowIndex = 8:29, colIndex = 25:30, header = FALSE, stringsAsFactor = "FALSE")
+TS2.2c[, 7] <- c(1:14, 11:14, 11:14) # Create a sequence
+names(TS2.2c) <- c("Year", "World", "Europe", "America", "Africa", "Asia", "Seq")
+TS2.2c <- TS2.2c[1:14, ] # Select a type of prediction
+TS2.2c$Year <- as.character(TS2.2c$Year)
+TS2.2c$Year[11:14] <- c(2030, 2050, 2070, 2100) # Clean dates
+TS2.2c$Year <- as.numeric(TS2.2c$Year)
+TS2.2c <- TS2.2c[ ,-which(names(TS2.2c) %in% c("Seq"))]
+save(TS2.2c, file = "data/TS2.2c.Rda")
+
+# Table S2.2d / TS2.2
+TS2.2d <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.2", rowIndex = 8:29, colIndex = 32:47, header = FALSE)
+TS2.2d[, 17] <- c(1:14, 11:14, 11:14) # Create a sequence
+names(TS2.2d) <- c("Year", "World", "Western Europe", "Eastern Europe", "Russia & Ukraine Belarus Moldavia", "North America", "Latin America", "Northern Africa", "Sub-Shaharan Africa", "China", "India", "Japan", "Australia & New Zealand", "Middle East (Including Turkey)", "Central Asia", "Other Asian Countries", "Seq")
+TS2.2d <- TS2.2d[1:14, ] # Select a type of prediction
+TS2.2d$Year <- as.character(TS2.2d$Year)
+TS2.2d$Year[11:14] <- c(2030, 2050, 2070, 2100) # Clean dates
+TS2.2d$Year <- as.numeric(TS2.2d$Year)
+TS2.2d <- TS2.2d[ ,-which(names(TS2.2d) %in% c("Seq"))]
+save(TS2.2d, file = "data/TS2.2d.Rda")
+
+# Table S2.2c (selection) / TS2.2
+TS2.2e <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.2", rowIndex = 8:17, colIndex = c(25, 27:30), header = FALSE)
+names(TS2.2e) <- c("Year", "Europe", "America", "Africa", "Asia")
+save(TS2.2e, file = "data/TS2.2e.Rda")
+
+# Spreadsheet TS2.4
+TS2.4a <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.4", rowIndex = 10:16, colIndex = 4:6, header = FALSE)
+TS2.4a[, 4] <- as.numeric(row.names(TS2.4a)) # Create a sequence
+names(TS2.4a) <- c("Period", "Western Europe", "North America", "Seq")
+save(TS2.4a, file = "data/TS2.4a.Rda")
+
+TS2.4b <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.4",rowIndex = 7:18, colIndex = c(1,3), header = FALSE)
+TS2.4b[, 3] <- as.numeric(row.names(TS2.4b)) # Create a sequence
+names(TS2.4b) <- c("Period", "World", "Seq")
+save(TS2.4b, file = "data/TS2.4b.Rda")
+
+TS2.4c <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.4",rowIndex = 7:18, colIndex = c(1,2), header = FALSE)
+TS2.4c[, 3] <- as.numeric(row.names(TS2.4c)) # Create a sequence
+names(TS2.4c) <- c("Period", "World", "Seq")
+save(TS2.4c, file = "data/TS2.4c.Rda")
+
+# Spreadsheet TS2.5
+TS2.5 <- read.xlsx("../Piketty2014FiguresTables/Chapter2TablesFigures.xlsx",
+  sheetName = "TS2.5", rowIndex = 8:14, colIndex = 1:5, header = FALSE)
+# Create a sequence
+TS2.5[, 6] <- as.numeric(row.names(TS2.5))
+names(TS2.5) <- c("Period", "France", "Germany", "United States", "Britain", "Seq")
+save(TS2.5, file = "data/TS2.5.Rda")
+
+# Figure 2.1 / TS2.2 / world population / 4 continents
+load("data/TS2.2e.Rda")
+df_2_1 <- melt(TS2.2e, id.vars = "Year")
+save(df_2_1, file = "data/df_2_1.Rda")
+
+# Figure 2.2S / TS2.2 / Population in several continents
+load("data/TS2.2a.Rda")
+df_2_2S <- melt(TS2.2a, id.vars = c("Period", "Seq"))
+# Create factors Observed / Projected
+df_2_2S$Category <- as.factor(ifelse(df_2_2S$Seq < 10, "Observed", "Projected"))
+save(df_2_2S, file = "data/df_2_2S.Rda")
+
+# Figure 2.2 / TS2.2 / World population
+load("data/df_2_2S.Rda")
+df_2_2 <- df_2_2S[which(df_2_2S$variable == "World"), ]
+save(df_2_2, file = "data/df_2_2.Rda")
+
+# Figure 2.3 / TS2.4 / Europe + America / Per capita output
+load("data/TS2.4a.Rda")
+df_2_3 <- melt(TS2.4a, id.vars = c("Period", "Seq"))
+save(df_2_3, file = "data/df_2_3.Rda")
+
+# Figure 2.4 / TS2.4 / World / Per capita output
+load("data/TS2.4b.Rda")
+df_2_4 <- melt(TS2.4b, id.vars = c("Period", "Seq"))
+# Create factors Observed / Projected
+df_2_4$Category <- as.factor(ifelse(df_2_4$Seq < 8, "Observed", "Projected"))
+save(df_2_4, file = "data/df_2_4.Rda")
+
+# Figure 2.5 / TS2.4 / World / Total output
+load("data/TS2.4c.Rda")
+df_2_5 <- melt(TS2.4c, id.vars = c("Period", "Seq"))
+# Create factors Observed / Projected
+df_2_5$Category <- as.factor(ifelse(df_2_5$Seq < 8, "Observed", "Projected"))
+save(df_2_5, file = "data/df_2_5.Rda")
+
+# Figure 2.6 / TS2.5 / Countries / Inflation
+load("data/TS2.5.Rda")
+df_2_6 <- melt(TS2.5, id.vars = c("Period", "Seq"))
+save(df_2_6, file = "data/df_2_6.Rda")
+
+
+
+## Chapter 3 - The Metamorphoses of Capital
+
+# Spreadsheet TS3.1
+TS3.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter3TablesFigures.xlsx", 
+  sheetName = "TS3.1", rowIndex = 9:19, colIndex = 1:10, header = FALSE)
+names(TS3.1) <- c("Year", "National capital (private + public)", "Agricultural land", "Housing", "Other domestic capital", "Net foreign capital", "Public capital", "Public assets", "Public debt", "Private capital")
+TS3.1 <- melt(TS3.1, id.vars = "Year")
+save(TS3.1, file = "data/TS3.1.Rda")
+
+# Spreadsheet TS3.2
+TS3.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter3TablesFigures.xlsx", 
+  sheetName = "TS3.2", rowIndex = 9:21, colIndex = 1:10, header = FALSE)
+names(TS3.2) <- c("Year", "National capital (private + public)", "Agricultural land", "Housing", "Other domestic capital", "Net foreign capital", "Public capital", "Public assets", "Public debt", "Private capital")
+TS3.2 <- melt(TS3.2, id.vars = "Year")
+save(TS3.2, file = "data/TS3.2.Rda")
+
+# Figure 3.1 / / TS1 / Britain / Capital
+load("data/TS3.1.Rda")
+df_3_1 <- TS3.1[which(TS3.1$variable %in% c("Agricultural land", "Housing", "Other domestic capital", "Net foreign capital")), ]
+row.names(df_3_1) <- NULL
+save(df_3_1, file = "data/df_3_1.Rda")
+
+# Figure 3.2 / TS3.2 / France / Capital
+load("data/TS3.2.Rda")
+df_3_2 <- TS3.2[which(TS3.2$variable %in% c("Agricultural land", "Housing", "Other domestic capital", "Net foreign capital")), ]
+row.names(df_3_2) <- NULL
+save(df_3_2, file = "data/df_3_2.Rda")
+
+# Figure 3.3 / TS3.1 / Britain / Capital
+load("data/TS3.1.Rda")
+df_3_3 <- TS3.1[which(TS3.1$variable %in% c("Public assets", "Public debt")), ]
+row.names(df_3_3) <- NULL
+save(df_3_3, file = "data/df_3_3.Rda")
+
+# Figure 3.4 / TS3.2 / France / Capital
+load("data/TS3.2.Rda")
+df_3_4 <- TS3.2[which(TS3.2$variable %in% c("Public assets", "Public debt")), ]
+row.names(df_3_4) <- NULL
+save(df_3_4, file = "data/df_3_4.Rda")
+
+# Figure 3.5 / TS3.1 / Britain / Capital
+load("data/TS3.1.Rda")
+df_3_5 <- TS3.1[which(TS3.1$variable %in% c("National capital (private + public)", "Private capital", "Public capital")), ]
+row.names(df_3_5) <- NULL
+save(df_3_5, file = "data/df_3_5.Rda")
+
+# Figure 3.6 / TS3.2 / France / Capital
+load("data/TS3.2.Rda")
+df_3_6 <- TS3.2[which(TS3.2$variable %in% c("National capital (private + public)", "Private capital", "Public capital")), ]
+row.names(df_3_6) <- NULL
+save(df_3_6, file = "data/df_3_6.Rda")
+
+
+## Chapter 4 - From Old Europe to the New World
+
+# Spreadsheet TS4.1
+TS4.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter4TablesFigures.xlsx", 
+  sheetName = "TS4.1", rowIndex = 9:17, colIndex = 1:10, header = FALSE)
+names(TS4.1) <- c("Year", "National capital (private + public)", "Agricultural land", "Housing", "Other domestic capital", "Net foreign capital", "Public capital", "Public assets", "Public debt", "Private capital")
+TS4.1 <- melt(TS4.1, id.vars = "Year")
+save(TS4.1, file = "data/TS4.1.Rda")
+
+# Spreadsheet TS4.2
+TS4.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter4TablesFigures.xlsx", 
+  sheetName = "TS4.2", rowIndex = 11:21, colIndex = 1:12, header = FALSE)
+names(TS4.2) <- c("Year", "National capital (private + public)", "Agricultural land", "Housing", "Other domestic capital", "Net foreign capital", "Public capital", "Public assets", "Public debt", "Private capital", "Slaves", "National capital (including Slaves)")
+TS4.2 <- melt(TS4.2, id.vars = "Year")
+save(TS4.2, file = "data/TS4.2.Rda")
+
+# Spreadsheet TS4.3
+  # Remark: label of Chapter4TablesFigures, TS4.3, column E is incorrect
+TS4.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter4TablesFigures.xlsx", 
+  sheetName = "TS4.3", rowIndex = 9:18, colIndex = c(1:10,12:13), header = FALSE)
+names(TS4.3) <- c("Year", "National capital (private + public)", "Agricultural land", "Housing", "Other domestic capital", "Net foreign capital", "Public capital", "Public assets", "Public debt", "Private capital", "Housing + Land", "Land + Housing + Other domestic capital")
+TS4.3 <- melt(TS4.3, id.vars = "Year")
+save(TS4.3, file = "data/TS4.3.Rda")
+
+# Spreadsheet TS4.4
+TS4.4 <- read.xlsx("../Piketty2014FiguresTables/Chapter4TablesFigures.xlsx", 
+  sheetName = "TS4.4", rowIndex = 9:12, colIndex = 1:7, header = FALSE)
+names(TS4.4) <- c("Country", "National wealth", "Agricultural land", "Slaves", "Housing", "Other domestic capital", "Net foreign assets")
+TS4.4 <- melt(TS4.4, id.vars = "Country")
+save(TS4.4, file = "data/TS4.4.Rda")
+
+# Spreadsheet TS4.5
+TS4.5a <- read.xlsx("../Piketty2014FiguresTables/Chapter4TablesFigures.xlsx", 
+  sheetName = "TS4.5", rowIndex = 6:20, colIndex = 1:6, header = FALSE)
+TS4.5a[, "Category"] <- "Private capital"
+names(TS4.5a) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe", "Category")
+TS4.5b <- read.xlsx("../Piketty2014FiguresTables/Chapter4TablesFigures.xlsx", 
+  sheetName = "TS4.5", rowIndex = 6:20, colIndex = c(1,7:11), header = FALSE)
+TS4.5b[, "Category"] <- "National capital"
+names(TS4.5b) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe", "Category")
+TS4.5c <- read.xlsx("../Piketty2014FiguresTables/Chapter4TablesFigures.xlsx", 
+  sheetName = "TS4.5", rowIndex = 6:20, colIndex = c(1,12:16), header = FALSE)
+TS4.5c[, "Category"] <- "Public capital"
+names(TS4.5c) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe", "Category")
+TS4.5 <- rbind(TS4.5a, TS4.5b, TS4.5c)
+rm(list = c('TS4.5a', 'TS4.5b', 'TS4.5c'))
+TS4.5[, "Category"] <- factor(TS4.5[, "Category"])
+TS4.5 <- melt(TS4.5, id.vars = c("Year", "Category"))
+save(TS4.5, file = "data/TS4.5.Rda")
+
+# Figure 4.1 / TS4.1 / Germany / Capital
+load("data/TS4.1.Rda")
+df_4_1 <- TS4.1[which(TS4.1$variable %in% c("Agricultural land", "Housing", "Other domestic capital", "Net foreign capital")), ]
+row.names(df_4_1) <- NULL
+save(df_4_1, file = "data/df_4_1.Rda")
+
+# Figure 4.2 / TS4.1 / Germany / Public capital
+load("data/TS4.1.Rda")
+df_4_2 <- TS4.1[which(TS4.1$variable %in% c("Public assets", "Public debt")), ]
+row.names(df_4_2) <- NULL
+save(df_4_2, file = "data/df_4_2.Rda")
+
+# Figure 4.3 / TS4.1 / Germany / Private and public capital
+load("data/TS4.1.Rda")
+df_4_3 <- TS4.1[which(TS4.1$variable %in% c("National capital (private + public)", "Private capital", "Public capital")), ]
+row.names(df_4_3) <- NULL
+save(df_4_3, file = "data/df_4_3.Rda")
+
+# Figure 4.4 / TS4.5 / Germany France Britain / Private and public capital
+load("data/TS4.5.Rda")
+df_4_4 <- subset(TS4.5, variable %in% c("Germany", "France", "United Kingdom") & Category %in% c("Private capital", "Public capital"))
+row.names(df_4_4) <- NULL
+save(df_4_4, file = "data/df_4_4.Rda")
+
+# Figure 4.5 / TS4.5 / Germany France Britain / National capital
+  # Remark: y-axis label of Figure 4.5 on page 147 is incorrect
+load("data/TS4.5.Rda")
+df_4_5 <- subset(TS4.5, variable %in% c("Germany", "France", "United Kingdom") & Category %in% c("National capital"))
+row.names(df_4_5) <- NULL
+save(df_4_5, file = "data/df_4_5.Rda")
+
+# Figure 4.6 / TS4.2 / United States / National capital
+load("data/TS4.2.Rda")
+df_4_6 <- TS4.2[which(TS4.2$variable %in% c("Agricultural land", "Housing", "Other domestic capital", "Net foreign capital")), ]
+row.names(df_4_6) <- NULL
+save(df_4_6, file = "data/df_4_6.Rda")
+
+# Figure 4.7 / TS4.2 / United States / Public wealth
+load("data/TS4.2.Rda")
+df_4_7 <- TS4.2[which(TS4.2$variable %in% c("Public assets", "Public debt")), ]
+row.names(df_4_7) <- NULL
+save(df_4_7, file = "data/df_4_7.Rda")
+
+# Figure 4.8 / TS4.2 / United States / Private and public wealth
+load("data/TS4.2.Rda")
+df_4_8 <- TS4.2[which(TS4.2$variable %in% c("National capital (private + public)", "Private capital", "Public capital")), ]
+row.names(df_4_8) <- NULL
+save(df_4_8, file = "data/df_4_8.Rda")
+
+# Figure 4.9 / TS4.3 / Canada / National capital
+load("data/TS4.3.Rda")
+df_4_9 <- TS4.3[which(TS4.3$variable %in% c("Agricultural land", "Housing", "Other domestic capital", "Net foreign capital")), ]
+row.names(df_4_9) <- NULL
+save(df_4_9, file = "data/df_4_9.Rda")
+
+# Figure 4.10 / TS4.2 / United States / National capital + slaves
+load("data/TS4.2.Rda")
+df_4_10 <- TS4.2[which(TS4.2$variable %in% c("Agricultural land", "Housing", "Other domestic capital", "Net foreign capital", "Slaves")), ]
+row.names(df_4_10) <- NULL
+save(df_4_10, file = "data/df_4_10.Rda")
+
+# Figure 4.11 / TS4.4 / Britain France United States South & North / National capital
+load("data/TS4.4.Rda")
+df_4_11 <- TS4.4[which(TS4.4$variable %in% c("Agricultural land", "Slaves", "Housing", "Other domestic capital")), ]
+df_4_11$Country = factor(df_4_11$Country, levels = c("United Kingdom", "France", "United States (South)", "United States (North)"))
+row.names(df_4_11) <- NULL
+save(df_4_11, file = "data/df_4_11.Rda")
+
+
+## Chapter 5 - The Capital/Income Ratio Over the Long Run
+
+# Spreadsheet TS5.2
+TS5.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.2", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(TS5.2) <-  c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+TS5.2 <- melt(TS5.2, id.vars = "Year")
+save(TS5.2, file = "data/TS5.2.Rda")
+
+# Spreadsheet TS5.3
+TS5.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.3", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(TS5.3) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+TS5.3 <- melt(TS5.3, id.vars = "Year")
+save(TS5.3, file = "data/TS5.3.Rda")
+
+# Spreadsheet TS5.5
+TS5.5 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.5", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(TS5.5) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+TS5.5 <- melt(TS5.5, id.vars = "Year")
+save(TS5.5, file = "data/TS5.5.Rda")
+
+# Spreadsheet TS5.11
+TS5.11 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.11", rowIndex = 5:45, colIndex = 1:9, header = FALSE)
+names(TS5.11) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia")
+TS5.11 <- TS5.11[, c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Canada", "Australia")] # Drop Italy as data is empty
+TS5.11 <- melt(TS5.11, id.vars = "Year")
+save(TS5.11, file = "data/TS5.11.Rda")
+
+# Spreadsheet TS5.12
+TS5.12 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.12", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(TS5.12) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+TS5.12 <- melt(TS5.12, id.vars = "Year")
+save(TS5.12, file = "data/TS5.12.Rda")
+
+# Spreadsheet CTS4.5
+# CTS4.5a / Private capital
+cTS4.5a <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS4.5", rowIndex = 6:20, colIndex = c(1:6), header = FALSE)
+names(cTS4.5a) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe")
+cTS4.5a[, "Category"] <- "Private capital"
+# CTS4.5b / National capital
+cTS4.5b <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS4.5", rowIndex = 6:20, colIndex = c(1,7:11), header = FALSE)
+names(cTS4.5b) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe")
+cTS4.5b[, "Category"] <- "National capital"
+# CTS4.5c / Public capital
+cTS4.5c <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS4.5", rowIndex = 6:20, colIndex = c(1,12:16), header = FALSE)
+names(cTS4.5c) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe")
+cTS4.5c[, "Category"] <- "Public capital"
+# CTS4.5d / Net foreign capital
+cTS4.5d <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS4.5", rowIndex = 6:20, colIndex = c(1,21:25), header = FALSE)
+names(cTS4.5d) <- c("Year", "United States", "Germany", "France", "United Kingdom", "Europe")
+cTS4.5d[, "Category"] <- "Net foreign capital"
+# CTS4.5 / Merge data frames
+cTS4.5 <- rbind(cTS4.5a, cTS4.5b, cTS4.5c, cTS4.5d)
+rm(list = c('cTS4.5a', 'cTS4.5b', 'cTS4.5c', 'cTS4.5d'))
+cTS4.5[, "Category"] <- factor(cTS4.5[, "Category"])
+cTS4.5 <- melt(cTS4.5, id.vars = c("Year", "Category"))
+cTS4.5$Country <- cTS4.5$variable
+# cTS4.5$variable <- interaction(cTS4.5$variable, cTS4.5$Category) # proper way
+cTS4.5$variable <- paste(cTS4.5$variable, ":", cTS4.5$Category) # dirty way
+save(cTS4.5, file = "data/cTS4.5.Rda")
+
+# Spreadsheet TS5.1
+TS5.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.1", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(TS5.1) <-  c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+TS5.1 <- melt(TS5.1, id.vars = "Year")
+save(TS5.1, file = "data/TS5.1.Rda")
+
+# Spreadsheet cTS12.3
+cTS12.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "CTS12.3", rowIndex = 5:28, colIndex = 1:2, header = FALSE)
+names(cTS12.3) <- c("Year", "Capital")
+cTS12.3 <- melt(cTS12.3, id.vars = "Year")
+save(cTS12.3, file = "data/cTS12.3.Rda")
+
+# Figure 5.1 / CTS4.5 / private & public capital / USA & Europe
+load("data/cTS4.5.Rda")
+df_5_1 <- subset(cTS4.5, Country %in% c("United States", "Europe") & Category %in% c("Private capital", "Public capital"))
+row.names(df_5_1) <- NULL
+save(df_5_1, file = "data/df_5_1.Rda")
+
+# Figure 5.2 / CTS4.5 / national & foreign capital / USA & Europe
+load("data/cTS4.5.Rda")
+df_5_2 <- subset(cTS4.5, Country %in% c("United States", "Europe") & Category %in% c("National capital", "Net foreign capital"))
+row.names(df_5_2) <- NULL
+save(df_5_2, file = "data/df_5_2.Rda")
+
+# Figure 5.3S / TS5.1 / private capital / several countries / incl Spain
+load("data/TS5.1.Rda")
+df_5_3S <- TS5.1
+save(df_5_3S, file = "data/df_5_3S.Rda")
+
+# Figure 5.3 / TS5.1 / private capital / several countries
+load("data/TS5.1.Rda")
+df_5_3 <- subset(TS5.1, Country %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
+row.names(df_5_3) <- NULL
+save(df_5_3, file = "data/df_5_3.Rda")
+
+# Figure 5.4S / TS5.12 / private capital ratio / several countries / incl Spain
+load("data/TS5.12.Rda")
+df_5_4S <- TS5.12
+save(df_5_4S, file = "data/df_5_4S.Rda")
+
+# Figure 5.4 / TS5.12 / private capital ratio / several countries
+load("data/TS5.12.Rda")
+df_5_4 <- subset(TS5.12, Country %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
+save(df_5_4, file = "data/df_5_4.Rda")
+
+# Figure 5.5XS / TS5.2 / public capital / several countries / incl Spain
+load("data/TS5.2.Rda")
+df_5_5XS <- TS5.2
+save(df_5_5XS, file = "data/df_5_5XS.Rda")
+
+# Figure 5.5X / TS5.2 / public capital / several countries
+load("data/TS5.2.Rda")
+df_5_5X <- subset(TS5.2, Country %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
+save(df_5_5X, file = "data/df_5_5X.Rda")
+
+# Figure 5.5S / TS5.1 + TS5.2 / public & private capital / several countries / incl Spain
+load("data/df_5_3S.Rda")
+load("data/df_5_5XS.Rda")
+df_5_5S <- merge(df_5_3S, df_5_5XS, by = c("Year", "variable"))
+names(df_5_5S) <- c("Year", "variable", "Private", "Public")
+df_5_5S <- melt(df_5_5S, id.vars = c("Year", "variable"))
+names(df_5_5S) <- c("Year", "variable", "Category", "value")
+save(df_5_5S, file = "data/df_5_5S.Rda")
+
+# Figure 5.5 / TS5.1 + TS5.2 / public & private capital / several countries
+load("data/df_5_5S.Rda")
+df_5_5 <- subset(df_5_5S, Country %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
+row.names(df_5_5) <- NULL
+save(df_5_5, file = "data/df_5_5.Rda")
+
+# Figure 5.6 / TS5.11 / market/book value of corporations  / 7 countries
+load("data/TS5.11.Rda")
+df_5_6 <- TS5.11
+save(df_5_6, file = "data/df_5_6.Rda")
+
+# Figure 5.7S / TS5.3 + TS5.5 / national & foreign capital / several countries / incl Spain
+load("data/TS5.3.Rda")
+load("data/TS5.5.Rda")
+df_5_7S <- merge(TS5.3, TS5.5, by = c("Year", "variable"))
+names(df_5_7S) <- c("Year", "variable", "National", "Foreign")
+df_5_7S <- melt(df_5_7S, id.vars = c("Year", "variable"))
+names(df_5_7S) <- c("Year", "variable", "Category", "value")
+save(df_5_7S, file = "data/df_5_7S.Rda")
+
+# Figure 5.7 / TS5.3 + TS5.5 / national & foreign capital / several countries
+load("data/df_5_7S.Rda")
+df_5_7 <- subset(df_5_7S, Country %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
+row.names(df_5_7) <- NULL
+save(df_5_7, file = "data/df_5_7.Rda")
+
+# Figure 5.8 / CTS12.3 / world capital/income ratio
+# Create factors Observed / Projected
+load("data/cTS12.3.Rda")
+df_5_8 <- cTS12.3
+df_5_8$Category <- as.factor(ifelse(df_5_8$Year < 2011, "Observed", "Projected"))
+row.names(df_5_8) <- NULL
+save(df_5_8, file = "data/df_5_8.Rda")
+
+
+
+## Chapter 6 - The Capital/Labor Split in the Twenty-First Century
+
+# Spreadsheet TS6.1
+TS6.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter6TablesFigures.xlsx",
+  sheetName = "TS6.1", rowIndex = 9:33, colIndex = 1:8, header = FALSE)
+names(TS6.1) <- c("Year", "Capital income share", "Labor income share", "Average rate of return", "Pure rate of return (estimate)", "Minimum rate of return", "Pure capital share (estimate)", "Minimum capital share")
+save(TS6.1, file = "data/TS6.1.Rda")
+
+# Spreadsheet TS6.2
+TS6.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter6TablesFigures.xlsx",
+  sheetName = "TS6.2", rowIndex = 7:26, colIndex = 1:8, header = FALSE)
+names(TS6.2) <- c("Year", "Capital income share", "Labor income share", "Average rate of return", "Pure rate of return (estimate)", "Minimum rate of return", "Pure capital share (estimate)", "Minimum capital share")
+save(TS6.2, file = "data/TS6.2.Rda")
+
+# Spreadsheet TS6.3
+TS6.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter6TablesFigures.xlsx",
+  sheetName = "TS6.3", rowIndex = 5:45, colIndex = 1:11, header = FALSE)
+names(TS6.3) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Europe")
+save(TS6.3, file = "data/TS6.3.Rda")
+
+# Spreadsheet TS6.4
+TS6.4 <- read.xlsx("../Piketty2014FiguresTables/Chapter6TablesFigures.xlsx",
+  sheetName = "TS6.4", rowIndex = 6:120, colIndex = 1:6, header = FALSE)
+names(TS6.4) <- c("Year", "Share of housing in national income (net of depreciation)", "Share of gross profits in gross value added", "Share of net profits in net value added (net of capital depreciation)", "Share of capital income in national income (before tax)", "Share of capital income (after tax and excluding retained earnings)")
+save(TS6.4, file = "data/TS6.4.Rda")
+
+# Figure 6.1 / TS6.1 /  capital/labor income shares / United Kingdom
+load("data/TS6.1.Rda")
+df_6_1 <- TS6.1[, c("Year", "Capital income share", "Labor income share")]
+df_6_1 <- melt(df_6_1, id.vars = "Year")
+save(df_6_1, file = "data/df_6_1.Rda")
+
+# Figure 6.2 / TS6.2 /  capital/labor income shares / France
+load("data/TS6.2.Rda")
+df_6_2 <- TS6.2[, c("Year", "Capital income share", "Labor income share")]
+df_6_2 <- melt(df_6_2, id.vars = "Year")
+save(df_6_2, file = "data/df_6_2.Rda")
+
+# Figure 6.3 / TS6.1 / rate of return / Britain
+load("data/TS6.1.Rda")
+df_6_3 <- TS6.1[, c("Year", "Average rate of return", "Pure rate of return (estimate)")]
+df_6_3 <- melt(df_6_3, id.vars = "Year")
+save(df_6_3, file = "data/df_6_3.Rda")
+
+# Figure 6.4 / TS6.2 / rate of return / France
+load("data/TS6.2.Rda")
+df_6_4 <- TS6.2[, c("Year", "Average rate of return", "Pure rate of return (estimate)")]
+df_6_4 <- melt(df_6_4, id.vars = "Year")
+save(df_6_4, file = "data/df_6_4.Rda")
+
+# Figure 6.5 / TS6.3 / capital share / several countries
+load("data/TS6.3.Rda")
+df_6_5 <- TS6.3[, c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia")]
+df_6_5 <- melt(df_6_5, id.vars = "Year")
+save(df_6_5, file = "data/df_6_5.Rda")
+
+# Figure 6.6 / TS6.4 / profit share / France
+load("data/TS6.4.Rda")
+df_6_6 <- TS6.4[, c("Year", "Share of gross profits in gross value added", "Share of net profits in net value added (net of capital depreciation)")]
+df_6_6 <- melt(df_6_6, id.vars = "Year")
+save(df_6_6, file = "data/df_6_6.Rda")
+
+# Figure 6.7 / TS6.4 / housing rent / France
+load("data/TS6.4.Rda")
+df_6_7 <- TS6.4[, c("Year", "Share of housing in national income (net of depreciation)")]
+df_6_7 <- melt(df_6_7, id.vars = "Year")
+save(df_6_7, file = "data/df_6_7.Rda")
+
+# Figure 6.8 / TS6.4 / capital income share / France
+load("data/TS6.4.Rda")
+df_6_8 <- TS6.4[, c("Year", "Share of capital income in national income (before tax)")]
+df_6_8 <- melt(df_6_8, id.vars = "Year")
+save(df_6_8, file = "data/df_6_8.Rda")
+
+# Figure 6.8 / TS6.4 / capital income share / France
+load("data/TS6.4.Rda")
+df_6_8S <- TS6.4[, c("Year", "Share of capital income in national income (before tax)", "Share of capital income (after tax and excluding retained earnings)")]
+df_6_8S <- melt(df_6_8S, id.vars = "Year")
+save(df_6_8S, file = "data/df_6_8S.Rda")
+
+
+## Chapter 7 - Inequality and Concentration: Preliminary Bearings
+
+# Spreadsheet TS7.7
+TS7.7 <- read.xlsx("../Piketty2014FiguresTables/Chapter7TablesFigures.xlsx",
+  sheetName = "TS7.7", rowIndex = 8:108, colIndex = 1:3, header = FALSE)
+names(TS7.7) <- c("x", "Distribution with 2 income groups (discrete)", "Distribution with many income groups (continuous)")
+TS7.7 <- cbind(TS7.7, "Perfect Equality (45 degree line)" = TS7.7$x)
+save(TS7.7, file = "data/TS7.7.Rda")
+
+# Figure 7.1X / TS7.7 / Gini-Lorenz curve / France
+# Figure from sheet FS7.1 but not in book
+load("data/TS7.7.Rda")
+df_7_1X <- melt(TS7.7, id.vars = "x")
+save(df_7_1X, file = "data/df_7_1X.Rda")
+
+
+## Chapter 8 - Two Worlds
+
+# Spreadsheet TS8.1
+TS8.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+  sheetName = "TS8.1", rowIndex = 6:116, colIndex = 1:6, header = FALSE)
+names(TS8.1) <- c("Year", "france_top_10_is", "france_top_1_is", "france_top_01_is", "france_top_10_ws", "france_top_1_ws")
+TS8.1$Country <- "France"
+save(TS8.1, file = "data/TS8.1.Rda")
+
+# Spreadsheet TS8.2
+TS8.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+  sheetName = "TS8.2", rowIndex = 6:116, colIndex = 1:11, header = FALSE)
+names(TS8.2) <- c("Year",
+  "usa_top_10_is","usa_top_10_5_is", "usa_top_5_1_is","usa_top_1_is", "usa_top_01_is",
+  "usa_top_10_is_wok", "usa_top_1_is_wok", "usa_top_01_is_wok", 
+  "usa_top_10_ws", "usa_top_1_ws")
+  # is = income share
+  # wok = without kapital gains
+  # ws = wage share
+TS8.2$Country <- "United States"
+save(TS8.2, file = "data/TS8.2.Rda")
+
+# Spreadsheet TS8.3
+TS8.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter8TablesFigures.xlsx",
+  sheetName = "TS8.3", rowIndex = c(6:11,15:20,24:29), colIndex = 1:7, header = FALSE)
+names(TS8.3) <- c("Quantile", "Labor Income", "Capital Income", "Mixed Income", "Labor Income", "Capital Income", "Mixed Income")
+TS8.3 <- rbind(TS8.3[,1:4], TS8.3[,c(1,5:7)])
+TS8.3[c(1:6,19:24), "Country"] <- "France"
+TS8.3[c(7:12,13:18,25:30,31:36), "Country"] <- "United States"
+TS8.3[1:6, "Year"] <- "1932"
+TS8.3[c(7:12,13:18), "Year"] <- "1929"
+TS8.3[19:24, "Year"] <- "2005"
+TS8.3[c(25:30,31:36), "Year"] <- "2007"
+TS8.3[c(1:6,13:18,19:24,31:36), "Category"] <- "Excluding capital gains"
+TS8.3[c(7:12,25:30), "Category"] <- "Including capital gains"
+TS8.3[, c("Country","Year","Category")] <- lapply(TS8.3[, c("Country","Year","Category")] , factor)
+TS8.3 <- melt(TS8.3, id.vars = c("Quantile", "Country", "Year", "Category"))
+save(TS8.3, file = "data/TS8.3.Rda")
+
+# Figure 8.1 /  TS8.1 / incomes & wages deciles / France
+load("data/TS8.1.Rda")
+df_8_1 <- TS8.1[, c("Year", "france_top_10_is", "france_top_10_ws")]
+names(df_8_1) <- c("Year", "Incomes", "Wages")
+df_8_1 <- melt(df_8_1, id.vars = c("Year"))
+df_8_1 <- df_8_1[!is.na(df_8_1$value), ]  # connect points despite NAs
+row.names(df_8_1) <- NULL
+save(df_8_1, file = "data/df_8_1.Rda")
+
+# Figure 8.2 /  TS8.1 / incomes & wages percentiles / France
+load("data/TS8.1.Rda")
+df_8_2 <- TS8.1[, c("Year", "france_top_1_is", "france_top_1_ws")]
+names(df_8_2) <- c("Year", "Incomes", "Wages")
+df_8_2 <- melt(df_8_2, id.vars = c("Year"))
+row.names(df_8_2) <- NULL
+save(df_8_2, file = "data/df_8_2.Rda")
+
+# Figure 8.3 /  TS8.3 / income sources / France / 1932
+load("data/TS8.3.Rda")
+df_8_3 <- subset(TS8.3, Country == "France" & Year == "1932" & Category == "Excluding capital gains")
+df_8_3 <- df_8_3[, c("Quantile", "variable", "value")]
+row.names(df_8_3) <- NULL
+save(df_8_3, file = "data/df_8_3.Rda")
+
+# Figure 8.4 /  TS8.3 / income by sources / France / 2005
+load("data/TS8.3.Rda")
+df_8_4 <- subset(TS8.3, Country == "France" & Year == "2005" & Category == "Excluding capital gains")
+df_8_4 <- df_8_4[, c("Quantile", "variable", "value")]
+row.names(df_8_4) <- NULL
+save(df_8_4, file = "data/df_8_4.Rda")
+
+# Figure 8.5 /  TS8.2 / top decile w/o capital gains / USA
+load("data/TS8.2.Rda")
+df_8_5 <- TS8.2[, c("Year", "usa_top_10_is", "usa_top_10_is_wok")]
+names(df_8_5) <- c("Year", "Including capital gains", "Excluding capital gains")
+df_8_5 <- melt(df_8_5, id.vars = "Year")
+df_8_5 <- df_8_5[!is.na(df_8_5$value), ]  # connect points despite NAs
+row.names(df_8_5) <- NULL
+save(df_8_5, file = "data/df_8_5.Rda")
+
+# Figure 8.6 /  TS8.2 / incomes for 3 quantiles / USA
+load("data/TS8.2.Rda")
+df_8_6 <- TS8.2[, c("Year", "usa_top_1_is", "usa_top_5_1_is", "usa_top_10_5_is")]
+names(df_8_6) <- c("Year", "Top 1% (above $352,000)", "Top 5%-1% (between $150,000 and $350,000)", "Top 10%-5% (between $108,000 and $150,000)")
+df_8_6 <- melt(df_8_6, id.vars = "Year")
+row.names(df_8_6) <- NULL
+save(df_8_6, file = "data/df_8_6.Rda")
+
+# Figure 8.7 /  TS8.2 / incomes & wages deciles / USA
+load("data/TS8.2.Rda")
+df_8_7 <- TS8.2[, c("Year", "usa_top_10_is", "usa_top_10_is_wok", "usa_top_10_ws")]
+names(df_8_7) <- c("Year", "Incomes", "Incomes (Excluding capital gains)", "Wages")
+df_8_7 <- melt(df_8_7, id.vars = c("Year"))
+df_8_7 <- df_8_7[!is.na(df_8_7$value), ]  # connect points despite NAs
+row.names(df_8_7) <- NULL
+save(df_8_7, file = "data/df_8_7.Rda")
+
+# Figure 8.8 /  TS8.2 / incomes & wages percentiles / USA
+load("data/TS8.2.Rda")
+df_8_8 <- TS8.2[, c("Year", "usa_top_1_is", "usa_top_1_is_wok", "usa_top_1_ws")]
+names(df_8_8) <- c("Year", "Incomes", "Incomes (Excluding capital gains)", "Wages")
+df_8_8 <- melt(df_8_8, id.vars = c("Year"))
+row.names(df_8_8) <- NULL
+save(df_8_8, file = "data/df_8_8.Rda")
+
+# Figure 8.9 /  TS8.3 / income by sources / USA / 1929
+load("data/TS8.3.Rda")
+df_8_9 <- melt(TS8.3, id.vars = c("Year", "Country", "Quantile", "variable", "Category"))
+df_8_9 <- subset(df_8_9, Country == "United States" & Year == "1929" & Category == "Including capital gains")
+df_8_9 <- df_8_9[, c("Quantile", "variable", "value")]
+row.names(df_8_9) <- NULL
+save(df_8_9, file = "data/df_8_9.Rda")
+
+# Figure 8.10 /  TS8.3 / income by sources / USA / 2007
+load("data/TS8.3.Rda")
+df_8_10 <- melt(TS8.3, id.vars = c("Year", "Country", "Quantile", "variable", "Category"))
+df_8_10 <- subset(df_8_10, Country == "United States" & Year == "2007" & Category == "Including capital gains")
+df_8_10 <- df_8_10[, c("Quantile", "variable", "value")]
+row.names(df_8_10) <- NULL
+save(df_8_10, file = "data/df_8_10.Rda")
+
+
+## Chapter 9 - Inequality of Labor Income
+
+# Spreadsheet TS9.1
+# France
+TS9.1a <- read.xlsx("../Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
+  sheetName = "TS9.1", rowIndex = 7:70, colIndex = 1:5, header = FALSE)
+names(TS9.1a) <- c("Year", "Hourly minimum wage (current francs/euros)", "Hourly minimum wage (current euros)", "Hourly minimum wage (2013 euros)", "Consumer Price Index")
+TS9.1a <- cbind(TS9.1a, "Country" = "France")
+TS9.1a <- melt(TS9.1a, id.vars = c("Year", "Country"), variable.name = "Category")
+TS9.1a <- cbind(TS9.1a, "variable" = NA)  # create unique variable name
+TS9.1a[which(TS9.1a$Category == "Hourly minimum wage (current francs/euros)"), ]$variable <- "France (current francs/euros)"
+TS9.1a[which(TS9.1a$Category == "Hourly minimum wage (current euros)"), ]$variable <- "France (current euros)"
+TS9.1a[which(TS9.1a$Category == "Hourly minimum wage (2013 euros)"), ]$variable <- "France (2013 euros)"
+TS9.1a[which(TS9.1a$Category == "Consumer Price Index"), ]$variable <- "France CPI"
+TS9.1a <- cbind(TS9.1a, "Unit" = NA)  # create units
+TS9.1a[which(TS9.1a$Category == "Hourly minimum wage (current francs/euros)"), ]$Unit <- "current francs/euros"
+TS9.1a[which(TS9.1a$Category == "Hourly minimum wage (current euros)"), ]$Unit <- "current euros"
+TS9.1a[which(TS9.1a$Category == "Hourly minimum wage (2013 euros)"), ]$Unit <- "2013 euros"
+TS9.1a[which(TS9.1a$Category == "Consumer Price Index"), ]$Unit <- "Index"
+TS9.1a$Category <- "Hourly minimum wage"
+# United States
+TS9.1b <- read.xlsx("../Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
+  sheetName = "TS9.1", rowIndex = 7:70, colIndex = c(1,6:8), header = FALSE)
+names(TS9.1b) <- c("Year", "Hourly minimum wage (current dollars)", "Hourly minimum wage (2013 dollars)", "Consumer Price Index")
+TS9.1b <- cbind(TS9.1b, "Country" = "United States")
+TS9.1b <- melt(TS9.1b, id.vars = c("Year", "Country"),  variable.name = "Category")
+TS9.1b <- cbind(TS9.1b, "variable" = NA)  # create unique variable name
+TS9.1b[which(TS9.1b$Category == "Hourly minimum wage (current dollars)"), ]$variable <- "United States (current dollars)"
+TS9.1b[which(TS9.1b$Category == "Hourly minimum wage (2013 dollars)"), ]$variable <- "United States (2013 dollars)"
+TS9.1b[which(TS9.1b$Category == "Consumer Price Index"), ]$variable <- "United States CPI"
+TS9.1b <- cbind(TS9.1b, "Unit" = NA)  # create units
+TS9.1b[which(TS9.1b$Category == "Hourly minimum wage (current dollars)"), ]$Unit <- "current dollars"
+TS9.1b[which(TS9.1b$Category == "Hourly minimum wage (2013 dollars)"), ]$Unit <- "2013 dollars"
+TS9.1b[which(TS9.1b$Category == "Consumer Price Index"), ]$Unit <- "Index"
+TS9.1b$Category <- "Hourly minimum wage"
+# France + United States
+TS9.1 <- rbind(TS9.1a, TS9.1b)
+rm(list = c('TS9.1a', 'TS9.1b'))
+save(TS9.1, file = "data/TS9.1.Rda")
+
+# Spreadsheet TS9.2
+TS9.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
+  sheetName = "TS9.2", rowIndex = 6:116, colIndex = 1:12, header = FALSE)
+names(TS9.2) <- c("Year", "uk_top_10_is","uk_top_1_is", "uk_top_01_is", "germany_top_10_is", "germany_top_1_is", "germany_top_01_is", "swedenmark_top_10_is", "swedenmark_top_1_is", "swedenmark_top_01_is", "japan_top_1_is", "japan_top_01_is")
+save(TS9.2, file = "data/TS9.2.Rda")
+
+# Spreadsheet TS9.3
+TS9.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
+  sheetName = "TS9.3", rowIndex = 6:116, colIndex = 1:15, header = FALSE)
+names(TS9.3) <- c("Year", "canada_top_1_is", "canada_top_01_is", "australia__top_1_is","australia__top_01_is", "nzl_top_1_is", "nzl_top_01_is", "denmark_top_1_is","denmark_top_01_is","italy_top_1_is","italy_top_01_is", "holland_top_1_is","holland_top_01_is","spa_top_1_is","spa_top_01_is")
+save(TS9.3, file = "data/TS9.3.Rda")
+
+# Spreadsheet TS9.4
+# Europe = United Kingdom + Germany + France + Sweden
+TS9.4 <- read.xlsx("../Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
+  sheetName = "TS9.4", rowIndex = 6:116, colIndex = 1:3, header = FALSE)
+names(TS9.4) <- c("Year", "Europe (Germany, France, Britain, Sweden)", "Europe (Germany, France, Britain)")
+save(TS9.4, file = "data/TS9.4.Rda")
+
+# Spreadsheet TS9.5
+TS9.5 <- read.xlsx("../Piketty2014FiguresTables/Chapter9TablesFigures.xlsx",
+  sheetName = "TS9.5", rowIndex = 6:116, colIndex = 1:13, header = FALSE)
+names(TS9.5) <- c("Year", "india_top_1_is", "india_top_01_is", "sa_top_1_is", "sa_top_01_is", "indonesia_top_1_is", "indonesia_top_01_is", "argentina_top_1_is", "argentina_top_01_is", "china_top_1_is", "china_top_01_is", "colombia_top_1_is", "colombia_top_01_is")
+save(TS9.5, file = "data/TS9.5.Rda")
+
+# Figure 9.1 / TS9.1 / minimum wage / France USA
+# 2013 Euro/Dollar PPP conversion rate = 1.2, as per Figure 9.1, page 309.
+load("data/TS9.1.Rda")
+df_9_1 <- subset(TS9.1, variable %in% c("Year", "United States (2013 dollars)", "France (2013 euros)"))
+df <- df_9_1[which(df_9_1$Country == "United States"), ]
+df$value <- 1/1.2*df$value
+df$variable <- "United States (2013 euros)"
+df$Category <- "Hourly minimum wage"
+df$Unit <- "2013 euros"
+df_9_1 <- rbind(df_9_1, df)
+row.names(df_9_1) <- NULL
+save(df_9_1, file = "data/df_9_1.Rda")
+
+# Figure 9.2 / TS8.2 + TS9.2 / top income percentile / 4 Anglo-Saxon countries
+# The data for the US is "excluding capital gains". To do: find out why.
+# United States
+load("data/TS8.2.Rda")
+df_9_2a <- cbind(TS8.2$Year, TS8.2$usa_top_1_is, TS8.2$usa_top_1_is_wok)
+df_9_2a <- data.frame(rbind(cbind(1900:1909, NA, NA), df_9_2a))
+names(df_9_2a) <- c("Year", "United States top income percentile", "United States top income percentile (excluding capital gains)")
+df_9_2a$Country <- "United States"
+df_9_2a$Category <- "Top income percentile"
+df_9_2a <- melt(df_9_2a, id.vars = c("Year", "Country", "Category"))
+# United Kingdom
+load("data/TS9.2.Rda")
+df_9_2b <- data.frame(cbind(TS9.2$Year, TS9.2$uk_top_1_is))
+names(df_9_2b) <- c("Year", "United Kingdom top income percentile")
+df_9_2b$Country <- "United Kingdom"
+df_9_2b$Category <- "Top income percentile"
+df_9_2b <- melt(df_9_2b, id.vars = c("Year", "Country", "Category"))
+# Canada
+load("data/TS9.3.Rda")
+df_9_2c <- data.frame(cbind(TS9.3$Year, TS9.3$canada_top_1_is))
+names(df_9_2c) <- c("Year", "Canada top income percentile")
+df_9_2c$Country <- "Canada"
+df_9_2c$Category <- "Top income percentile"
+df_9_2c <- melt(df_9_2c, id.vars = c("Year", "Country", "Category"))
+# Australia
+df_9_2d <- data.frame(cbind(TS9.3$Year, TS9.3$australia__top_1_is))
+names(df_9_2d) <- c("Year", "Australia top income percentile")
+df_9_2d$Country <- "Australia"
+df_9_2d$Category <- "Top income percentile"
+df_9_2d <- melt(df_9_2d, id.vars = c("Year", "Country", "Category"))
+# United States + United Kingdom + Canada + Australia
+df_9_2S <- rbind(df_9_2a, df_9_2b, df_9_2c, df_9_2d)
+row.names(df_9_2S) <- NULL
+save(df_9_2S, file = "data/df_9_2S.Rda")
+rm(list = c('df_9_2a', 'df_9_2b', 'df_9_2c', 'df_9_2d'))
+df_9_2 <- subset(df_9_2S, variable %in% c("United States top income percentile", "United Kingdom top income percentile", "Canada top income percentile", "Australia top income percentile") & Year %in% 1910:2010) # subset including/excluding capital gains
+df_9_2 <- df_9_2[, c("Year", "Country", "value")]
+names(df_9_2) <- c("Year", "variable", "value")
+df_9_2$variable <- factor(df_9_2$variable, levels = (c("United States", "United Kingdom", "Canada", "Australia")), ordered = TRUE)
+row.names(df_9_2) <- NULL
+save(df_9_2, file = "data/df_9_2.Rda")
+
+# Figure 9.3 / TS8.1 + TS9.2 / top income percentile / Continental Europe + Japan
+# France
+load("data/TS8.1.Rda")
+df_9_3a <- data.frame(cbind(TS8.1$Year, TS8.1$france_top_1_is))
+names(df_9_3a) <- c("Year", "France top income percentile")
+df_9_3a$Country <- "France"
+df_9_3a$Category <- "Top income percentile"
+df_9_3a <- melt(df_9_3a, id.vars = c("Year", "Country", "Category"))
+# Germany
+load("data/TS9.2.Rda")
+df_9_3b <- data.frame(cbind(TS9.2$Year, TS9.2$germany_top_1_is))
+names(df_9_3b) <- c("Year", "Germany top income percentile")
+df_9_3b$Country <- "Germany"
+df_9_3b$Category <- "Top income percentile"
+df_9_3b <- melt(df_9_3b, id.vars = c("Year", "Country", "Category"))
+# Sweden
+df_9_3c <- data.frame(cbind(TS9.2$Year, TS9.2$swedenmark_top_1_is))
+names(df_9_3c) <- c("Year", "Sweden top income percentile")
+df_9_3c$Country <- "Sweden"
+df_9_3c$Category <- "Top income percentile"
+df_9_3c <- melt(df_9_3c, id.vars = c("Year", "Country", "Category"))
+# Japan
+df_9_3d <- data.frame(cbind(TS9.2$Year, TS9.2$japan_top_1_is))
+names(df_9_3d) <- c("Year", "Japan top income percentile")
+df_9_3d$Country <- "Japan"
+df_9_3d$Category <- "Top income percentile"
+df_9_3d <- melt(df_9_3d, id.vars = c("Year", "Country", "Category"))
+# France + Germany + Sweden + Japan
+df_9_3S <- rbind(df_9_3a, df_9_3b, df_9_3c, df_9_3d)
+row.names(df_9_3S) <- NULL
+save(df_9_3S, file = "data/df_9_3S.Rda")
+rm(list = c('df_9_3a', 'df_9_3b', 'df_9_3c', 'df_9_3d'))
+df_9_3 <- subset(df_9_3S, variable %in% c("France top income percentile", "Germany top income percentile", "Sweden top income percentile", "Japan top income percentile") & Year %in% 1910:2010) # subset including/excluding capital gains
+df_9_3 <- df_9_3[, c("Year", "Country", "value")]
+names(df_9_3) <- c("Year", "variable", "value")
+df_9_3$variable <- factor(df_9_3$variable, levels = (c("France", "Germany", "Sweden", "Japan")), ordered = TRUE)
+row.names(df_9_3) <- NULL
+df_9_3 <- df_9_3[!is.na(df_9_3$value), ]  # connect points despite NAs
+save(df_9_3, file = "data/df_9_3.Rda")
+
+# Figure 9.4 / TS8.1 + TS9.3 / top income percentile / North + South Europe
+# France
+load("data/df_9_3S.Rda")
+df_9_4a <- subset(df_9_3S, variable == "France top income percentile")
+# Denmark
+load("data/TS9.3.Rda")
+df_9_4b <- data.frame(cbind(TS9.3$Year, TS9.3$denmark_top_1_is))
+names(df_9_4b) <- c("Year", "Denmark top income percentile")
+df_9_4b$Country <- "Denmark"
+df_9_4b$Category <- "Top income percentile"
+df_9_4b <- melt(df_9_4b, id.vars = c("Year", "Country", "Category"))
+# Italy
+df_9_4c <- data.frame(cbind(TS9.3$Year, TS9.3$italy_top_1_is))
+names(df_9_4c) <- c("Year", "Italy top income percentile")
+df_9_4c$Country <- "Italy"
+df_9_4c$Category <- "Top income percentile"
+df_9_4c <- melt(df_9_4c, id.vars = c("Year", "Country", "Category"))
+# Spain
+df_9_4d <- data.frame(cbind(TS9.3$Year, TS9.3$spa_top_1_is))
+names(df_9_4d) <- c("Year", "Spain top income percentile")
+df_9_4d$Country <- "Spain"
+df_9_4d$Category <- "Top income percentile"
+df_9_4d <- melt(df_9_4d, id.vars = c("Year", "Country", "Category"))
+# France + Denmark + Italy + Spain
+df_9_4S <- rbind(df_9_4a, df_9_4b, df_9_4c, df_9_4d)
+row.names(df_9_4S) <- NULL
+save(df_9_4S, file = "data/df_9_4S.Rda")
+rm(list = c('df_9_4a', 'df_9_4b', 'df_9_4c', 'df_9_4d'))
+df_9_4 <- subset(df_9_4S, variable %in% c("France top income percentile", "Denmark top income percentile", "Italy top income percentile", "Spain top income percentile") & Year %in% 1910:2010) # subset including/excluding capital gains
+df_9_4 <- df_9_4[, c("Year", "Country", "value")]
+names(df_9_4) <- c("Year", "variable", "value")
+df_9_4$variable <- as.factor(df_9_4$variable)
+df_9_4$variable <- factor(df_9_4$variable, levels = (c("France", "Denmark", "Italy", "Spain")), ordered = TRUE)
+df_9_4 <- df_9_4[!is.na(df_9_4$value), ]  # connect points despite NAs
+row.names(df_9_4) <- NULL
+save(df_9_4, file = "data/df_9_4.Rda")
+
+# Figure 9.5 / TS8.2 + TS9.2 / top income 0.1% / 4 Anglo-Saxon countries
+# Figure title incorrect in book, "decile" should read "permille" (http://en.wikipedia.org/wiki/Quantile)
+# United States
+load("data/TS8.2.Rda")
+df_9_5a <- cbind(TS8.2$Year, TS8.2$usa_top_01_is, TS8.2$usa_top_01_is_wok)
+df_9_5a <- data.frame(rbind(cbind(1900:1909, NA, NA), df_9_5a))
+names(df_9_5a) <- c("Year", "United States top income permille", "United States top income permille (excluding capital gains)")
+df_9_5a$Country <- "United States"
+df_9_5a$Category <- "Top income permille"
+df_9_5a <- melt(df_9_5a, id.vars = c("Year", "Country", "Category"))
+# United Kingdom
+load("data/TS9.2.Rda")
+df_9_5b <- data.frame(cbind(TS9.2$Year, TS9.2$uk_top_01_is))
+names(df_9_5b) <- c("Year", "United Kingdom top income permille")
+df_9_5b$Country <- "United Kingdom"
+df_9_5b$Category <- "Top income permille"
+df_9_5b <- melt(df_9_5b, id.vars = c("Year", "Country", "Category"))
+# Canada
+load("data/TS9.3.Rda")
+df_9_5c <- data.frame(cbind(TS9.3$Year, TS9.3$canada_top_01_is))
+names(df_9_5c) <- c("Year", "Canada top income permille")
+df_9_5c$Country <- "Canada"
+df_9_5c$Category <- "Top income permille"
+df_9_5c <- melt(df_9_5c, id.vars = c("Year", "Country", "Category"))
+# Australia
+df_9_5d <- data.frame(cbind(TS9.3$Year, TS9.3$australia__top_01_is))
+names(df_9_5d) <- c("Year", "Australia top income permille")
+df_9_5d$Country <- "Australia"
+df_9_5d$Category <- "Top income permille"
+df_9_5d <- melt(df_9_5d, id.vars = c("Year", "Country", "Category"))
+# United States + United Kingdom + Canada + Australia
+df_9_5S <- rbind(df_9_5a, df_9_5b, df_9_5c, df_9_5d)
+row.names(df_9_5S) <- NULL
+save(df_9_5S, file = "data/df_9_5S.Rda")
+rm(list = c('df_9_5a', 'df_9_5b', 'df_9_5c', 'df_9_5d'))
+df_9_5 <- subset(df_9_5S, variable %in% c("United States top income permille", "United Kingdom top income permille", "Canada top income permille", "Australia top income permille") & Year %in% 1910:2010) # subset including/excluding capital gains
+df_9_5 <- df_9_5[, c("Year", "Country", "value")]
+names(df_9_5) <- c("Year", "variable", "value")
+df_9_5$variable <- factor(df_9_5$variable, levels = (c("United States", "United Kingdom", "Canada", "Australia")), ordered = TRUE)
+row.names(df_9_5) <- NULL
+save(df_9_5, file = "data/df_9_5.Rda")
+
+# Figure 9.5X / TS8.2 + TS9.2 / top income decile / US + UK
+# United States
+load("data/TS8.2.Rda")
+df_9_5a <- cbind(TS8.2$Year, TS8.2$usa_top_10_is, TS8.2$usa_top_10_is_wok)
+df_9_5a <- data.frame(rbind(cbind(1900:1909, NA, NA), df_9_5a))
+names(df_9_5a) <- c("Year", "United States top income decile", "United States top income decile (excluding capital gains)")
+df_9_5a$Country <- "United States"
+df_9_5a$Category <- "Top income decile"
+df_9_5a <- melt(df_9_5a, id.vars = c("Year", "Country", "Category"))
+# United Kingdom
+load("data/TS9.2.Rda")
+df_9_5b <- data.frame(cbind(TS9.2$Year, TS9.2$uk_top_10_is))
+names(df_9_5b) <- c("Year", "United Kingdom top income decile")
+df_9_5b$Country <- "United Kingdom"
+df_9_5b$Category <- "Top income decile"
+df_9_5b <- melt(df_9_5b, id.vars = c("Year", "Country", "Category"))
+# Canada: no data for decile in spreadsheet TS9.3
+# Australia: no data for decile in spreadsheet TS9.3
+# United States + United Kingdom
+df_9_5XS <- rbind(df_9_5a, df_9_5b)
+row.names(df_9_5XS) <- NULL
+save(df_9_5XS, file = "data/df_9_5XS.Rda")
+rm(list = c('df_9_5a', 'df_9_5b'))
+df_9_5X <- subset(df_9_5XS, variable %in% c("United States top income decile", "United Kingdom top income decile") & Year %in% 1910:2010)
+df_9_5X <- df_9_5X[, c("Year", "Country", "value")]
+names(df_9_5X) <- c("Year", "variable", "value")
+df_9_5X$variable <- factor(df_9_5X$variable, levels = (c("United States", "United Kingdom")), ordered = TRUE)
+row.names(df_9_5X) <- NULL
+save(df_9_5X, file = "data/df_9_5X.Rda")
+
+# Figure 9.6 / TS8.1 + TS9.2 / top income 0.1% / Continental Europe + Japan
+# Figure title incorrect in book, "decile" should read "permille"
+# France
+load("data/TS8.1.Rda")
+df_9_6a <- data.frame(cbind(TS8.1$Year, TS8.1$france_top_01_is))
+names(df_9_6a) <- c("Year", "France top income permille")
+df_9_6a$Country <- "France"
+df_9_6a$Category <- "Top income permille"
+df_9_6a <- melt(df_9_6a, id.vars = c("Year", "Country", "Category"))
+# Germany
+load("data/TS9.2.Rda")
+df_9_6b <- data.frame(cbind(TS9.2$Year, TS9.2$germany_top_01_is))
+names(df_9_6b) <- c("Year", "Germany top income permille")
+df_9_6b$Country <- "Germany"
+df_9_6b$Category <- "Top income permille"
+df_9_6b <- melt(df_9_6b, id.vars = c("Year", "Country", "Category"))
+# Sweden
+df_9_6c <- data.frame(cbind(TS9.2$Year, TS9.2$swedenmark_top_01_is))
+names(df_9_6c) <- c("Year", "Sweden top income permille")
+df_9_6c$Country <- "Sweden"
+df_9_6c$Category <- "Top income permille"
+df_9_6c <- melt(df_9_6c, id.vars = c("Year", "Country", "Category"))
+# Japan
+df_9_6d <- data.frame(cbind(TS9.2$Year, TS9.2$japan_top_01_is))
+names(df_9_6d) <- c("Year", "Japan top income permille")
+df_9_6d$Country <- "Japan"
+df_9_6d$Category <- "Top income permille"
+df_9_6d <- melt(df_9_6d, id.vars = c("Year", "Country", "Category"))
+# France + Germany + Sweden + Japan
+df_9_6S <- rbind(df_9_6a, df_9_6b, df_9_6c, df_9_6d)
+row.names(df_9_6S) <- NULL
+save(df_9_6S, file = "data/df_9_6S.Rda")
+rm(list = c('df_9_6a', 'df_9_6b', 'df_9_6c', 'df_9_6d'))
+df_9_6 <- subset(df_9_6S, variable %in% c("France top income permille", "Germany top income permille", "Sweden top income permille", "Japan top income permille") & Year %in% 1910:2010) # subset including/excluding capital gains
+df_9_6 <- df_9_6[, c("Year", "Country", "value")]
+names(df_9_6) <- c("Year", "variable", "value")
+df_9_6$variable <- factor(df_9_6$variable, levels = (c("France", "Germany", "Sweden", "Japan")), ordered = TRUE)
+df_9_6 <- df_9_6[!is.na(df_9_6$value), ]  # connect points despite NAs
+row.names(df_9_6) <- NULL
+save(df_9_6, file = "data/df_9_6.Rda")
+
+# Figure 9.6X / TS8.1 + TS9.2 / top income decile / Continental Europe
+# France
+load("data/TS8.1.Rda")
+df_9_6a <- data.frame(cbind(TS8.1$Year, TS8.1$france_top_10_is))
+names(df_9_6a) <- c("Year", "France top income decile")
+df_9_6a$Country <- "France"
+df_9_6a$Category <- "Top income decile"
+df_9_6a <- melt(df_9_6a, id.vars = c("Year", "Country", "Category"))
+# Germany
+load("data/TS9.2.Rda")
+df_9_6b <- data.frame(cbind(TS9.2$Year, TS9.2$germany_top_10_is))
+names(df_9_6b) <- c("Year", "Germany top income decile")
+df_9_6b$Country <- "Germany"
+df_9_6b$Category <- "Top income decile"
+df_9_6b <- melt(df_9_6b, id.vars = c("Year", "Country", "Category"))
+# Sweden
+df_9_6c <- data.frame(cbind(TS9.2$Year, TS9.2$swedenmark_top_10_is))
+names(df_9_6c) <- c("Year", "Sweden top income decile")
+df_9_6c$Country <- "Sweden"
+df_9_6c$Category <- "Top income decile"
+df_9_6c <- melt(df_9_6c, id.vars = c("Year", "Country", "Category"))
+# France + Germany + Sweden
+df_9_6XS <- rbind(df_9_6a, df_9_6b, df_9_6c)
+row.names(df_9_6XS) <- NULL
+save(df_9_6XS, file = "data/df_9_6XS.Rda")
+rm(list = c('df_9_6a', 'df_9_6b', 'df_9_6c'))
+df_9_6X <- subset(df_9_6XS, variable %in% c("France top income decile", "Germany top income decile", "Sweden top income decile") & Year %in% 1910:2010)
+df_9_6X <- df_9_6X[, c("Year", "Country", "value")]
+names(df_9_6X) <- c("Year", "variable", "value")
+df_9_6X$variable <- factor(df_9_6X$variable, levels = (c("France", "Germany", "Sweden")), ordered = TRUE)
+row.names(df_9_6X) <- NULL
+save(df_9_6X, file = "data/df_9_6X.Rda")
+
+# Figure 9.7 / TS8.1 + TS8.1 + TS9.2 / top income decile / Europe + USA
+# France
+load("data/df_9_6XS.Rda")  # France + Germany + Sweden
+df_9_7a <- subset(df_9_6XS, variable == "France top income decile")
+# Germany
+df_9_7b <- subset(df_9_6XS, variable == "Germany top income decile")
+# Sweden
+df_9_7c <- subset(df_9_6XS, variable == "Sweden top income decile")
+# United States
+load("data/df_9_5XS.Rda")  # United States + United Kingdom
+df_9_7d <- subset(df_9_5XS, variable == "United States top income decile")
+# United Kingdom
+df_9_7e <- subset(df_9_5XS, variable == "United Kingdom top income decile")
+# France + Germany + Sweden + United Kingdom + United States
+df_9_7S <- rbind(df_9_7a, df_9_7b, df_9_7c, df_9_7d, df_9_7e)
+row.names(df_9_7S) <- NULL
+save(df_9_7S, file = "data/df_9_7S.Rda")
+rm(list = c('df_9_7a', 'df_9_7b', 'df_9_7c', 'df_9_7d', 'df_9_7e'))
+df_9_7 <- subset(df_9_7S, variable %in% c("France top income decile", "Germany top income decile", "Sweden top income decile", "United States top income decile", "United Kingdom top income decile"))
+df_9_7 <- df_9_7[, c("Year", "Country", "value")]
+names(df_9_7) <- c("Year", "variable", "value")
+df_9_7$variable <- factor(df_9_7$variable, levels = (c("United States", "United Kingdom", "Germany", "France", "Sweden")), ordered = TRUE)
+df_9_7 <- df_9_7[!is.na(df_9_7$value), ]  # connect points despite NAs
+row.names(df_9_7) <- NULL
+save(df_9_7, file = "data/df_9_7.Rda")
+
+# Figure 9.7X / TS8.1 + TS8.1 + TS9.2 / top income 0.1% / Europe + USA
+# France
+load("data/df_9_6S.Rda")  # France + Germany + Sweden
+df_9_7a <- subset(df_9_6S, variable == "France top income permille")
+# Germany
+df_9_7b <- subset(df_9_6S, variable == "Germany top income permille")
+# Sweden
+df_9_7c <- subset(df_9_6S, variable == "Sweden top income permille")
+# United States
+load("data/df_9_5S.Rda")  # United States + United Kingdom
+df_9_7d <- subset(df_9_5S, variable == "United States top income permille")
+# United Kingdom
+df_9_7e <- subset(df_9_5S, variable == "United Kingdom top income permille")
+# France + Germany + Sweden + United Kingdom + United States
+df_9_7XS <- rbind(df_9_7a, df_9_7b, df_9_7c, df_9_7d, df_9_7e)
+row.names(df_9_7XS) <- NULL
+save(df_9_7XS, file = "data/df_9_7XS.Rda")
+rm(list = c('df_9_7a', 'df_9_7b', 'df_9_7c', 'df_9_7d', 'df_9_7e'))
+df_9_7X <- subset(df_9_7XS, variable %in% c("France top income permille", "Germany top income permille", "Sweden top income permille", "United States top income permille", "United Kingdom top income permille"))
+df_9_7X <- df_9_7X[, c("Year", "Country", "value")]
+names(df_9_7X) <- c("Year", "variable", "value")
+df_9_7X$variable <- factor(df_9_7X$variable, levels = (c("United States", "United Kingdom", "Germany", "France", "Sweden")), ordered = TRUE)
+row.names(df_9_7X) <- NULL
+save(df_9_7X, file = "data/df_9_7X.Rda")
+
+# Figure 9.8 / TS9.4 + TS8.2 / top income decile / Europe + USA
+# Europe (including Sweden)
+load("data/TS9.4.Rda")
+df_9_8a <- TS9.4[, c("Year", "Europe (Germany, France, Britain, Sweden)")] 
+# United States
+load("data/TS8.2.Rda")
+df_9_8b <- TS8.2[, c("Year", "usa_top_10_is")]
+names(df_9_8b) <- c("Year", "United States")
+# Europe + United States
+df_9_8 <- merge(df_9_8a, df_9_8b, by = c("Year"))
+df_9_8 <- melt(df_9_8, id.vars = "Year")
+row.names(df_9_8) <- NULL
+save(df_9_8, file = "data/df_9_8.Rda")
+
+# Figure 9.9 / TS9.5 / top income percentile / Emerging economies
+# India
+load("data/TS9.5.Rda")
+df_9_9a <- TS9.5[, c("Year", "india_top_1_is")]
+names(df_9_9a) <- c("Year", "India")
+# South Africa
+df_9_9b <- TS9.5[, c("Year", "sa_top_1_is")]
+names(df_9_9b) <- c("Year", "South Africa")
+# Indonesia
+df_9_9c <- TS9.5[, c("Year", "indonesia_top_1_is")]
+names(df_9_9c) <- c("Year", "Indonesia")
+# Argentina
+df_9_9d <- TS9.5[, c("Year", "argentina_top_1_is")]
+names(df_9_9d) <- c("Year", "Argentina")
+# China
+df_9_9e <- TS9.5[, c("Year", "china_top_1_is")]
+names(df_9_9e) <- c("Year", "China")
+# Colombia
+df_9_9f <- TS9.5[, c("Year", "colombia_top_1_is")]
+names(df_9_9f) <- c("Year", "Colombia")
+# 6 emerging economies
+df_9_9 <- Reduce(function(...)merge(..., by = "Year"), list(df_9_9a, df_9_9b, df_9_9c, df_9_9d, df_9_9e, df_9_9f))
+df_9_9 <- melt(df_9_9, id.vars = "Year")
+rl <- rle(!is.na(df_9_9$value))
+rl$values[which(rl$lengths > 9 & !rl$values)] <- TRUE
+df_9_9 <- df_9_9[inverse.rle(rl), ] # connect some but not all NAs
+row.names(df_9_9) <- NULL
+save(df_9_9, file = "data/df_9_9.Rda")
+
+
+## Chapter 10 - Inequality of Capital Ownership
+
+# Spreadsheet TS10.1
+TS10.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter10TablesFigures.xlsx",
+  sheetName = "TS10.1", rowIndex = 6:26, colIndex = 1:17, header = FALSE)
+names(TS10.1) <- c("Year", "france_top_10_wealth", "france_top_1_wealth", "france_top_01_wealth", "paris_top_1_wealth", "uk_top_10_wealth", "uk_top_1_wealth", "uk_top_01_wealth", "usa_top_10_wealth", "usa_top_1_wealth", "usa_top_01_wealth", "sweden_top_10_wealth", "sweden_top_1_wealth", "sweden_top_01_wealth", "europe_top_10_wealth", "europe_top_1_wealth", "europe_top_01_wealth")
+save(TS10.1, file = "data/TS10.1.Rda")
+
+# Spreadsheet TS10.2
+TS10.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter10TablesFigures.xlsx",
+  sheetName = "TS10.2", rowIndex = 10:19, colIndex = 1:7, header = FALSE)
+names(TS10.2) <- c("Year", "france_savings_rate", "france_capital_share", "france_pure_return_to_capital", "france_rate_of_return_pre_tax", "france_rate_of_growth_national_income", "france_rate_of_return_post_tax")
+save(TS10.2, file = "data/TS10.2.Rda")
+
+# Spreadsheet TS10.3
+TS10.3a <- read.xlsx("../Piketty2014FiguresTables/Chapter10TablesFigures.xlsx",
+  sheetName = "TS10.3", rowIndex = 7:15, colIndex = 1:4, header = FALSE)
+names(TS10.3a) <- c("Period", "world_r_pre_tax", "world_r_post_tax", "world_g")
+save(TS10.3a, file = "data/TS10.3a.Rda")
+TS10.3b <- read.xlsx("../Piketty2014FiguresTables/Chapter10TablesFigures.xlsx",
+  sheetName = "TS10.3", rowIndex = 7:14, colIndex = 6:9, header = FALSE)
+names(TS10.3b) <- c("Period", "world_r_pre_tax", "world_r_post_tax", "world_g")
+save(TS10.3b, file = "data/TS10.3b.Rda")
+
+# Figure 10.1S / TS10.1 / wealth inequality / France
+load("data/TS10.1.Rda")
+df_10_1S <- TS10.1[, c("Year", "france_top_10_wealth", "france_top_1_wealth", "france_top_01_wealth")]
+df_10_1S$Country <- "France"
+df_10_1S$Category <- "Wealth quantile"
+names(df_10_1S) <- c("Year", "Top 10% wealth share", "Top 1% wealth share", "Top 0.1% wealth share", "Country", "Category")
+df_10_1S <- melt(df_10_1S, id.vars = c("Year", "Country", "Category"))
+row.names(df_10_1S) <- NULL
+save(df_10_1S, file = "data/df_10_1S.Rda")
+
+# Figure 10.1 / TS10.1 / wealth inequality / France
+load("data/df_10_1S.Rda")
+df_10_1 <- subset(df_10_1S, variable %in% c("Top 10% wealth share", "Top 1% wealth share"))
+save(df_10_1, file = "data/df_10_1.Rda")
+
+# Figure 10.2 / TS10.1 / wealth inequality / France + Paris
+load("data/TS10.1.Rda")
+df_10_2 <- TS10.1[, c("Year", "paris_top_1_wealth", "france_top_1_wealth")]
+df_10_2$Country <- "Paris"
+df_10_2$Category <- "Wealth quantile"
+names(df_10_2) <- c("Year", "Top 1% wealth share (Paris)", "Top 1% wealth share (France)", "Country", "Category")
+df_10_2 <- melt(df_10_2, id.vars = c("Year", "Country", "Category"))
+row.names(df_10_2) <- NULL
+save(df_10_2, file = "data/df_10_2.Rda")
+
+# Figure 10.3S / TS10.1 / wealth inequality / Britain
+load("data/TS10.1.Rda")  # "uk_top_01_wealth" is filled with NAs
+df_10_3S <- TS10.1[, c("Year", "uk_top_10_wealth", "uk_top_1_wealth")] 
+df_10_3S$Country <- "United Kingdom"
+df_10_3S$Category <- "Wealth quantile"
+names(df_10_3S) <- c("Year", "Top 10% wealth share", "Top 1% wealth share", "Country", "Category")
+df_10_3S <- melt(df_10_3S, id.vars = c("Year", "Country", "Category"))
+row.names(df_10_3S) <- NULL
+save(df_10_3S, file = "data/df_10_3S.Rda")
+
+# Figure 10.3 / TS10.1 / wealth inequality / Britain
+load("data/df_10_3S.Rda")
+df_10_3 <- df_10_3S[!is.na(df_10_3S$value), ]  # connect points despite NAs
+save(df_10_3, file = "data/df_10_3.Rda")
+
+# Figure 10.4S / TS10.1 / wealth inequality / Sweden
+load("data/TS10.1.Rda")
+df_10_4S <- TS10.1[, c("Year", "sweden_top_10_wealth", "sweden_top_1_wealth", "sweden_top_01_wealth")]
+df_10_4S$Country <- "Sweden"
+df_10_4S$Category <- "Wealth quantile"
+names(df_10_4S) <- c("Year", "Top 10% wealth share", "Top 1% wealth share", "Top 0.1% wealth share", "Country", "Category")
+df_10_4S <- melt(df_10_4S, id.vars = c("Year", "Country", "Category"))
+save(df_10_4S, file = "data/df_10_4S.Rda")
+
+# Figure 10.4 / TS10.1 / wealth inequality / Sweden
+load("data/df_10_4S.Rda")
+df_10_4 <- subset(df_10_4S, variable %in% c("Top 10% wealth share", "Top 1% wealth share"))
+df_10_4 <- df_10_4[!is.na(df_10_4$value), ]  # connect points despite NAs
+save(df_10_4, file = "data/df_10_4.Rda")
+
+# Figure 10.5S / TS10.1 / wealth inequality / USA
+load("data/TS10.1.Rda")
+df_10_5S <- TS10.1[, c("Year", "usa_top_10_wealth", "usa_top_1_wealth", "usa_top_01_wealth")]
+df_10_5S$Country <- "United States"
+df_10_5S$Category <- "Wealth quantile"
+names(df_10_5S) <- c("Year", "Top 10% wealth share", "Top 1% wealth share", "Top 0.1% wealth share", "Country", "Category")
+df_10_5S <- melt(df_10_5S, id.vars = c("Year", "Country", "Category"))
+save(df_10_5S, file = "data/df_10_5S.Rda")
+
+# Figure 10.5 / TS10.1 / wealth inequality / USA
+load("data/df_10_5S.Rda")
+df_10_5 <- subset(df_10_5S, variable %in% c("Top 10% wealth share", "Top 1% wealth share"))
+df_10_5 <- df_10_5[!is.na(df_10_5$value), ]  # connect points despite NAs
+row.names(df_10_5) <- NULL
+save(df_10_5, file = "data/df_10_5.Rda")
+
+# Figure 10.6S / TS10.1 / wealth inequality / Europe + USA
+load("data/TS10.1.Rda")
+df_10_6a <- TS10.1[, c("Year", "usa_top_10_wealth", "usa_top_1_wealth", "usa_top_01_wealth")]
+df_10_6a$Country <- "United States"
+df_10_6a$Category <- "Wealth quantile"
+names(df_10_6a) <- c("Year", "Top 10% wealth share: United States", "Top 1% wealth share: United States", "Top 0.1% wealth share: United States", "Country", "Category")
+df_10_6a <- melt(df_10_6a, id.vars = c("Year", "Country", "Category"))
+df_10_6b <- TS10.1[, c("Year", "europe_top_10_wealth", "europe_top_1_wealth", "europe_top_01_wealth")]
+df_10_6b$Country <- "Europe"
+df_10_6b$Category <- "Wealth quantile"
+names(df_10_6b) <- c("Year", "Top 10% wealth share: Europe", "Top 1% wealth share: Europe", "Top 0.1% wealth share: Europe", "Country", "Category")
+df_10_6b <- melt(df_10_6b, id.vars = c("Year", "Country", "Category"))
+# United States + Europe
+df_10_6S <- rbind(df_10_6a, df_10_6b)
+save(df_10_6S, file = "data/df_10_6S.Rda")
+
+# Figure 10.6 / TS10.1 / wealth inequality / Europe + USA
+load("data/df_10_6S.Rda")
+df_10_6 <- subset(df_10_6S, variable %in% c("Top 10% wealth share: United States", "Top 1% wealth share: United States", "Top 10% wealth share: Europe", "Top 1% wealth share: Europe"))
+df_10_6 <- df_10_6[!is.na(df_10_6$value), ]  # connect points despite NAs
+row.names(df_10_6) <- NULL
+save(df_10_6, file = "data/df_10_6.Rda")
+
+# Figure 10.7 + 10.8 / TS10.2
+load("data/TS10.2.Rda")
+df_10_7a <- TS10.2[, c("Year", "france_savings_rate")]
+names(df_10_7a) <- c("Year", "National saving rate (s)")
+df_10_7a$Country <- "France"
+df_10_7a$Category <- "National saving rate"
+df_10_7a <- melt(df_10_7a, id.vars = c("Year", "Country", "Category"))
+df_10_7b <- TS10.2[, c("Year", "france_capital_share")]
+names(df_10_7b) <- c("Year", "Capital income share (alpha)")
+df_10_7b$Country <- "France"
+df_10_7b$Category <- "Capital income share"
+df_10_7b <- melt(df_10_7b, id.vars = c("Year", "Country", "Category"))
+df_10_7c <- TS10.2[, c("Year", "france_pure_return_to_capital")]
+names(df_10_7c) <- c("Year", "Pure rate of return to capital (r)")
+df_10_7c$Country <- "France"
+df_10_7c$Category <- "Capital rate of return"
+df_10_7c <- melt(df_10_7c, id.vars = c("Year", "Country", "Category"))
+df_10_7d <- TS10.2[, c("Year", "france_rate_of_return_pre_tax", "france_rate_of_return_post_tax")]
+names(df_10_7d) <- c("Year", "Rate of return (before tax)", "Rate of return (after tax)")
+df_10_7d$Country <- "France"
+df_10_7d$Category <- "Capital rate of return"
+df_10_7d <- melt(df_10_7d, id.vars = c("Year", "Country", "Category"))
+df_10_7e <- TS10.2[, c("Year", "france_rate_of_growth_national_income")]
+names(df_10_7e) <- c("Year", "Growth rate of national income (g)")
+df_10_7e$Country <- "France"
+df_10_7e$Category <- "National income growth"
+df_10_7e <- melt(df_10_7e, id.vars = c("Year", "Country", "Category"))
+df_10_7S <- rbind(df_10_7a, df_10_7b, df_10_7c, df_10_7d, df_10_7e)
+rm(list = c('df_10_7a', 'df_10_7b', 'df_10_7c', 'df_10_7d', 'df_10_7e'))
+save(df_10_7S, file = "data/df_10_7S.Rda")
+
+# Figure 10.7 / TS10.2 / return to capital + growth / France
+load("data/df_10_7S.Rda")
+df_10_7 <- subset(df_10_7S, variable %in% c("Pure rate of return to capital (r)", "Growth rate of national income (g)"))
+row.names(df_10_7) <- NULL
+save(df_10_7, file = "data/df_10_7.Rda")
+
+# Figure 10.8 / TS10.2 / capital share + saving rate / France
+load("data/df_10_7S.Rda")
+df_10_8 <- subset(df_10_7S, variable %in% c("Capital income share (alpha)", "National saving rate (s)"))
+row.names(df_10_8) <- NULL
+save(df_10_8, file = "data/df_10_8.Rda")
+
+# Figure 10.9 + 10.10 / TS10.3a
+load("data/TS10.3a.Rda")
+df_10_9a <- TS10.3a[, c("Period", "world_r_pre_tax", "world_r_post_tax")]
+names(df_10_9a) <- c("Period", "Pure rate of return to capital (r) \n(before tax)", "Pure rate of return to capital (r) \n(after tax and capital losses)")
+df_10_9a$Country <- "World"
+df_10_9a$Category <- "Capital rate of return"
+df_10_9a <- melt(df_10_9a, id.vars = c("Period", "Country", "Category"))
+df_10_9b <- TS10.3a[, c("Period", "world_g")]
+names(df_10_9b) <- c("Period", "Growth rate of world output (g)")
+df_10_9b$Country <- "World"
+df_10_9b$Category <- "World income growth"
+df_10_9b <- melt(df_10_9b, id.vars = c("Period", "Country", "Category"))
+df_10_9S <- rbind(df_10_9a, df_10_9b)
+rm(list = c('df_10_9a', 'df_10_9b'))
+save(df_10_9S, file = "data/df_10_9S.Rda")
+
+# Figure 10.9 / TS10.3a / pre-tax rate of return + growth / World
+load("data/df_10_9S.Rda")
+df_10_9 <- subset(df_10_9S, variable %in% c("Pure rate of return to capital (r) \n(before tax)", "Growth rate of world output (g)"))
+row.names(df_10_9) <- NULL
+save(df_10_9, file = "data/df_10_9.Rda")
+
+# Figure 10.10 / TS10.3b / after-tax rate of return + growth / World
+load("data/df_10_9S.Rda")
+df_10_10 <- subset(df_10_9S, variable %in% c("Pure rate of return to capital (r) \n(after tax and capital losses)", "Growth rate of world output (g)"))
+row.names(df_10_10) <- NULL
+save(df_10_10, file = "data/df_10_10.Rda")
+
+# Figure 10.11S / TS10.3 / rate of return + growth / World
+load("data/TS10.3b.Rda")
+df_10_11a <- TS10.3b[, c("Period", "world_r_pre_tax", "world_r_post_tax")]
+names(df_10_11a) <- c("Period", "Pure rate of return to capital (r) \n(before tax)", "Pure rate of return to capital (r) \n(after tax and capital losses)")
+df_10_11a$Country <- "World"
+df_10_11a$Category <- "Capital rate of return"
+df_10_11a <- melt(df_10_11a, id.vars = c("Period", "Country", "Category"))
+df_10_11b <- TS10.3b[, c("Period", "world_g")]
+names(df_10_11b) <- c("Period", "Growth rate of world output (g)")
+df_10_11b$Country <- "World"
+df_10_11b$Category <- "World income growth"
+df_10_11b <- melt(df_10_11b, id.vars = c("Period", "Country", "Category"))
+df_10_11S <- rbind(df_10_11a, df_10_11b)
+save(df_10_11S, file = "data/df_10_11S.Rda")
+
+# Figure 10.11 / TS10.3 / after-tax rate of return + growth / World
+df_10_11 <- subset(df_10_11S, variable %in% c("Pure rate of return to capital (r) \n(after tax and capital losses)", "Growth rate of world output (g)"))
+row.names(df_10_11) <- NULL
+save(df_10_11, file = "data/df_10_11.Rda")
+
+
+
+## Chapter 11 - Merit and Inheritance in the Long Run
+
+# Spreadsheet TS11.1
+# Table S11.1a / TS11.1
+TS11.1a <- read.xlsx("../Piketty2014FiguresTables/Chapter11TablesFigures.xlsx",
+  sheetName = "TS11.1", rowIndex = 8:39, colIndex = 1:13, header = FALSE)
+names(TS11.1a) <- c("Year", 
+                    "Annual inheritance flow (% of national income) (economic flows)", 
+                    "Annual inheritance flow (% national income) (fiscal flows)", 
+                    "Annual inheritance flow (% disposable income) (economic flows)", 
+                    "Annual inheritance flow (% disposable income) (fiscal flows)", 
+                    "Adult mortality rate (adults aged 20 and over)", 
+                    "Average age of decedents (adults aged 20 and over)", 
+                    "Average age of inheritors (direct line)", 
+                    "Ratio of average wealth at death to average wealth of the decedents and the living, (not including bequest gifts made before death)", 
+                    "Ratio of average wealth at death to average wealth of the decedents and the living, (including bequest gifts made before death)", 
+                    "Annual inheritance flow (% aggregate private wealth) (economic flows)", 
+                    "Simulated annual inheritance flow (scenario 1)", 
+                    "Simulated annual inheritance flow (scenario 2)" )
+TS11.1a$Country <- "France"
+TS11.1a$Category <- "Inheritance flows"
+save(TS11.1a, file = "data/TS11.1a.Rda")
+
+# Table S11.1b / TS11.1
+TS11.1b <- read.xlsx("../Piketty2014FiguresTables/Chapter11TablesFigures.xlsx",
+  sheetName = "TS11.1", rowIndex = 8:39, colIndex = 15:24, header = FALSE)
+names(TS11.1b) <- c("Year", 
+                    "Inheritance share (% total lifetime resources) (scenario 1)", 
+                    "Inheritance share (% labor resources) (scenario 1)", 
+                    "Living standard attained by top 1% inheritors (% of bottom 50% labor earners lifetime resources) (scenario 1)", 
+                    "Living standard attained by top 1% labor earners (% of bottom 50% labor earners lifetime resources) (scenario 1)", 
+                    "Fraction of each cohort receiving more inheritance than the bottom 50% labor resources (scenario 1)",
+                    "Inheritance share (% total lifetime resources) (scenario 2)", 
+                    "Inheritance (% labor resources) (scenario 2)", 
+                    "Living standard attained by top 1% inheritors (% of bottom 50% labor earners lifetime resources) (scenario 2)", 
+                    "Fraction of each cohort receiving more inheritance than the bottom 50% labor resources (scenario 2)")
+TS11.1b$Country <- "France"
+TS11.1b$Category <- "Inheritance flows"
+save(TS11.1b, file = "data/TS11.1b.Rda")
+
+# Spreadsheet TS11.2
+# Table S11.2a / TS11.2
+TS11.2a <- read.xlsx("../Piketty2014FiguresTables/Chapter11TablesFigures.xlsx",
+  sheetName = "TS11.2", rowIndex = 9:34, colIndex = 1:9, header = FALSE)
+names(TS11.2a) <- c("Year", 
+                    "Share of the non-capitalized inherited wealth (Modigliani) (scenario 1)", 
+                    "Share of the non-capitalized inherited wealth (Modigliani) (scenario 2)", 
+                    "Share of the capitalized inherited wealth (KS1) (Kotlikoff-Summers, r=3%, 30yrs) (scenario 1)", 
+                    "Share of the capitalized inherited wealth (KS1) (Kotlikoff-Summers, r=3%, 30yrs) (scenario 2)", 
+                    "Share of the capitalized inherited wealth (KS2) (Kotlikoff-Summers, observed rate of return) (scenario 1)", 
+                    "Share of the capitalized inherited wealth (KS2) (Kotlikoff-Summers, observed rate of return) (scenario 2)", 
+                    "Share of the capitalized inherited wealth (PPVR definition, estimate) (scenario 1)", 
+                    "Share of the capitalized inherited wealth (PPVR definition, estimate) (scenario 2)")
+TS11.2a$Country <- "France"
+TS11.2a$Category <- "Share of inherited wealth"
+save(TS11.2a, file = "data/TS11.2a.Rda")
+
+# Table S11.2b / TS11.2
+TS11.2b <- read.xlsx("../Piketty2014FiguresTables/Chapter11TablesFigures.xlsx",
+  sheetName = "TS11.2", rowIndex = 9:15, colIndex = 14:18, header = FALSE)
+names(TS11.2b) <- c("Year", 
+                    "Share of the non-capitalized inherited wealth (Modigliani)", 
+                    "Share of the capitalized inherited wealth (KS1) (Kotlikoff-Summers, r=3%, 30yrs)", 
+                    "Share of the capitalized inherited wealth (KS2) (Kotlikoff-Summers, observed rate of return)", 
+                    "Share of the capitalized inherited wealth (PPVR definition)")
+TS11.2b$Country <- "France"
+TS11.2b$Category <- "Share of inherited wealth"
+save(TS11.2b, file = "data/TS11.2b.Rda")
+
+# Spreadsheet TS11.3
+# Table S11.3 / TS11.3
+TS11.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter11TablesFigures.xlsx",
+  sheetName = "TS11.3", rowIndex = 8:19, colIndex = 1:3, header = FALSE)
+names(TS11.3) <- c("Year", "Inheritance flow in the UK (% national income) (fiscal flows) (Atkinson)", "Inheritance flow in Germany (% national income) (economic flow) (Schinke)")
+TS11.3$Category <- "Inheritance flows"
+save(TS11.3, file = "data/TS11.3.Rda")
+
+# Figure 11.1 / TS11.1a / inheritance flow / France
+load("data/TS11.1a.Rda")
+df_11_1 <- TS11.1a[, c("Year", "Annual inheritance flow (% of national income) (economic flows)", "Annual inheritance flow (% national income) (fiscal flows)")]
+names(df_11_1) <- c("Year", "Economic flow \n(computed from national wealth estimates, \nmortality table, and age-wealth profiles)\n", "Fiscal flow \n(computed from bequest and gift tax data, \nincluding tax-exempt assets\n")
+df_11_1 <- melt(df_11_1, id.vars = "Year")
+save(df_11_1, file = "data/df_11_1.Rda")
+
+# Figure 11.2 / TS11.1a / mortality rate / France
+load("data/TS11.1a.Rda")
+df_11_2 <- TS11.1a[, c("Year", "Adult mortality rate (adults aged 20 and over)")]
+names(df_11_2) <- c("Year", "Adult mortality rate \n(adults aged 20 and over)")
+df_11_2 <- melt(df_11_2, id.vars = "Year")
+save(df_11_2, file = "data/df_11_2.Rda")
+
+# Figure 11.3 / TS11.1a / age of descendants + inheritors / France
+load("data/TS11.1a.Rda")
+df_11_3 <- TS11.1a[, c("Year", "Average age of decedents (adults aged 20 and over)", "Average age of inheritors (direct line)")]
+df_11_3 <- melt(df_11_3, id.vars = "Year")
+save(df_11_3, file = "data/df_11_3.Rda")
+
+# Figure 11.4 / TS11.1a / inheritance flow + mortality / France
+load("data/TS11.1a.Rda")
+df_11_4 <- TS11.1a[, c("Year", "Annual inheritance flow (% aggregate private wealth) (economic flows)", "Adult mortality rate (adults aged 20 and over)")]
+names(df_11_4) <- c("Year", "Annual inheritance flow \n(% aggregate private wealth): \nannual rate of wealth transmission\n", "Adult mortality rate \n(adults aged 20 and over)\n")
+df_11_4 <- melt(df_11_4, id.vars = "Year")
+save(df_11_4, file = "data/df_11_4.Rda")
+
+# Figure 11.5 / TS11.1a / wealth at death + wealth of living / France
+load("data/TS11.1a.Rda")
+df_11_5 <- TS11.1a[, c("Year", "Ratio of average wealth at death to average wealth of the decedents and the living, (not including bequest gifts made before death)", "Ratio of average wealth at death to average wealth of the decedents and the living, (including bequest gifts made before death)")]
+names(df_11_5) <- c("Year", "Ratio of average wealth at death \nto average wealth of the decedents and the living, \n(not including bequest gifts made before death)\n", "Ratio of average wealth at death \nto average wealth of the decedents and the living, \n(including bequest gifts made before death)\n")
+df_11_5 <- melt(df_11_5, id.vars = "Year")
+save(df_11_5, file = "data/df_11_5.Rda")
+
+# Figure 11.6 / TS11.1a / inheritance flows + simulated / France
+load("data/TS11.1a.Rda")
+df_11_6 <- TS11.1a[, c("Year", "Annual inheritance flow (% of national income) (economic flows)", "Simulated annual inheritance flow (scenario 1)", "Simulated annual inheritance flow (scenario 2)")]
+df_11_6 <- melt(df_11_6, id.vars = "Year")
+save(df_11_6, file = "data/df_11_6.Rda")
+
+# Figure 11.7 / TS11.2a / inherited wealth share / France
+load("data/TS11.2a.Rda")
+df_11_7 <- TS11.2a[, c("Year", "Share of the capitalized inherited wealth (PPVR definition, estimate) (scenario 1)", "Share of the capitalized inherited wealth (PPVR definition, estimate) (scenario 2)")]
+df_11_7 <- melt(df_11_7, id.vars = "Year")
+# remove values prior to 2010
+df_11_7[df_11_7$Year < 2010 & df_11_7$variable == "Share of the capitalized inherited wealth (PPVR definition, estimate) (scenario 2)", ]$value <- NA
+save(df_11_7, file = "data/df_11_7.Rda")
+
+# Figure 11.8 / TS11.1a / inheritance flow/disposable income / France
+load("data/TS11.1a.Rda")
+df_11_8 <- TS11.1a[, c("Year", "Annual inheritance flow (% disposable income) (economic flows)", "Annual inheritance flow (% disposable income) (fiscal flows)")]
+names(df_11_8) <- c("Year", "Economic flows \n(annual inheritance flow % of disposable income, \ncomputed from national wealth estimates, \nmortality tables, and age-wealth profiles)\n", "Fiscal flows: \n(annual inheritance flow % of disposable income, \ncomputed from bequest and gift tax data, \nincluding tax-exempt assets)\n")
+df_11_8 <- melt(df_11_8, id.vars = "Year")
+save(df_11_8, file = "data/df_11_8.Rda")
+
+# Figure 11.9 / TS11.1b / inheritance share / France
+load("data/TS11.1b.Rda")
+df_11_9 <- TS11.1b[, c("Year", "Inheritance share (% total lifetime resources) (scenario 1)")]
+df_11_9 <- melt(df_11_9, id.vars = "Year")
+save(df_11_9, file = "data/df_11_9.Rda")
+
+# Figure 11.10 / TS11.b / living standards w + w/o inheritance / France
+load("data/TS11.1b.Rda")
+df_11_10 <- TS11.1b[, c("Year", "Living standard attained by top 1% inheritors (% of bottom 50% labor earners lifetime resources) (scenario 1)", "Living standard attained by top 1% labor earners (% of bottom 50% labor earners lifetime resources) (scenario 1)")]
+names(df_11_10) <- c("Year", "Living standard attained by top 1% inheritors", "Living standard attained by top 1% labor earners \n(multiples of living standard attained by the bottom 50% \nof labor earners, and as a function of year of birth)")
+df_11_10 <- melt(df_11_10, id.vars = "Year")
+save(df_11_10, file = "data/df_11_10.Rda")
+
+# Figure 11.11 / TS11.1b / big inheritance / France
+load("data/TS11.1b.Rda")
+df_11_11 <- TS11.1b[, c("Year", "Fraction of each cohort receiving more inheritance than the bottom 50% labor resources (scenario 1)")]
+names(df_11_11) <- c("Year", "Fraction of each cohort receiving more inheritance \nthan the bottom 50% labor earners \n(as a function of year of birth)")
+df_11_11 <- melt(df_11_11, id.vars = "Year")
+save(df_11_11, file = "data/df_11_11.Rda")
+
+# Figure 11.12 / TS11.1a + TS11.3 / inheritance flow / Europe
+# UK: fiscal flows, FRA + GER: economic flows
+load("data/TS11.3.Rda")
+df_11_12 <- TS11.3[, c("Year", "Inheritance flow in the UK (% national income) (fiscal flows) (Atkinson)", "Inheritance flow in Germany (% national income) (economic flow) (Schinke)")]
+load("data/TS11.1a.Rda")
+df_11_12 <- merge(df_11_12, TS11.1a[, c("Year", "Annual inheritance flow (% of national income) (economic flows)")])
+names(df_11_12) <- c("Year", "United Kingdom", "Germany", "France")
+df_11_12 <- melt(df_11_12, id.vars = "Year")
+save(df_11_12, file = "data/df_11_12.Rda")
+
+
+
+## Chapter 12 - Global Inequality of Wealth in the Twenty-First Century
+
+# Spreadsheet TS12.3
+# Table TS12.3 / TS12.3
+TS12.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
+  sheetName = "TS12.3", rowIndex = 7:33, colIndex = 1:7, header = FALSE)
+names(TS12.3) <- c("Year", "Number of $ billionaires", "Total wealth in billions of dollars", "Total wealth of billionaires as a fraction of aggregate private wealth", "Number of billionaires per 100 million adults", "Share of the top 1/20 million highest wealth holders in gobal private wealth", "Share of top 1/100 million highest wealth holders in gobal private wealth")
+save(TS12.3, file = "data/TS12.3.Rda")
+
+# Spreadsheet TS12.4
+# Table S12.4a / TS12.4
+TS12.4a <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
+  sheetName = "TS12.4", rowIndex = 8:31, colIndex = 1:6, header = FALSE)
+names(TS12.4a) <- c("Year", "World", "Europe", "America", "Africa", "Asia")
+save(TS12.4a, file = "data/TS12.4a.Rda")
+# Table S12.4b / TS12.4
+TS12.4b <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
+  sheetName = "TS12.4", rowIndex = 38:61, colIndex = 1:6, header = FALSE)
+names(TS12.4b) <- c("Year", "World", "Europe", "America", "Africa", "Asia")
+save(TS12.4b, file = "data/TS12.4b.Rda")
+# Table S12.4c / TS12.4
+TS12.4c <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
+  sheetName = "TS12.4", rowIndex = 81:104, colIndex = 1:6, header = FALSE)
+names(TS12.4c) <- c("Year", "World", "Europe", "America", "Africa", "Asia")
+save(TS12.4c, file = "data/TS12.4c.Rda")
+# Table S12.4d / TS12.4
+TS12.4d <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
+  sheetName = "TS12.4", rowIndex = 8:31, colIndex = c(1,8:22), header = FALSE)
+names(TS12.4d) <- c("Year", "Total", "Western Europe", "Eastern Europe", "Russia & Ukraine Belarus Moldavia", "North America", "Latin America", "Northern Africa", "Sub-Shaharan Africa", "China", "India", "Japan", "Australia & New Zealand", "Middle East (Including Turkey)", "Central Asia", "Other Asian Countries")
+save(TS12.4d, file = "data/TS12.4d.Rda")
+# Table S12.4e / TS12.4
+TS12.4e <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
+  sheetName = "TS12.4", rowIndex = 38:61, colIndex = c(1,8:22), header = FALSE)
+names(TS12.4e) <- c("Year", "Total", "Western Europe", "Eastern Europe", "Russia & Ukraine Belarus Moldavia", "North America", "Latin America", "Northern Africa", "Sub-Shaharan Africa", "China", "India", "Japan", "Australia & New Zealand", "Middle East (Including Turkey)", "Central Asia", "Other Asian Countries")
+save(TS12.4e, file = "data/TS12.4e.Rda")
+# Table S12.4f / TS12.4
+TS12.4f <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
+  sheetName = "TS12.4", rowIndex = 81:104, colIndex = c(1,8:22), header = FALSE)
+names(TS12.4f) <- c("Year", "Total", "Western Europe", "Eastern Europe", "Russia & Ukraine Belarus Moldavia", "North America", "Latin America", "Northern Africa", "Sub-Shaharan Africa", "China", "India", "Japan", "Australia & New Zealand", "Middle East (Including Turkey)", "Central Asia", "Other Asian Countries")
+save(TS12.4f, file = "data/TS12.4f.Rda")
+
+# Table S12.5 / TS12.5
+TS12.5 <- read.xlsx("../Piketty2014FiguresTables/Chapter12TablesFigures.xlsx",
+  sheetName = "TS12.5", rowIndex = 5:28, colIndex = 1:6, header = FALSE)
+names(TS12.5) <- c("Year", "Europe", "United States", "Japan", "Rich countries (Europe, Japan, United States)", "Financial assets registered in tax havens (lower estimate)")
+save(TS12.5, file = "data/TS12.5.Rda")
+
+# Figure 12.1 / TS12.3
+load("data/TS12.3.Rda")
+df_12_1 <- TS12.3[, c("Year", "Number of $ billionaires", "Total wealth in billions of dollars")]
+df_12_1 <- melt(df_12_1, id.vars = "Year")
+save(df_12_1, file = "data/df_12_1.Rda")
+
+# Figure 12.2 / TS12.3
+load("data/TS12.3.Rda")
+df_12_2 <- TS12.3[, c("Year", "Total wealth of billionaires as a fraction of aggregate private wealth", "Number of billionaires per 100 million adults")]
+names(df_12_2) <- c("Year", "Total wealth of billionaires, as a fraction of \naggregate private wealth", "Number of billionaires per 100 million adults")
+df_12_2 <- melt(df_12_2, id.vars = "Year")
+save(df_12_2, file = "data/df_12_2.Rda")
+
+# Figure 12.3 / TS12.3
+load("data/TS12.3.Rda")
+df_12_3 <- TS12.3[, c("Year", "Share of the top 1/20 million highest wealth holders in gobal private wealth", "Share of top 1/100 million highest wealth holders in gobal private wealth")]
+names(df_12_3) <- c("Year", "Share of the top 1/20 million highest wealth holders \nin gobal private wealth\n", "Share of top 1/100 million highest wealth holders \nin gobal private wealth\n")
+df_12_3 <- melt(df_12_3, id.vars = "Year")
+save(df_12_3, file = "data/df_12_3.Rda")
+
+# Figure 12.4 / TS12.4
+load("data/TS12.4a.Rda")
+df_12_4 <- TS12.4a[, c("Year", "World")]
+# Create factors Observed / Projected
+df_12_4$Category <- as.factor(ifelse(df_12_4$Year < 2012, "Observed", "Projected"))
+df_12_4 <- melt(df_12_4, id.vars = c("Year", "Category"))
+save(df_12_4, file = "data/df_12_4.Rda")
+
+# Figure 12.5 / TS12.4
+load("data/TS12.4a.Rda")
+df_12_5 <- TS12.4a[, c("Year", "Asia", "Africa", "America", "Europe")]
+df_12_5 <- melt(df_12_5, id.vars = "Year")
+save(df_12_5, file = "data/df_12_5.Rda")
+
+# Figure 12.6 / TS12.5
+load("data/TS12.5.Rda")
+df_12_6 <- TS12.5
+names(df_12_6)[6] <- "Financial assets registered in tax havens \n(lower estimate)"
+df_12_6 <- melt(df_12_6, id.vars = "Year")
+save(df_12_6, file = "data/df_12_6.Rda")
+
+
+
+## Chapter 13 - A Social State for the Twenty-First Century
+
+# Spreadsheet TS13.1
+TS13.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter13TablesFigures.xlsx",
+  sheetName = "TS13.1", rowIndex = 6:146, colIndex = 7:11, header = FALSE)
+names(TS13.1) <- c("Year", "United States", "United Kingdom", "Sweden", "France")
+TS13.1$Category <- "Tax revenue"
+save(TS13.1, file = "data/TS13.1.Rda")
+# decennial averages
+TS13.1b <- read.xlsx("../Piketty2014FiguresTables/Chapter13TablesFigures.xlsx",
+  sheetName = "TS13.1", rowIndex = 6:20, colIndex = 1:5, header = FALSE)
+names(TS13.1b) <- c("Year", "United States", "United Kingdom", "Sweden", "France")
+TS13.1b$Category <- "Tax revenue (decennial average)"
+save(TS13.1b, file = "data/TS13.1b.Rda")
+
+# Figure 13.1 / TS13.1 / Tax revenue / USA + UK + Sweden + France
+load("data/TS13.1.Rda")
+df_13_1 <- melt(TS13.1, id.vars = c("Year", "Category"))
+df_13_1 <- df_13_1[!is.na(df_13_1$value), ]  # connect points despite NAs
+save(df_13_1, file = "data/df_13_1.Rda")
+
+
+
+## Chapter 14 - Rethinking the Progressive Income Tax
+
+# Spreadsheet TS14.1
+TS14.1 = read.xlsx("../Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
+  sheetName = "TS14.1", rowIndex = 5:118, colIndex = c(1:5, 7:16), header = FALSE)
+names(TS14.1) = c("Year", "United States", "United Kingdom", "Germany", "France", "United States (top marginal rate on earned income)", "United States (top effective rate)", "United Kingdom (top marginal rate on earned income)", "France (income tax)", "France (CSG)", "Japan (Saez-Moriguchi Table A0)")
+TS14.1 <- melt(TS14.1, id.vars = "Year")
+save(TS14.1, file = "data/TS14.1.Rda")
+
+# Spreadsheet TS14.2
+TS14.2 = read.xlsx("../Piketty2014FiguresTables/Chapter14TablesFigures.xlsx", 
+  sheetName = "TS14.2", rowIndex = 5:118, colIndex = c(1:5), header = FALSE)
+names(TS14.2) = c("Year", "United States", "United Kingdom", "Germany", "France")
+TS14.2 <- melt(TS14.2, id.vars = "Year")
+save(TS14.2, file = "data/TS14.2.Rda")
+
+# Figure 14.1 / TS14.1 / marginal income tax rates / 4 countries
+load("data/TS14.1.Rda")
+df_14_1 <- subset(TS14.1, variable %in% c("Year", "United States", "United Kingdom", "Germany", "France"))
+save(df_14_1, file = "data/df_14_1.Rda")
+
+# Figure 14.2 / TS14.2 / marginal inheritance tax rates / 4 countries
+load("data/TS14.2.Rda")
+df_14_2 <- TS14.2
+save(df_14_2, file = "data/df_14_2.Rda")
+
+
+
+## Chapter 15 - A Global Tax on Capital
+
+
+
+## Chapter 16 - The Question of the Public Debt
+
+
+
+@
+
