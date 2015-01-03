@@ -220,3 +220,5 @@ pip-log.txt
 *.rdx
 .Rhistory
 *_packages
+
+*.ffs_db
