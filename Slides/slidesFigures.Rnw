@@ -153,7 +153,7 @@ library("RColorBrewer") # convenient color palettes
 # legend.title = theme_text(size = base_size * 0.8, face = "bold", hjust = 0)
 # Remark: ggplot2 has a bug in legend.title vertical spacing when legend.title is NULL, e.g. , legend.title = element_text(vjust = 1)
 # to do: add e.g. legend.justification = c(0,0)
-theme_piketty <- function(base_size = x) {
+theme_piketty <- function(x) {
   theme_bw(x) + 
       theme(legend.key = element_blank(), legend.background = element_rect(colour = 'black', fill = 'white'))
 }
