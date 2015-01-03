@@ -398,25 +398,28 @@ save(df_4_11, file = "data/df_4_11.Rda")
 
 ## Chapter 5 - The Capital/Income Ratio Over the Long Run
 
+# Spreadsheet TS5.1
+TS5.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
+  sheetName = "TS5.1", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
+names(TS5.1) <-  c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
+save(TS5.1, file = "data/TS5.1.Rda")
+
 # Spreadsheet TS5.2
 TS5.2 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.2", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
 names(TS5.2) <-  c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
-TS5.2 <- melt(TS5.2, id.vars = "Year")
 save(TS5.2, file = "data/TS5.2.Rda")
 
 # Spreadsheet TS5.3
 TS5.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.3", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
 names(TS5.3) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
-TS5.3 <- melt(TS5.3, id.vars = "Year")
 save(TS5.3, file = "data/TS5.3.Rda")
 
 # Spreadsheet TS5.5
 TS5.5 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.5", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
 names(TS5.5) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
-TS5.5 <- melt(TS5.5, id.vars = "Year")
 save(TS5.5, file = "data/TS5.5.Rda")
 
 # Spreadsheet TS5.11
@@ -424,14 +427,12 @@ TS5.11 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.11", rowIndex = 5:45, colIndex = 1:9, header = FALSE)
 names(TS5.11) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia")
 TS5.11 <- TS5.11[, c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Canada", "Australia")] # Drop Italy as data is empty
-TS5.11 <- melt(TS5.11, id.vars = "Year")
 save(TS5.11, file = "data/TS5.11.Rda")
 
 # Spreadsheet TS5.12
 TS5.12 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "TS5.12", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
 names(TS5.12) <- c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
-TS5.12 <- melt(TS5.12, id.vars = "Year")
 save(TS5.12, file = "data/TS5.12.Rda")
 
 # Spreadsheet CTS4.5
@@ -465,18 +466,10 @@ cTS4.5$Country <- cTS4.5$variable
 cTS4.5$variable <- paste(cTS4.5$variable, ":", cTS4.5$Category) # dirty way
 save(cTS4.5, file = "data/cTS4.5.Rda")
 
-# Spreadsheet TS5.1
-TS5.1 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
-  sheetName = "TS5.1", rowIndex = 5:45, colIndex = 1:10, header = FALSE)
-names(TS5.1) <-  c("Year", "United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia", "Spain")
-TS5.1 <- melt(TS5.1, id.vars = "Year")
-save(TS5.1, file = "data/TS5.1.Rda")
-
 # Spreadsheet cTS12.3
 cTS12.3 <- read.xlsx("../Piketty2014FiguresTables/Chapter5TablesFigures.xlsx",
   sheetName = "CTS12.3", rowIndex = 5:28, colIndex = 1:2, header = FALSE)
 names(cTS12.3) <- c("Year", "Capital")
-cTS12.3 <- melt(cTS12.3, id.vars = "Year")
 save(cTS12.3, file = "data/cTS12.3.Rda")
 
 # Figure 5.1 / CTS4.5 / private & public capital / USA & Europe
@@ -493,33 +486,36 @@ save(df_5_2, file = "data/df_5_2.Rda")
 
 # Figure 5.3S / TS5.1 / private capital / several countries / incl Spain
 load("data/TS5.1.Rda")
-df_5_3S <- TS5.1
+df_5_3S <- melt(TS5.1, id.vars = "Year")
 save(df_5_3S, file = "data/df_5_3S.Rda")
 
 # Figure 5.3 / TS5.1 / private capital / several countries
 load("data/TS5.1.Rda")
-df_5_3 <- subset(TS5.1, Country %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
+df_5_3 <- melt(TS5.1, id.vars = "Year")
+df_5_3 <- subset(df_5_3, variable %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
 row.names(df_5_3) <- NULL
 save(df_5_3, file = "data/df_5_3.Rda")
 
 # Figure 5.4S / TS5.12 / private capital ratio / several countries / incl Spain
 load("data/TS5.12.Rda")
-df_5_4S <- TS5.12
+df_5_4S <- melt(TS5.12, id.vars = "Year")
 save(df_5_4S, file = "data/df_5_4S.Rda")
 
 # Figure 5.4 / TS5.12 / private capital ratio / several countries
 load("data/TS5.12.Rda")
-df_5_4 <- subset(TS5.12, Country %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
+df_5_4 <- melt(TS5.12, id.vars = "Year")
+df_5_4 <- subset(df_5_4, variable %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
 save(df_5_4, file = "data/df_5_4.Rda")
 
 # Figure 5.5XS / TS5.2 / public capital / several countries / incl Spain
 load("data/TS5.2.Rda")
-df_5_5XS <- TS5.2
+df_5_5XS <- TS5.2 <- melt(TS5.2, id.vars = "Year")
 save(df_5_5XS, file = "data/df_5_5XS.Rda")
 
 # Figure 5.5X / TS5.2 / public capital / several countries
 load("data/TS5.2.Rda")
-df_5_5X <- subset(TS5.2, Country %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
+df_5_5X <- TS5.2 <- melt(TS5.2, id.vars = "Year")
+df_5_5X <- subset(TS5.2, variable %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
 save(df_5_5X, file = "data/df_5_5X.Rda")
 
 # Figure 5.5S / TS5.1 + TS5.2 / public & private capital / several countries / incl Spain
@@ -533,19 +529,19 @@ save(df_5_5S, file = "data/df_5_5S.Rda")
 
 # Figure 5.5 / TS5.1 + TS5.2 / public & private capital / several countries
 load("data/df_5_5S.Rda")
-df_5_5 <- subset(df_5_5S, Country %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
+df_5_5 <- subset(df_5_5S, variable %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
 row.names(df_5_5) <- NULL
 save(df_5_5, file = "data/df_5_5.Rda")
 
 # Figure 5.6 / TS5.11 / market/book value of corporations  / 7 countries
 load("data/TS5.11.Rda")
-df_5_6 <- TS5.11
+df_5_6 <- melt(TS5.11, id.vars = "Year")
 save(df_5_6, file = "data/df_5_6.Rda")
 
 # Figure 5.7S / TS5.3 + TS5.5 / national & foreign capital / several countries / incl Spain
 load("data/TS5.3.Rda")
 load("data/TS5.5.Rda")
-df_5_7S <- merge(TS5.3, TS5.5, by = c("Year", "variable"))
+df_5_7S <- merge(melt(TS5.3, id.vars = "Year"), melt(TS5.5, id.vars = "Year"), by = c("Year", "variable"))
 names(df_5_7S) <- c("Year", "variable", "National", "Foreign")
 df_5_7S <- melt(df_5_7S, id.vars = c("Year", "variable"))
 names(df_5_7S) <- c("Year", "variable", "Category", "value")
@@ -553,14 +549,14 @@ save(df_5_7S, file = "data/df_5_7S.Rda")
 
 # Figure 5.7 / TS5.3 + TS5.5 / national & foreign capital / several countries
 load("data/df_5_7S.Rda")
-df_5_7 <- subset(df_5_7S, Country %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
+df_5_7 <- subset(df_5_7S, variable %in% c("United States", "Japan", "Germany", "France", "United Kingdom", "Italy", "Canada", "Australia"))
 row.names(df_5_7) <- NULL
 save(df_5_7, file = "data/df_5_7.Rda")
 
 # Figure 5.8 / CTS12.3 / world capital/income ratio
 # Create factors Observed / Projected
 load("data/cTS12.3.Rda")
-df_5_8 <- cTS12.3
+df_5_8 <- melt(cTS12.3, id.vars = "Year")
 df_5_8$Category <- as.factor(ifelse(df_5_8$Year < 2011, "Observed", "Projected"))
 row.names(df_5_8) <- NULL
 save(df_5_8, file = "data/df_5_8.Rda")
