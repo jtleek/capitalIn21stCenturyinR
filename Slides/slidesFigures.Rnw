@@ -117,7 +117,11 @@ CairoFonts(regular = paste(mainfont, "style = Regular", sep = ":"),
 # Set figure size and resolution
 # many other output formats are possible, e.g. postscript, svg, tiff, etc.
 # CairoJPEG, CairoPS, etc. require the Cairo package (optional)
-opts_chunk$set(dev = c('pdf','png'), fig.path = 'figures/color/', fig.align='center', fig.height = 5, fig.width = 8, dpi = 300, pdf.options(encoding = "ISOLatin9.enc")) 
+# option dev is vectorized, so to set different figure sizes, do:
+# dev=c('pdf', 'png'), fig.width = c(5, 2.5), fig.height = c(8, 4)
+# where pdf has size 5 by 8 and png 2.5 by 4
+# units are always inches
+opts_chunk$set(dev = c('pdf','png'), fig.path = 'figures/color/', fig.align='center', fig.height = c(5, 5), fig.width = c(8, 8), dpi = 300, pdf.options(encoding = "ISOLatin9.enc")) 
 # list of encodings: list.files(system.file("enc", package = "grDevices")) 
 
 # evaluate fig.cap after a chunk is evaluated
@@ -125,6 +129,14 @@ opts_knit$set(eval.after = 'fig.cap')
 
 # TeX styles in tex document, CSS styles in HTML document
 opts_knit$set(self.contained = TRUE)
+
+# modify the default hook to remove spaces before writing the output
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  s = options$rm.spaces
+  if (!is.null(s)) x = gsub(sprintf('(^|\n)%s', s), '\\1', x)
+  hook_output(x, options)
+})
 
 # Rename figures to remove -1 suffix
 local({# works for first element of dev=c('pdf','png')
