@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Mac crap
 
 # file indexing
@@ -54,3 +55,28 @@ tmp*.*
 *TODO*.*
 *to-do*.*
 *TO-DO*.*
+=======
+.DS_Store
+.sync.ffs_db
+
+*.Rda
+*.RData
+*.rdb
+*.rdx
+.Rhistory
+*.Rproj
+*.Rproj.user
+*_packages
+
+#Graphics specific
+*.pdf
+*.png
+
+#Tex specific
+*.log
+*.nav
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+>>>>>>> 7b2593275cbe9fe45393ac897eed0852a8b1c85f
