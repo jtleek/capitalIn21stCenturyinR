@@ -1247,7 +1247,7 @@ ggplot(data = df_6_4, aes(x = Year, y = value, group = variable, colour = variab
 \centering
 <<'Figure_6_5', out.width='1\\linewidth'>>=
 load("data/df_6_5.Rda")  # load data from /data subdirectory
-ggplot(data = df_6_5, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Capital income (% national income)") + xlab(NULL) + scale_x_continuous(breaks = seq(1975, 2010, by = 5)) + scale_y_continuous(limits = c(.1, .38), labels = percent, breaks = seq(0, .4, by = .05)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.position = c(.8, .15), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
+ggplot(data = df_6_5, aes(x = Year, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Capital income (% national income)") + xlab(NULL) + scale_x_continuous(breaks = seq(1970, 2010, by = 5)) + scale_y_continuous(limits = c(.1, .37), labels = percent, breaks = seq(0, .4, by = .05)) + scale_shape_manual(name = "Category", values = shapePalette) + scale_colour_manual(name = "Category", values = colorPalette) + theme(legend.position = c(.8, .15), legend.title = element_blank()) + guides(shape = guide_legend(ncol = 2)) 
 @
 \caption{Capital income absorbs between 15 percent and 25 percent of national income in rich countries in 1970, and between 25 percent and 30 percent in 2000--2010.}
 \end{minipage}
@@ -1387,7 +1387,7 @@ ggplot(data = df_8_2, aes(x = Year, y = value, group = variable, colour = variab
 load("data/df_8_3.Rda")  # load data from /data subdirectory
 ggplot(data = df_8_3, aes(x = Quantile, y = value, group = variable, colour = variable, shape = variable)) + geom_line() + geom_point(size = 3) + ylab("Share in total income of various fractiles") + xlab(NULL) + scale_y_continuous(labels = percent, breaks = seq(0, 1, by = .1)) + scale_shape_manual(name = "France", values = shapePalettePaired) + scale_colour_manual(name = "France", values = colorPalette) + theme(legend.position = c(.6, .85)) 
 @
-\caption{Labor income becomes less and less important as one goes up within the top decile of total income. Notes: (i)~``P90--95'' includes individuals between percentiles 90 to 95, ``P95--99'' includes the next 4 percent, ``P99--99.5'' the next 0.5 percent, etc.; (ii)~Labor income: wages, bonuses, pensions. Capital income: dividends, interest, rent. Mixed income: self-employment income.}
+\caption{\scriptsize{Labor income becomes less and less important as one goes up within the top decile of total income. Notes: (i)~``P90--95'' includes individuals between percentiles 90 to 95, ``P95--99'' includes the next 4 percent, ``P99--99.5'' the next 0.5 percent, etc.; (ii)~Labor income: wages, bonuses, pensions. Capital income: dividends, interest, rent. Mixed income: self-employment income.}}
 \end{minipage}
 \end{figure}
 \end{frame}
