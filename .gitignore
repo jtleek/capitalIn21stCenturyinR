@@ -1,3 +1,61 @@
+<<<<<<< HEAD
+## Mac crap
+
+# file indexing
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+## Windows detritus
+
+# image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin
+$RECYCLE.BIN/
+
+## FreeFileSync
+.sync.ffs_db
+*.ffs_db
+
+
+## R specific
+cache/
+tmp/
+*.cache
+*.Rhistory
+
+## Project specific
+*.bak
+*.tmp
+tmp*.*
+*_tmp.*
+*todo*.*
+*TODO*.*
+*to-do*.*
+*TO-DO*.*
+=======
 .DS_Store
 .sync.ffs_db
 
@@ -21,3 +79,4 @@
 *.synctex.gz
 *.toc
 *.vrb
+>>>>>>> 7b2593275cbe9fe45393ac897eed0852a8b1c85f
