@@ -52,10 +52,15 @@ There is basically only one figure in this chapter, the rest are all tables
 
 baseline <- expression(paste("45",degree," degree line (perfect equality)"))
 ggplot(data=ts7.7)+
+  geom_line(aes(x=x,y=x,color= 'black')) +
   geom_point(aes(x=x,y=x,color= 'black')) +
+  geom_line(aes(x=x,y=linear,color= 'red')) +
   geom_point(aes(x=x,y=linear,color= 'red')) +
+  geom_line(aes(x=x,y=continuous,color= 'green')) +
   geom_point(aes(x=x,y=continuous,color= 'green')) +
   ylab('Total income or capital share owned by the poorest x%') +
-  xlab('Curve 1 assumes that the poorest 90% and the richest 10% own 50% of total income or capital each, and that both groups are homogenous \n (hence a linear curve); curve 2 assumes a continuous distribution') + 
+  xlab('Cumulative x% of population ordered from the poorest to the richest\n \n Curve 1 assumes that the poorest 90% and the richest 10% own 50% of total income or capital each, and that both groups are homogenous \n (hence a linear curve); curve 2 assumes a continuous distribution') + 
+  scale_x_continuous(breaks=seq(0, 1, 0.1)) +
+  scale_y_continuous(breaks=seq(0, 1, 0.1)) +
   scale_color_discrete("Legend", labels = c(baseline, "Curve #1: distribution with 2 groups", "Curve #2: continuous distribution"))
 ```
