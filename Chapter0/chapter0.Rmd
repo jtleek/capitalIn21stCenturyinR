@@ -12,7 +12,7 @@ The data were downloaded as Excel files from: http://piketty.pse.ens.fr/en/capit
 
 ```{r, message=FALSE}
 library(knitr)
-opts_chunk$set(comment=NA,dev=c('pdf','png'),fig.path='figures/',fig.height=5,fig.width=10,dpi=300)
+opts_chunk$set(comment=NA,dev=c('png','pdf'),fig.path='figures/',fig.height=5,fig.width=10,dpi=300)
 ```
 
 ### Load required libraries
